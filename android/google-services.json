@@ -1,0 +1,271 @@
+{
+  "project_info": {
+    "project_number": "822924385324",
+    "firebase_url": "https://kobochat-8ff50.firebaseio.com",
+    "project_id": "kobochat-8ff50",
+    "storage_bucket": "kobochat-8ff50.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822924385324:android:2faf0d642a6ab859",
+        "android_client_info": {
+          "package_name": "com.kobo.kobo360"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "822924385324-s21bfi8288jgcqa3paul8bfqcgika3ii.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTj0zxc5PBYXWHrguo5agJ9T6wDm_wsBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "822924385324-s21bfi8288jgcqa3paul8bfqcgika3ii.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "822924385324-djd8d8jsbtbdkp55nfmgmksuufdjihfq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.novu.barters"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822924385324:android:2faf0d642a6ab859",
+        "android_client_info": {
+          "package_name": "com.kobo.mobile_map_core.mobile_map_core"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "822924385324-s21bfi8288jgcqa3paul8bfqcgika3ii.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTj0zxc5PBYXWHrguo5agJ9T6wDm_wsBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "822924385324-s21bfi8288jgcqa3paul8bfqcgika3ii.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "822924385324-djd8d8jsbtbdkp55nfmgmksuufdjihfq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.novu.barters"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822924385324:android:9deb68aae8fc903f",
+        "android_client_info": {
+          "package_name": "com.kobo.kobo360.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "822924385324-s21bfi8288jgcqa3paul8bfqcgika3ii.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTj0zxc5PBYXWHrguo5agJ9T6wDm_wsBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "822924385324-s21bfi8288jgcqa3paul8bfqcgika3ii.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "822924385324-djd8d8jsbtbdkp55nfmgmksuufdjihfq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.novu.barters"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822924385324:android:09ccb32b5d5a98de738589",
+        "android_client_info": {
+          "package_name": "com.kobo.map"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "822924385324-s21bfi8288jgcqa3paul8bfqcgika3ii.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTj0zxc5PBYXWHrguo5agJ9T6wDm_wsBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "822924385324-s21bfi8288jgcqa3paul8bfqcgika3ii.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "822924385324-djd8d8jsbtbdkp55nfmgmksuufdjihfq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.novu.barters"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822924385324:android:f9114cecde2a684b",
+        "android_client_info": {
+          "package_name": "com.kobo360.kobocarepos"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "822924385324-s21bfi8288jgcqa3paul8bfqcgika3ii.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTj0zxc5PBYXWHrguo5agJ9T6wDm_wsBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "822924385324-s21bfi8288jgcqa3paul8bfqcgika3ii.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "822924385324-djd8d8jsbtbdkp55nfmgmksuufdjihfq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.novu.barters"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822924385324:android:2536ca1f05761d97738589",
+        "android_client_info": {
+          "package_name": "io.kobodriver.kobodriver.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "822924385324-s21bfi8288jgcqa3paul8bfqcgika3ii.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTj0zxc5PBYXWHrguo5agJ9T6wDm_wsBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "822924385324-s21bfi8288jgcqa3paul8bfqcgika3ii.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "822924385324-djd8d8jsbtbdkp55nfmgmksuufdjihfq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.novu.barters"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822924385324:android:12166d4487e24359",
+        "android_client_info": {
+          "package_name": "io.kobosquad.kobosquad.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "822924385324-a85tg21rob9aoro8lt1a31km5idpq8on.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.kobosquad.kobosquad.dev",
+            "certificate_hash": "feeee9b86a5547fa7217f54b12e1ea48268c0d55"
+          }
+        },
+        {
+          "client_id": "822924385324-s21bfi8288jgcqa3paul8bfqcgika3ii.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTj0zxc5PBYXWHrguo5agJ9T6wDm_wsBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "822924385324-s21bfi8288jgcqa3paul8bfqcgika3ii.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "822924385324-djd8d8jsbtbdkp55nfmgmksuufdjihfq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.novu.barters"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
