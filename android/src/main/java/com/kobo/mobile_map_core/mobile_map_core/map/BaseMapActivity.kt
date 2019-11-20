@@ -61,7 +61,7 @@ abstract class BaseMapActivity : AppCompatActivity() {
     //Protected variables ...
     protected lateinit var context: Context
     protected var isMappedFiltered = false
-    protected lateinit var customersLocations: CustomersLocations
+    protected var customersLocations: CustomersLocations? = null
     protected lateinit var fusedLocationClient: FusedLocationProviderClient
     protected lateinit var mapService: MapService
     protected lateinit var mMap: GoogleMap
@@ -337,8 +337,8 @@ abstract class BaseMapActivity : AppCompatActivity() {
         GlobalScope.launch(Dispatchers.Main) {
             try {
                 runGeoQuery(verifyCurrentLocation(toGeoPoint(currentLatLng)))
-                customersLocations = mapService.fetchCustomersLocations()!!
-                customersLocations.data.locations.forEach { pickUpStation ->
+                customersLocations = mapService.fetchCustomersLocations()
+                customersLocations?.data?.locations?.forEach { pickUpStation ->
                     addStations(pickUpStation)
                 }
             } catch (e: Exception) {
@@ -450,10 +450,8 @@ abstract class BaseMapActivity : AppCompatActivity() {
     }
 
     protected fun setUpLocationPermission() {
-        if (ActivityCompat.checkSelfPermission(this,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), MapsActivity.LOCATION_PERMISSION_REQUEST_CODE)
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), MapsActivity.LOCATION_PERMISSION_REQUEST_CODE)
             return
         } else {
             mMap.isMyLocationEnabled = true

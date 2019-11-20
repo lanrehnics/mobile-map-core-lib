@@ -340,9 +340,6 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
                 } else {
 
                     bootStrapPickupStationsAndTrucks()
-                    customersLocations.data.locations.forEach { pickUpStation ->
-                        addStations(pickUpStation)
-                    }
 
                     btnApply.text = "Apply Filter"
 
@@ -354,6 +351,14 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
                     statusAvailable.isChecked = false
                     flaggedTrips.isChecked = false
                     activeTrips.isChecked = false
+
+
+                    customersLocations?.let {
+                        it.data.locations.forEach { pickUpStation ->
+                            addStations(pickUpStation)
+                        }
+                    }
+
 
                 }
                 drawerLayout.closeDrawer(GravityCompat.END)
@@ -472,6 +477,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
                                             12f
                                     )
                             )
+                            bootStrapPickupStationsAndTrucks()
                         }
                     }
                 }
