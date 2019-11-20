@@ -2,7 +2,8 @@ package com.kobo.mobile_map_core.mobile_map_core
 
 import android.content.Context
 import android.content.Intent
-import android.support.v4.content.ContextCompat.startActivity
+import androidx.core.content.ContextCompat.startActivity
+import com.kobo.mobile_map_core.mobile_map_core.map.MapsActivity
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
@@ -13,6 +14,10 @@ class MobileMapCorePlugin : MethodCallHandler {
 
 
     companion object {
+
+        var KEY_CUSTOMER_STATION_URL: String? = "customer_stations_url"
+        var KEY_AUTH_TOKEN: String? = "auth_token"
+        var KEY_CUSTOMER_ID: String? = "customer_id"
 
         private var reg: Registrar? = null
 
@@ -26,7 +31,7 @@ class MobileMapCorePlugin : MethodCallHandler {
 
     override fun onMethodCall(call: MethodCall, result: Result) {
         if (call.method == "getPlatformVersion") {
-            val intent = Intent(getActiveContext(), MapActivity::class.java)
+            val intent = Intent(getActiveContext(), MapsActivity::class.java)
             getActiveContext()?.let { startActivity(it, intent, null) }
             result.success("Android ${android.os.Build.VERSION.RELEASE}")
 
