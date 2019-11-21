@@ -25,9 +25,9 @@ class _MyAppState extends State<MyApp> {
     String platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      platformVersion = await MobileMapCore.platformVersion;
+      platformVersion = await MobileMapCore.prepareMap;
     } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+      platformVersion = 'Failed to prepare map.';
     }
 
     // If the widget was removed from the tree while the asynchronous platform

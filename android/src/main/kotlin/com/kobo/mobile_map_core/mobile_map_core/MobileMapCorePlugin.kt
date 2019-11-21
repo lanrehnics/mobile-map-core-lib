@@ -12,9 +12,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar
 
 class MobileMapCorePlugin : MethodCallHandler {
 
-
     companion object {
-
         var KEY_CUSTOMER_STATION_URL: String? = "customer_stations_url"
         var KEY_AUTH_TOKEN: String? = "auth_token"
         var KEY_CUSTOMER_ID: String? = "customer_id"
@@ -30,10 +28,10 @@ class MobileMapCorePlugin : MethodCallHandler {
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
-        if (call.method == "getPlatformVersion") {
+        if (call.method == "prepareMap") {
             val intent = Intent(getActiveContext(), MapsActivity::class.java)
             getActiveContext()?.let { startActivity(it, intent, null) }
-            result.success("Android ${android.os.Build.VERSION.RELEASE}")
+            result.success("done")
 
         } else {
             result.notImplemented()
@@ -43,4 +41,5 @@ class MobileMapCorePlugin : MethodCallHandler {
     private fun getActiveContext(): Context? {
         return if (reg?.activity() != null) reg?.activity() else reg?.context()
     }
+
 }
