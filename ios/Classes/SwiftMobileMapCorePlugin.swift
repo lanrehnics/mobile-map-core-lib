@@ -1,5 +1,6 @@
 import Flutter
 import UIKit
+import GoogleMaps
 
 public class SwiftMobileMapCorePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -9,6 +10,13 @@ public class SwiftMobileMapCorePlugin: NSObject, FlutterPlugin {
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    result("iOS " + UIDevice.current.systemVersion)
+    var truck = Truck(data: ["" : ""])
+    truck?.customerName = "Miss bimbo in the spirit"
+    
+    result("iOS " + UIDevice.current.systemVersion + " " + truck!.customerName)
   }
+    
+    func testStuff() {
+       
+    }
 }
