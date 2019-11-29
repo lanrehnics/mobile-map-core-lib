@@ -10,6 +10,11 @@ data class TruckModelDataParser(
 
 )
 
+data class BattleFieldSearch(var id: Int, var regNumber: String, var tripId: String, var tag: SearchTag) {
+    constructor (id: Int, truckModel: TruckModelDataParser, tag: SearchTag) : this(id, truckModel.d.reg_number, truckModel.d.tripId, tag)
+}
+
+
 data class TruckModel(
         @PropertyName("lastConnectionTime") val lastConnectionTime: String = "",
         @PropertyName("reg_number") val reg_number: String = "",
@@ -92,6 +97,12 @@ class TripInfoWithMarker(val tripInfo: TruckModelDataParser)
 enum class DisplayMode {
     SINGLE,
     ALL
+}
+
+enum class SearchTag {
+    REG_NUMBER,
+    TRIP_ID,
+    PLACES
 }
 
 enum class ClearCommand {

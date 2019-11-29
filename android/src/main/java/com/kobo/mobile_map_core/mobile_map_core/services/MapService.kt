@@ -8,7 +8,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.GeoPoint
 import com.google.gson.Gson
 import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
-import com.kobo.mobile_map_core.mobile_map_core.client.RestClientHelper
+import com.kobo.mobile_map_core.mobile_map_core.client.LiteHttp
 import com.kobo.mobile_map_core.mobile_map_core.map.MapsActivity
 import com.kobo360.models.polyline.PolylineJsonDecoder
 import com.kobo360.models.CustomersLocations
@@ -22,7 +22,7 @@ class MapService constructor(private val mContext: Context) {
 
     suspend fun getPolyline(origin: GeoPoint, destination: GeoPoint): List<LatLng> {
         var polyLineList: List<LatLng> = ArrayList()
-        val res = RestClientHelper.instance?.get(getMapRouteUrlByTrip(origin, destination))
+        val res = LiteHttp.instance?.get(getMapRouteUrlByTrip(origin, destination))
         print(res.toString())
         val result = Gson().fromJson(res.toString(), PolylineJsonDecoder::class.java)
         if (result.routes.isNotEmpty()) {
@@ -94,7 +94,7 @@ class MapService constructor(private val mContext: Context) {
         if (url != null) {
             val headers: ArrayMap<String, String> = ArrayMap()
             headers["Authorization"] = token
-            val res = RestClientHelper.instance?.get(url, headers, null)
+            val res = LiteHttp.instance?.get(url, headers, null)
             customersLocations = Gson().fromJson(res, CustomersLocations::class.java)
 
         } else {

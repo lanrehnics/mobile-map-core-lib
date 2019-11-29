@@ -20,7 +20,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
 
-class RestClientHelper private constructor() {
+class LiteHttp private constructor() {
 
     private val executor: Executor
 
@@ -190,17 +190,17 @@ class RestClientHelper private constructor() {
     }
 
     companion object {
-        private val LOG_TAG = "RestClientHelper"
+        private val LOG_TAG = "LiteHttp"
         var defaultBaseUrl = ""
         private val lockObject = Any()
-        private var restClientHelper: RestClientHelper? = null
+        private var restClientHelper: LiteHttp? = null
 
-        val instance: RestClientHelper?
+        val instance: LiteHttp?
             get() {
                 if (restClientHelper == null)
                     synchronized(lockObject) {
                         if (restClientHelper == null)
-                            restClientHelper = RestClientHelper()
+                            restClientHelper = LiteHttp()
                     }
                 return restClientHelper
             }

@@ -1,6 +1,7 @@
 package com.kobo.mobile_map_core.mobile_map_core.map
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -25,6 +26,7 @@ import com.kobo.mobile_map_core.mobile_map_core.R
 import com.kobo.mobile_map_core.mobile_map_core.models.ClearCommand
 import com.kobo.mobile_map_core.mobile_map_core.models.DisplayMode
 import com.kobo.mobile_map_core.mobile_map_core.models.TripStatus
+import com.kobo.mobile_map_core.mobile_map_core.search.SearchActivity
 
 import java.util.*
 
@@ -48,8 +50,6 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
         setContentView(R.layout.partner_map_activity_main)
         context = this@MapsActivity
 
-        setUpAutoCompleteSearch()
-
         mapService = MapService(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -63,7 +63,6 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
         tvRegNumber = findViewById(R.id.reg_number)
         tvEtt = findViewById(R.id.ett)
         backArrowButton = findViewById(R.id.back_arrow_button)
-        autoCompleteTextViewCard = findViewById(R.id.autoCompleteTextViewCard)
 
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
@@ -103,6 +102,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
 
         toolbar = findViewById(R.id.toolbar)
         fabTripFilter = findViewById(R.id.fabTripFilter)
+//        fabOpenSearch = findViewById(R.id.fabSearch)
         fabMyLocation = findViewById(R.id.fabMyLocation)
         drawerLayout = findViewById(R.id.drawer_layout)
 
@@ -140,6 +140,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
                 //Todo Add Animation
                 fabTripFilter.visibility = View.VISIBLE
                 fabMyLocation.visibility = View.VISIBLE
+//                fabOpenSearch.visibility = View.VISIBLE
             }
 
             override fun onDrawerOpened(drawerView: View) {
@@ -149,6 +150,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
                 if (fabMyLocation.visibility == View.VISIBLE) {
                     fabTripFilter.visibility = View.INVISIBLE
                     fabMyLocation.visibility = View.INVISIBLE
+//                    fabOpenSearch.visibility = View.INVISIBLE
 
                 }
             }
@@ -159,6 +161,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
 
         fabTripFilter.setOnClickListener(this)
         fabMyLocation.setOnClickListener(this)
+//        fabOpenSearch.setOnClickListener(this)
         btnApply.setOnClickListener(this)
         btnApply.visibility = View.INVISIBLE
         btnCloseDrawer.setOnClickListener(this)
@@ -231,7 +234,6 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
     override fun onMarkerClick(marker: Marker): Boolean {
 
         backArrowButton.visibility = View.INVISIBLE
-        autoCompleteTextViewCard.visibility = View.INVISIBLE
         btnCloseTruckInfo.visibility = View.VISIBLE
 //        selectedMarker = marker
 
@@ -280,6 +282,10 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
                 }
             }
 
+//            R.id.fabSearch -> {
+//                val searchIntent = Intent(this, SearchActivity::class.java)
+//                startActivity(searchIntent)
+//            }
             R.id.fabMyLocation -> {
                 try {
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
@@ -511,7 +517,6 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
                     object : GoogleMap.CancelableCallback {
                         override fun onFinish() {
                             backArrowButton.visibility = View.INVISIBLE
-                            autoCompleteTextViewCard.visibility = View.INVISIBLE
                             btnCloseTruckInfo.visibility = View.VISIBLE
 
                             // Clear all geopoints and clustered markers

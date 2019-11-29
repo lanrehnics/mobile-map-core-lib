@@ -47,8 +47,6 @@ abstract class BaseMapActivity : AppCompatActivity() {
 
     //Private properties
     private var fireStoreSearchEventListener: ListenerRegistration? = null
-    private var truckIdStoreSearchEventListener: ListenerRegistration? = null
-    private lateinit var autoCompleteSearch: AutoCompleteTextView
     private val db = FirebaseFirestore.getInstance()
     private val collectionRef = FirebaseFirestore.getInstance().collection("Trucks")
     private val geoFireStore = GeoFirestore(collectionRef)
@@ -69,6 +67,7 @@ abstract class BaseMapActivity : AppCompatActivity() {
     protected lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     protected lateinit var fabMyLocation: View
     protected lateinit var fabTripFilter: View
+//    protected lateinit var fabOpenSearch: View
     protected lateinit var btnApply: Button
     protected lateinit var backArrowButton: ImageButton
     protected lateinit var btnCloseDrawer: View
@@ -86,7 +85,6 @@ abstract class BaseMapActivity : AppCompatActivity() {
     protected lateinit var flaggedTrips: CheckBox
     protected lateinit var btnCloseTruckInfo: ImageButton
     protected lateinit var currentLatLng: LatLng
-    protected lateinit var autoCompleteTextViewCard: View
     protected lateinit var bottomSheetHeader: LinearLayout
     protected lateinit var tvTripId: TextView
     protected lateinit var tvTripStatus: TextView
@@ -118,38 +116,10 @@ abstract class BaseMapActivity : AppCompatActivity() {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 
-    protected fun setUpAutoCompleteSearch() {
-        try {
-            autoCompleteSearch = findViewById(R.id.autoCompleteTextView)
-            val adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1)
 
-            truckIdStoreSearchEventListener = db.collection("Trucks").addSnapshotListener { querySnapshot, exception ->
-                if (exception != null) {
-                    showMessage(this, exception.toString())
-                }
-                adapter.clear()
-
-                val allIds = querySnapshot!!.documents.map { snapShot -> snapShot.id }.toSet().toList()
-                adapter.addAll(allIds)
-
-                autoCompleteSearch.setAdapter(adapter)
-                autoCompleteSearch.onItemClickListener =
-                        AdapterView.OnItemClickListener { parent, _, position, _ ->
-                            focusOnTruck(parent.getItemAtPosition(position).toString())
-                        }
-                truckIdStoreSearchEventListener?.remove()
-            }
-
-
-        } catch (e: Exception) {
-            showMessage(this, "Error fetching truck info")
-        }
-
-    }
 
     private fun focusOnTruck(truckId: String) {
         backArrowButton.visibility = View.INVISIBLE
-        autoCompleteTextViewCard.visibility = View.INVISIBLE
         btnCloseTruckInfo.visibility = View.VISIBLE
 
         val docRef = db.collection("Trucks").document(truckId)
@@ -222,7 +192,6 @@ abstract class BaseMapActivity : AppCompatActivity() {
                 mMap.clear()
                 markerManager.clear()
                 truckMarkerManager.clear()
-                autoCompleteTextViewCard.visibility = View.VISIBLE
                 backArrowButton.visibility = View.VISIBLE
                 btnCloseTruckInfo.visibility = View.INVISIBLE
                 listTripStatusFilter.clear()
@@ -233,7 +202,6 @@ abstract class BaseMapActivity : AppCompatActivity() {
     protected fun resetView() {
         try {
             selectedTruck = null
-            autoCompleteSearch.setText("")
             fireStoreSearchEventListener?.remove()
             currentDisplayMode = DisplayMode.ALL
             btnCloseTruckInfo.visibility = View.INVISIBLE
