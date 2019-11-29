@@ -1,6 +1,7 @@
 import Flutter
 import UIKit
 import GoogleMaps
+import Pulley
 
 public class SwiftMobileMapCorePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -10,13 +11,15 @@ public class SwiftMobileMapCorePlugin: NSObject, FlutterPlugin {
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    var truck = Truck(data: ["" : ""])
-    truck?.customerName = "Miss bimbo in the spirit"
     
-    result("iOS " + UIDevice.current.systemVersion + " " + truck!.customerName)
-  }
-    
-    func testStuff() {
-       
+    if call.method == "launch_map" {
+        let mainContentVC = MapViewController()
+        let bottomVC = TruckDetailsViewController()
+        let pulleyVc = PulleyViewController(contentViewController: mainContentVC, drawerViewController: bottomVC)
+        pulleyVc.modalPresentationStyle = .overFullScreen
+        UIApplication.shared.keyWindow?.rootViewController?.present(pulleyVc, animated: true, completion: nil)
+    } else {
+        result("iOS " + UIDevice.current.systemVersion)
     }
+  }
 }

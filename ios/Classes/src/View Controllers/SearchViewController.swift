@@ -14,11 +14,14 @@ class SearchViewController: UIViewController, UITableViewDelegate, UISearchBarDe
     
     var mapVC: MapViewController?
     
+    
     @IBOutlet weak var searchBar: UISearchBar!
-    @IBOutlet weak var tbl: UITableView!
+    
     var indicator = UIActivityIndicatorView()
     
     var searchData = [SearchResultModel]()
+    
+    @IBOutlet weak var tbl: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -166,10 +166,10 @@ open class CheckBox: UIControl {
     //Usaully check boxes are small in our app's UI, so we need more touchable area for its interaction
     open override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
         
-//        let relativeFrame = self.bounds
-//        let hitTestEdgeInsets = UIEdgeInsets(top: -increasedTouchRadius, left: -increasedTouchRadius, bottom: -increasedTouchRadius, right: -increasedTouchRadius)
-        //let hitFrame = relativeFrame.inset(by: hitTestEdgeInsets)
-        return false
+        let relativeFrame = self.bounds
+        let hitTestEdgeInsets = UIEdgeInsets(top: -increasedTouchRadius, left: -increasedTouchRadius, bottom: -increasedTouchRadius, right: -increasedTouchRadius)
+        let hitFrame = relativeFrame.insetBy(dx: hitTestEdgeInsets.left, dy: hitTestEdgeInsets.top)
+        return hitFrame.contains(point)
     }
     
     //Draws tick inside the component

@@ -326,7 +326,8 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
      */
     
     @objc func openFilterView(){
-        let filterVc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "MapFilterViewController") as! MapFilterViewController
+//        let filterVc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "MapFilterViewController") as! MapFilterViewController
+        let filterVc = FilterViewController()
         self.addChildViewController(filterVc)
         let height = view.frame.height
         let width  = view.frame.width
@@ -336,7 +337,8 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     }
     
     @objc func onSearchButtonClicked() {
-        let searchVc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SearchViewController") as! SearchViewController
+//        let searchVc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SearchViewController") as! SearchViewController
+        let searchVc = SearchViewController()
         searchVc.modalPresentationStyle = .formSheet
         searchVc.mapVC = self
         self.present(searchVc, animated: true, completion: nil)

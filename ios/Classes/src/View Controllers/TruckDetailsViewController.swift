@@ -2,7 +2,7 @@
 //  TruckDetailsViewController.swift
 //  kobo-ios-map
 //
-//  Created by Adedamola Adeyemo on 21/10/2019.
+//  Created by Adedamola Adeyemo on 24/11/2019.
 //  Copyright © 2019 Adedamola Adeyemo. All rights reserved.
 //
 
@@ -10,42 +10,39 @@ import UIKit
 import Pulley
 
 class TruckDetailsViewController: UIViewController {
-    
-    @IBOutlet weak var etaLabel: UILabel!
-    @IBOutlet weak var headerViewCon: UIView!
-    @IBOutlet weak var tripIdLabel: UILabel!
-    @IBOutlet weak var statusLabel: UILabel!
-    @IBOutlet weak var destLabel: UILabel!
+    private var truck: Truck!
 
-    @IBOutlet weak var customerDetailsCard: UIView!
-    
-    @IBOutlet weak var driverMobileLabel: UILabel!
-
-    @IBOutlet weak var truckRegLabel: UILabel!
+    @IBOutlet weak var driverDetailsCard: UIView!
+    @IBOutlet weak var customerName: UILabel!
     @IBOutlet weak var driverNameLabel: UILabel!
     @IBOutlet weak var pickUpLabel: UILabel!
-    @IBOutlet weak var customerName: UILabel!
-    @IBOutlet weak var driverDetailsCard: UIView!
+    @IBOutlet weak var truckRegLabel: UILabel!
+    @IBOutlet weak var driverMobileLabel: UILabel!
+    @IBOutlet weak var destLabel: UILabel!
+    @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var customerDetailsCard: UIView!
+    @IBOutlet weak var tripIdLabel: UILabel!
+    @IBOutlet weak var etaLabel: UILabel!
+    @IBOutlet weak var headerViewCon: UIView!
     
-    private var truck: Truck!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.isUserInteractionEnabled = true
-        customerDetailsCard.layer.cornerRadius = 20.0
-        customerDetailsCard.layer.shadowColor = UIColor.gray.cgColor
-        customerDetailsCard.layer.shadowRadius = 6.0
-        customerDetailsCard.layer.shadowOpacity = 0.5
-        customerDetailsCard.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
-
-        driverDetailsCard.layer.cornerRadius = 20.0
-        driverDetailsCard.layer.shadowColor = UIColor.gray.cgColor
-        driverDetailsCard.layer.shadowRadius = 6.0
-        driverDetailsCard.layer.shadowOpacity = 0.5
-        driverDetailsCard.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
-        let headerGesture = UITapGestureRecognizer(target: self, action: #selector(handleHeaderTap))
-        headerViewCon.isUserInteractionEnabled = true
-        headerViewCon.addGestureRecognizer(headerGesture)
+        //self.view.isUserInteractionEnabled = true
+//        customerDetailsCard.layer.cornerRadius = 20.0
+//        customerDetailsCard.layer.shadowColor = UIColor.gray.cgColor
+//        customerDetailsCard.layer.shadowRadius = 6.0
+//        customerDetailsCard.layer.shadowOpacity = 0.5
+//        customerDetailsCard.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
+//
+//        driverDetailsCard.layer.cornerRadius = 20.0
+//        driverDetailsCard.layer.shadowColor = UIColor.gray.cgColor
+//        driverDetailsCard.layer.shadowRadius = 6.0
+//        driverDetailsCard.layer.shadowOpacity = 0.5
+//        driverDetailsCard.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
+//        let headerGesture = UITapGestureRecognizer(target: self, action: #selector(handleHeaderTap))
+//        headerViewCon.isUserInteractionEnabled = true
+//        headerViewCon.addGestureRecognizer(headerGesture)
         // Do any additional setup after loading the view.
     }
     
@@ -59,13 +56,22 @@ class TruckDetailsViewController: UIViewController {
         }
     }
     
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-//         Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(bounceDrawer), userInfo: nil, repeats: false)
+   func setTruckDetails(truck: Truck) {
+        self.truck = truck
+//        if(truck.flagged) {
+//            headerViewCon.backgroundColor = UIColor(red:1.00, green:0.00, blue:0.00, alpha:1.0)
+//        } else {
+//            headerViewCon.backgroundColor = UIColor(red:0.21, green:0.70, blue:0.49, alpha:1.0)
+//        }
+//        tripIdLabel.text = truck.tripId
+//        statusLabel.text = truck.status
+//        customerName.text = truck.customerName
+//        pickUpLabel.text = "\(truck.source) \(truck.sourceCountry)"
+//        destLabel.text = truck.deliveryStation?.address ?? "N/A"
+//        driverNameLabel.text = truck.driverName
+//        driverMobileLabel.text = truck.driverMobile
+//        truckRegLabel.text = truck.regNumber
+//        etaLabel.text = "N/A"
     }
     
     @objc func handleHeaderTap() {
@@ -90,27 +96,10 @@ class TruckDetailsViewController: UIViewController {
     }
     
     func roundViews() {
-            view.layer.cornerRadius = 5
-            view.clipsToBounds = true
+               view.layer.cornerRadius = 5
+               view.clipsToBounds = true
     }
-    
-    func setTruckDetails(truck: Truck) {
-        self.truck = truck
-        if(truck.flagged) {
-            headerViewCon.backgroundColor = UIColor(red:1.00, green:0.00, blue:0.00, alpha:1.0)
-        } else {
-            headerViewCon.backgroundColor = UIColor(red:0.21, green:0.70, blue:0.49, alpha:1.0)
-        }
-        tripIdLabel.text = truck.tripId
-        statusLabel.text = truck.status
-        customerName.text = truck.customerName
-        pickUpLabel.text = "\(truck.source) \(truck.sourceCountry)"
-        destLabel.text = truck.deliveryStation?.address ?? "N/A"
-        driverNameLabel.text = truck.driverName
-        driverMobileLabel.text = truck.driverMobile
-        truckRegLabel.text = truck.regNumber
-        etaLabel.text = "N/A"
-    }
+
 
     /*
     // MARK: - Navigation
