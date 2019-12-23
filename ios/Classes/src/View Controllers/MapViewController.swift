@@ -201,15 +201,16 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     }
     
     func animateTruckOnMap(truck: Truck) {
-       let item = markers[truck.regNumber]!
-        if let marker = item.marker {
-            DispatchQueue.global(qos: .background).async {
-                DispatchQueue.main.async {
-                    let fromLocation = CLLocationCoordinate2D(latitude: truck.lat, longitude: truck.long)
-                    let toLocation = CLLocationCoordinate2D(
-                       latitude: truck.nextPosition?.lat ?? truck.lat, longitude: truck.nextPosition?.long ?? truck.long)
-                    self.truckAnimator = TruckAnimator(truckMarker: marker, mapView: self.mapView)
-                    self.truckAnimator.animate(from: fromLocation, to: toLocation, bearing: Double(truck.bearing)!)
+        if let item = markers[truck.regNumber] {
+            if let marker = item.marker {
+                DispatchQueue.global(qos: .background).async {
+                    DispatchQueue.main.async {
+                        let fromLocation = CLLocationCoordinate2D(latitude: truck.lat, longitude: truck.long)
+                        let toLocation = CLLocationCoordinate2D(
+                           latitude: truck.nextPosition?.lat ?? truck.lat, longitude: truck.nextPosition?.long ?? truck.long)
+                        self.truckAnimator = TruckAnimator(truckMarker: marker, mapView: self.mapView)
+                        self.truckAnimator.animate(from: fromLocation, to: toLocation, bearing: Double(truck.bearing)!)
+                    }
                 }
             }
         }
