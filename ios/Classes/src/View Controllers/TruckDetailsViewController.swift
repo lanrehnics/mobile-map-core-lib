@@ -29,20 +29,20 @@ class TruckDetailsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         //self.view.isUserInteractionEnabled = true
-//        customerDetailsCard.layer.cornerRadius = 20.0
-//        customerDetailsCard.layer.shadowColor = UIColor.gray.cgColor
-//        customerDetailsCard.layer.shadowRadius = 6.0
-//        customerDetailsCard.layer.shadowOpacity = 0.5
-//        customerDetailsCard.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
-//
-//        driverDetailsCard.layer.cornerRadius = 20.0
-//        driverDetailsCard.layer.shadowColor = UIColor.gray.cgColor
-//        driverDetailsCard.layer.shadowRadius = 6.0
-//        driverDetailsCard.layer.shadowOpacity = 0.5
-//        driverDetailsCard.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
-//        let headerGesture = UITapGestureRecognizer(target: self, action: #selector(handleHeaderTap))
-//        headerViewCon.isUserInteractionEnabled = true
-//        headerViewCon.addGestureRecognizer(headerGesture)
+        customerDetailsCard.layer.cornerRadius = 20.0
+        customerDetailsCard.layer.shadowColor = UIColor.gray.cgColor
+        customerDetailsCard.layer.shadowRadius = 6.0
+        customerDetailsCard.layer.shadowOpacity = 0.5
+        customerDetailsCard.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
+
+        driverDetailsCard.layer.cornerRadius = 20.0
+        driverDetailsCard.layer.shadowColor = UIColor.gray.cgColor
+        driverDetailsCard.layer.shadowRadius = 6.0
+        driverDetailsCard.layer.shadowOpacity = 0.5
+        driverDetailsCard.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
+        let headerGesture = UITapGestureRecognizer(target: self, action: #selector(handleHeaderTap))
+        headerViewCon.isUserInteractionEnabled = true
+        headerViewCon.addGestureRecognizer(headerGesture)
         // Do any additional setup after loading the view.
     }
     
@@ -58,20 +58,20 @@ class TruckDetailsViewController: UIViewController {
     
    func setTruckDetails(truck: Truck) {
         self.truck = truck
-//        if(truck.flagged) {
-//            headerViewCon.backgroundColor = UIColor(red:1.00, green:0.00, blue:0.00, alpha:1.0)
-//        } else {
-//            headerViewCon.backgroundColor = UIColor(red:0.21, green:0.70, blue:0.49, alpha:1.0)
-//        }
-//        tripIdLabel.text = truck.tripId
-//        statusLabel.text = truck.status
-//        customerName.text = truck.customerName
-//        pickUpLabel.text = "\(truck.source) \(truck.sourceCountry)"
-//        destLabel.text = truck.deliveryStation?.address ?? "N/A"
-//        driverNameLabel.text = truck.driverName
-//        driverMobileLabel.text = truck.driverMobile
-//        truckRegLabel.text = truck.regNumber
-//        etaLabel.text = "N/A"
+        if(truck.flagged) {
+            headerViewCon.backgroundColor = UIColor(red:1.00, green:0.00, blue:0.00, alpha:1.0)
+        } else {
+            headerViewCon.backgroundColor = UIColor(red:0.21, green:0.70, blue:0.49, alpha:1.0)
+        }
+        tripIdLabel.text = truck.tripId
+        statusLabel.text = truck.status
+        customerName.text = truck.customerName
+        pickUpLabel.text = "\(truck.source) \(truck.sourceCountry)"
+        destLabel.text = truck.deliveryStation?.address ?? "N/A"
+        driverNameLabel.text = truck.driverName
+        driverMobileLabel.text = truck.driverMobile
+        truckRegLabel.text = truck.regNumber
+        etaLabel.text = "N/A"
     }
     
     @objc func handleHeaderTap() {
