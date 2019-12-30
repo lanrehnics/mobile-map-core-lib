@@ -37,7 +37,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
     companion object {
         const val TAG = "MapsActivity ::: ===>"
         val QUERY_CENTER = GeoPoint(6.521645, 3.367835)
-        const val QUERY_RADIUS = 30.0
+        const val QUERY_RADIUS = 100.0
         const val LOCATION_PERMISSION_REQUEST_CODE = 1
 
         var KEY_CUSTOMER_STATION_URL: String? = "customer_stations_url"

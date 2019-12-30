@@ -67,7 +67,7 @@ abstract class BaseMapActivity : AppCompatActivity() {
     protected lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     protected lateinit var fabMyLocation: View
     protected lateinit var fabTripFilter: View
-//    protected lateinit var fabOpenSearch: View
+    //    protected lateinit var fabOpenSearch: View
     protected lateinit var btnApply: Button
     protected lateinit var backArrowButton: ImageButton
     protected lateinit var btnCloseDrawer: View
@@ -115,7 +115,6 @@ abstract class BaseMapActivity : AppCompatActivity() {
     protected fun showMessage(context: Context, message: String) {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
-
 
 
     private fun focusOnTruck(truckId: String) {
@@ -320,8 +319,10 @@ abstract class BaseMapActivity : AppCompatActivity() {
         geoQuery.addGeoQueryDataEventListener(object : GeoQueryDataEventListener {
             override fun onDocumentEntered(documentSnapshot: DocumentSnapshot, location: GeoPoint) {
                 try {
-                    val model = documentSnapshot.toObject(TruckModelDataParser::class.java)
-                    addTrucks(model)
+                    if (truckMarkerManager.size < 200) {
+                        val model = documentSnapshot.toObject(TruckModelDataParser::class.java)
+                        addTrucks(model)
+                    }
                 } catch (error: Exception) {
                     Log.e(MapsActivity.TAG, "Error parsing data")
                 }
