@@ -14,6 +14,12 @@ public class SwiftMobileMapCorePlugin: NSObject, FlutterPlugin {
     
     if call.method == "launch_map" {
         let mainContentVC = MapViewController()
+        let platformArgs = call.arguments as! [String: Any]
+        let model = ConfigModel(userType: UserType(rawValue: platformArgs["app_type"] as! String)!,
+                                authToken: platformArgs["token"] as! String,
+                                userTypeId: platformArgs["id"] as! Int)
+        print("config model:", model)
+        mainContentVC.setConfigurationModel(model: model)
         let bottomVC = TruckDetailsViewController()
         let pulleyVc = PulleyViewController(contentViewController: mainContentVC, drawerViewController: bottomVC)
         pulleyVc.modalPresentationStyle = .overFullScreen

@@ -45,6 +45,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     var mapDataState = MapDataState.initial
     var currentQuery: GFSCircleQuery!
     var singleDocListener: ListenerRegistration?
+    var configModel: ConfigModel!
     
     private var markers: [String : POIItem] = [:]
     private var trucks: [String : Truck] = [:]
@@ -77,6 +78,10 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
         renderer.delegate = self
         clusterManager = GMUClusterManager(map: mapView, algorithm: algorithm, renderer: renderer)
         clusterManager.setDelegate(self, mapDelegate: self)
+    }
+    
+    func setConfigurationModel(model: ConfigModel) {
+        self.configModel = model
     }
     
     func getCurrentLocation() {
@@ -312,6 +317,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
             searchButton = RoundButton()
             searchButton.frame = CGRect(x: mapView.bounds.size.width - 65, y: 20, width: 56, height: 56);
             searchButton.addTarget(self, action: #selector(onSearchButtonClicked), for: .touchDown)
+            searchButton.setImage(UIImage(named: "search_icon"), for: .normal)
             searchButton.backgroundColor = .white
            searchButton.layer.cornerRadius = 28
            searchButton.clipsToBounds = true
@@ -327,7 +333,6 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
      */
     
     @objc func openFilterView(){
-//        let filterVc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "MapFilterViewController") as! MapFilterViewController
         let filterVc = FilterViewController()
         self.addChildViewController(filterVc)
         let height = view.frame.height
@@ -338,7 +343,6 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     }
     
     @objc func onSearchButtonClicked() {
-//        let searchVc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SearchViewController") as! SearchViewController
         let searchVc = SearchViewController()
         searchVc.modalPresentationStyle = .formSheet
         searchVc.mapVC = self

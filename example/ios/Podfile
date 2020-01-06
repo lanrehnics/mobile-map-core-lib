@@ -57,6 +57,10 @@ target 'Runner' do
       pod 'Flutter', :path => File.join(symlink, File.basename(p[:path]))
     end
   }
+  
+  pod 'Firebase/Core'
+  pod 'Firebase/Firestore'
+  pod 'GeoFire', :git => 'https://github.com/firebase/geofire-objc.git', :branch => 'master'
 
   # Plugin Pods
   plugin_pods = parse_KV_file('../.flutter-plugins')

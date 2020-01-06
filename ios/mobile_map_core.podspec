@@ -18,7 +18,7 @@ A new flutter plugin project.
   s.dependency 'Pulley', '~> 2.5.0'
   s.dependency 'Firebase/Core'
   s.dependency 'Firebase/Firestore'
-  s.dependency 'GeoFire', '~> 3.0'
+  s.dependency 'GeoFire'
   s.dependency 'GoogleMaps'
   s.static_framework = true
   s.ios.deployment_target = '10.0'
