@@ -63,6 +63,25 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
         self.view = mapView
         getCurrentLocation()
         setUpMarkerCluster()
+        if #available(iOS 13.0, *) {
+            let app = UIApplication.shared
+              let statusBarHeight: CGFloat = app.statusBarFrame.size.height
+              let statusbarView = UIView()
+              statusbarView.backgroundColor = UIColor(red:0.16, green:0.28, blue:0.61, alpha:1.0)
+              view.addSubview(statusbarView)
+            
+              statusbarView.translatesAutoresizingMaskIntoConstraints = false
+              statusbarView.heightAnchor
+                  .constraint(equalToConstant: statusBarHeight).isActive = true
+              statusbarView.widthAnchor
+                  .constraint(equalTo: view.widthAnchor, multiplier: 1.0).isActive = true
+              statusbarView.topAnchor
+                  .constraint(equalTo: view.topAnchor).isActive = true
+              statusbarView.centerXAnchor
+                  .constraint(equalTo: view.centerXAnchor).isActive = true
+        } else {
+            // Fallback on earlier versions
+        }
         // Do any additional setup after loading the view.
     }
     
@@ -98,16 +117,15 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
         }
     }
     
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        if #available(iOS 13.0, *) {
-            return .darkContent
-        } else {
-            return .default
-        }
-    }
+//    override var preferredStatusBarStyle: UIStatusBarStyle {
+//        if #available(iOS 13.0, *) {
+//            return .lightContent
+//        } else {
+//            return .default
+//        }
+//    }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        print("Location is here")
         if currentUserLocation != nil {return}
         if let location = locations.last {
             print("User current location", location.coordinate)
@@ -122,8 +140,8 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     }
     
     override func loadView() {
-        currentUserLocation = CLLocationCoordinate2D(latitude: 6.5212402, longitude: 3.3679965)
-        let camera = GMSCameraPosition(latitude: 6.5212402, longitude: 3.3679965, zoom: 15)
+        currentUserLocation = CLLocationCoordinate2D(latitude: 9.076479, longitude: 7.398574)
+        let camera = GMSCameraPosition(latitude: 9.076479, longitude: 7.398574, zoom: 15)
         mapView = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
         mapView.isTrafficEnabled = false
         mapView.isMyLocationEnabled = true
@@ -142,27 +160,34 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
         custLocationsIcon = UIImageView(image: custLoc)
         truckBlueIcon = UIImageView(image: blue)
         truckRedIcon = UIImageView(image: red)
-        mapView.setMinZoom(8, maxZoom: 18)
+        mapView.setMinZoom(8, maxZoom: 19)
         
 
-        do {
-           if let styleUrl = Bundle.main.url(forResource: "style", withExtension: "json") {
-               mapView.mapStyle = try GMSMapStyle(contentsOfFileURL: styleUrl)
-           } else {
-               NSLog("Unable to find style file")
-           }
-        } catch {
-           NSLog("one or more of the file styles failed to ooad")
-        }
+//        do {
+//           if let styleUrl = Bundle.main.url(forResource: "style", withExtension: "json") {
+//               mapView.mapStyle = try GMSMapStyle(contentsOfFileURL: styleUrl)
+//           } else {
+//               NSLog("Unable to find style file")
+//           }
+//        } catch {
+//           NSLog("one or more of the file styles failed to ooad")
+//        }
         loadTrucks()
     }
     
     func loadTrucks() {
-        print("connecting to firebase")
-        firebaseColRef = Firestore.firestore().collection("Trucks")
+        switch configModel.userType {
+        case .customer:
+            firebaseColRef = Firestore.firestore().collection("Customers/76/TripList")
+        case .partner:
+            firebaseColRef = Firestore.firestore().collection("Partners/2291/TruckList")
+        case .squad:
+            firebaseColRef = Firestore.firestore().collection("Trucks")
+        }
         let geoFireStore = GeoFirestore(collectionRef: firebaseColRef)
-        let center = CLLocation(latitude: currentUserLocation.latitude, longitude: currentUserLocation.longitude)
-        currentQuery = geoFireStore.query(withCenter: center, radius: 10) // 60Km
+        //let center = CLLocation(latitude: currentUserLocation.latitude, longitude: currentUserLocation.longitude)
+        let center = CLLocation(latitude: 9.076479, longitude: 7.398574)
+        currentQuery = geoFireStore.query(withCenter: center, radius: 1000) // 60Km
         
         _ = currentQuery.observe(.documentEntered, with: {
             (snapshot: DocumentSnapshot?, location) in
@@ -189,7 +214,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
                 case .filtering:
                     filterTruck(truck, state: state)
                 default:
-                    print("nothning")
+                    print("map doesnt have any state")
                 }
             }
         }
@@ -267,6 +292,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
         poiItem.data.isClustered = false
         if(poiItem.data.flagged) {
             marker.iconView = self.truckRedIcon
+            
         } else if poiItem.data.active == 1 {
             marker.iconView = self.truckGreenIcon
         } else if(poiItem.data.speed > 0) {
@@ -301,7 +327,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     func buildCloseBtn() {
         if closeBtn == nil {
             closeBtn = RoundButton()
-            closeBtn.frame = CGRect(x: 5, y: 20, width: 56, height: 56);
+            closeBtn.frame = CGRect(x: -10, y: UIDevice.current.hasNotch ? 45 : 20, width: 50, height: 50);
             closeBtn.addTarget(self, action: #selector(closeBtnAction), for: .touchDown)
             closeBtn.layer.cornerRadius = 28
             closeBtn.clipsToBounds = true
@@ -315,13 +341,12 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     func buildSearchButton() {
         if searchButton == nil {
             searchButton = RoundButton()
-            searchButton.frame = CGRect(x: mapView.bounds.size.width - 65, y: 20, width: 56, height: 56);
+            searchButton.frame = CGRect(x: mapView.bounds.size.width - 65, y: UIDevice.current.hasNotch ? 45 : 25, width: 56, height: 56);
             searchButton.addTarget(self, action: #selector(onSearchButtonClicked), for: .touchDown)
             searchButton.setImage(UIImage(named: "search_icon"), for: .normal)
             searchButton.backgroundColor = .white
-           searchButton.layer.cornerRadius = 28
-           searchButton.clipsToBounds = true
-            //closeBtn.setImage(UIImage(named: "arrow_back"), for: .normal)
+            searchButton.layer.cornerRadius = 28
+            searchButton.clipsToBounds = true
             searchButton.layer.shadowRadius = 12.0
             searchButton.layer.shadowOpacity = 0.7
             self.view.addSubview(searchButton)
@@ -345,6 +370,8 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     @objc func onSearchButtonClicked() {
         let searchVc = SearchViewController()
         searchVc.modalPresentationStyle = .formSheet
+        searchVc.collectionRef = firebaseColRef
+        searchVc.configModel = configModel
         searchVc.mapVC = self
         self.present(searchVc, animated: true, completion: nil)
     }
@@ -380,7 +407,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
         if (marker.title == nil) {return false}
         
-        if let truck = markers[marker.title!]!.data {
+        if let truck = markers[marker.title!]?.data {
             onSingleTruckFocus(truck)
             return true
         } else {
@@ -486,6 +513,12 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
                 self.animateTruckOnMap(truck: truck)
             }
         }
+    }
+    
+    func loadKoboStations() {
+        networkUtil.getKoboStations("", configModel.authToken, onCompleted: { hubLocation in
+            print("hublocations totqal record is", hubLocation.hubs.count)
+        })
     }
 
     

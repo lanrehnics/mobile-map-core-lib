@@ -113,6 +113,16 @@ class TruckDetailsViewController: UIViewController {
 
 }
 
+extension UIDevice {
+    var hasNotch: Bool {
+        var bottom = CGFloat(0)
+        if #available(iOS 11.0, *) {
+            bottom = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? CGFloat(0)
+        }
+        return bottom > 0
+    }
+}
+
 extension TruckDetailsViewController: PulleyDrawerViewControllerDelegate {
     
     func collapsedDrawerHeight(bottomSafeArea: CGFloat) -> CGFloat

@@ -20,6 +20,8 @@ class SearchViewController: UIViewController, UITableViewDelegate, UISearchBarDe
     var indicator = UIActivityIndicatorView()
     
     var searchData = [SearchResultModel]()
+    var collectionRef: CollectionReference!
+    var configModel: ConfigModel!
     
     @IBOutlet weak var tbl: UITableView!
     
@@ -85,7 +87,7 @@ class SearchViewController: UIViewController, UITableViewDelegate, UISearchBarDe
     
     func searchFirebase(_ field: String, _ searchTerm: String) {
         print("connect to firebase search")
-        Firestore.firestore().collection("Trucks").whereField(field, isEqualTo: searchTerm).getDocuments {
+        collectionRef.whereField(field, isEqualTo: searchTerm).getDocuments {
              (snapShot: QuerySnapshot?, err) in
              print(" search result is back")
             if err != nil || snapShot == nil{

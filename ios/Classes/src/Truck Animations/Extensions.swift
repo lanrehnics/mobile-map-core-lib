@@ -34,13 +34,11 @@ extension GMSMapView {
 
 extension UIColor {
     static var routeColor: UIColor {
-        let color: UIColor
-        if #available(iOS 11.0, *) {
-            color = UIColor( named: "routeColor")!
-        } else {
-            color = UIColor(red:1.00, green:0.00, blue:0.60, alpha:1.0)
-        }
-        return color
+        return  UIColor(red:1.00, green:0.00, blue:0.60, alpha:1.0)
+    }
+    
+    static var greenColor: UIColor {
+        return UIColor(red:0.21, green:0.70, blue:0.49, alpha:1.0)
     }
 }
 
