@@ -482,8 +482,6 @@ abstract class BaseMapActivity : AppCompatActivity() {
 
 
     protected fun configureCollectionReferenceForApp() {
-
-
         val appType: String? = PreferenceManager.getDefaultSharedPreferences(context).getString(MobileMapCorePlugin.KEY_APP_TYPE, null)
         val id: String? = PreferenceManager.getDefaultSharedPreferences(context).getString(MobileMapCorePlugin.KEY_ID, null)
 
@@ -497,7 +495,6 @@ abstract class BaseMapActivity : AppCompatActivity() {
             AppType.Transporter -> {
                 collectionRef = FirebaseFirestore.getInstance().collection("Trucks")
             }
-
         }
 
         geoFireStore = GeoFirestore(collectionRef)

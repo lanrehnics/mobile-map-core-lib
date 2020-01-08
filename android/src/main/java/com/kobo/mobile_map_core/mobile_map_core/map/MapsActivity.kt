@@ -95,7 +95,6 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
             }
         })
 
-
         toolbar = findViewById(R.id.toolbar)
         fabTripFilter = findViewById(R.id.fabTripFilter)
         fabOpenSearch = findViewById(R.id.fabSearch)
