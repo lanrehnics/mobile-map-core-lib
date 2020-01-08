@@ -58,7 +58,11 @@ class _MyAppState extends State<MyApp> {
 
               RaisedButton(
                 onPressed: () async{
-                  MobileMapCore.loadMap;
+                  MobileMapCore.loadMap({
+                    "token": "",
+                    "id": 0,
+                    "user_type": "squad",
+                  });
                 },
                 child: Text("Open map"),
               )

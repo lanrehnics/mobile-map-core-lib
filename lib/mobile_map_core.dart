@@ -10,7 +10,7 @@ class MobileMapCore {
     return status;
   }
   
-  static get loadMap async {
-    await _channel.invokeMethod("launch_map");
+  static loadMap(Map<String, dynamic> data) async {
+    await _channel.invokeMethod("launch_map", data);
   }
 }

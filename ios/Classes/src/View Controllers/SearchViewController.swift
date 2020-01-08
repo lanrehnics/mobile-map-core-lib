@@ -20,6 +20,8 @@ class SearchViewController: UIViewController, UITableViewDelegate, UISearchBarDe
     var indicator = UIActivityIndicatorView()
     
     var searchData = [SearchResultModel]()
+    var collectionRef: CollectionReference!
+    var configModel: ConfigModel!
     
     @IBOutlet weak var tbl: UITableView!
     
@@ -33,6 +35,11 @@ class SearchViewController: UIViewController, UITableViewDelegate, UISearchBarDe
         searchBar.delegate = self
         self.registerTableViewCells()
         buildActivityIndicator()
+        if #available(iOS 13.0, *) {
+            overrideUserInterfaceStyle = .light
+        } else {
+            // Fallback on earlier versions
+        }
         // Do any additional setup after loading the view.
     }
     
@@ -59,8 +66,9 @@ class SearchViewController: UIViewController, UITableViewDelegate, UISearchBarDe
         if let searchTerm = searchBar.text {
             searchData = []
             indicator.startAnimating()
-            searchByTruckRegNum(searchTerm)
-            searchByAddress(searchTerm)
+            searchFirebase("d.normalizedRegNumber", searchTerm.lowercased())
+            searchFirebase("d.tripId", searchTerm.uppercased())
+            //searchByAddress(searchTerm)
             searchBar.resignFirstResponder()
         }
     }
@@ -77,9 +85,9 @@ class SearchViewController: UIViewController, UITableViewDelegate, UISearchBarDe
         self.tbl.register(cell, forCellReuseIdentifier: "cell")
     }
     
-    func searchByTruckRegNum(_ regNum: String) {
+    func searchFirebase(_ field: String, _ searchTerm: String) {
         print("connect to firebase search")
-        Firestore.firestore().collection("Trucks").whereField("d.reg_number", isEqualTo: regNum).getDocuments {
+        collectionRef.whereField(field, isEqualTo: searchTerm).getDocuments {
              (snapShot: QuerySnapshot?, err) in
              print(" search result is back")
             if err != nil || snapShot == nil{
@@ -94,6 +102,7 @@ class SearchViewController: UIViewController, UITableViewDelegate, UISearchBarDe
                     self.searchData.append(data)
                 }
             }
+            self.stopLoadingAnimations()
             self.tbl.reloadData()
         }
     }
