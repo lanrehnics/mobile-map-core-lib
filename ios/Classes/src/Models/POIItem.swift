@@ -12,10 +12,12 @@ class POIItem: NSObject, GMUClusterItem {
     var position: CLLocationCoordinate2D
     var data: Truck!
     var marker: GMSMarker?
+    var markerType: MarkerType!
     
-    init(position: CLLocationCoordinate2D, data: Truck) {
+    init(position: CLLocationCoordinate2D, data: Truck, type: MarkerType) {
         self.position = position
         self.data = data
+        self.markerType = type
     }
 }
 

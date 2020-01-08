@@ -12,7 +12,7 @@ struct ConfigModel {
     var userType: UserType
     var authToken: String
     var koboStationsUrl: String
-    var customer: String
+    var customerLocationsUrl: String
     var userTypeId: Int
 }
 

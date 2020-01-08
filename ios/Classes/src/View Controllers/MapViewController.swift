@@ -224,7 +224,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
         if markers[truck.regNumber] == nil || mapDataState == .filtering {
            let position = CLLocationCoordinate2D(latitude: truck.lat, longitude: truck.long)
            bounds = bounds.includingCoordinate(position)
-           let item = POIItem(position: position, data: truck)
+           let item = POIItem(position: position, data: truck, type: .truck)
            clusterManager.add(item)
            markers[truck.regNumber] = item
         }
@@ -368,6 +368,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     }
     
     @objc func onSearchButtonClicked() {
+        loadKoboStations();
         let searchVc = SearchViewController()
         searchVc.modalPresentationStyle = .formSheet
         searchVc.collectionRef = firebaseColRef
@@ -482,7 +483,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
         searchButton.isHidden = true
         
         let fromLocation = CLLocationCoordinate2D(latitude: truck.lat, longitude: truck.long)
-        let poItem = POIItem(position: fromLocation, data: truck)
+        let poItem = POIItem(position: fromLocation, data: truck, type: .truck)
         let marker = buildMarkerObj(poItem)
         marker.map = mapView
         trackingTruck = true
@@ -516,8 +517,11 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     }
     
     func loadKoboStations() {
-        networkUtil.getKoboStations("", configModel.authToken, onCompleted: { hubLocation in
-            print("hublocations totqal record is", hubLocation.hubs.count)
+        let geohash = currentUserLocation.geohash(length: 5)
+        let url = configModel.koboStationsUrl + "?geohash=\(geohash)"
+        print("stations url ", url)
+        networkUtil.getHubLocations(url: url, configModel.authToken, onCompleted: { hubLocation in
+            print("hublocations total record is", hubLocation.hubs.count)
         })
     }
 
