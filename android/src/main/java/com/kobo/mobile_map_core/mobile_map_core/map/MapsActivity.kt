@@ -36,19 +36,17 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
 
     companion object {
         const val TAG = "MapsActivity ::: ===>"
-        val QUERY_CENTER = GeoPoint(6.521645, 3.367835)
-        const val QUERY_RADIUS = 100.0
+        val QUERY_CENTER = GeoPoint( 9.0649869,7.3277417) //Using Abuja As Centre
+        const val QUERY_RADIUS = 855.0
         const val LOCATION_PERMISSION_REQUEST_CODE = 1
-
-        var KEY_CUSTOMER_STATION_URL: String? = "customer_stations_url"
-        var KEY_AUTH_TOKEN: String? = "auth_token"
-        var KEY_CUSTOMER_ID: String? = "customer_id"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.partner_map_activity_main)
         context = this@MapsActivity
+
+        configureCollectionReferenceForApp()
 
         mapService = MapService(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -69,8 +67,6 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
         mMapView = mapFragment.view!!
         mapFragment.getMapAsync(this)
 
-
-//        bottomSheetBehavior = BottomSheetBehavior.from(layout_bottom_sheet)
         bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.layout_bottom_sheet))
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
@@ -102,7 +98,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
 
         toolbar = findViewById(R.id.toolbar)
         fabTripFilter = findViewById(R.id.fabTripFilter)
-//        fabOpenSearch = findViewById(R.id.fabSearch)
+        fabOpenSearch = findViewById(R.id.fabSearch)
         fabMyLocation = findViewById(R.id.fabMyLocation)
         drawerLayout = findViewById(R.id.drawer_layout)
 
@@ -150,7 +146,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
                 if (fabMyLocation.visibility == View.VISIBLE) {
                     fabTripFilter.visibility = View.INVISIBLE
                     fabMyLocation.visibility = View.INVISIBLE
-//                    fabOpenSearch.visibility = View.INVISIBLE
+                    fabOpenSearch.visibility = View.INVISIBLE
 
                 }
             }
@@ -161,7 +157,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
 
         fabTripFilter.setOnClickListener(this)
         fabMyLocation.setOnClickListener(this)
-//        fabOpenSearch.setOnClickListener(this)
+        fabOpenSearch.setOnClickListener(this)
         btnApply.setOnClickListener(this)
         btnApply.visibility = View.INVISIBLE
         btnCloseDrawer.setOnClickListener(this)
@@ -282,10 +278,10 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
                 }
             }
 
-//            R.id.fabSearch -> {
-//                val searchIntent = Intent(this, SearchActivity::class.java)
-//                startActivity(searchIntent)
-//            }
+            R.id.fabSearch -> {
+                val searchIntent = Intent(this, SearchActivity::class.java)
+                startActivity(searchIntent)
+            }
             R.id.fabMyLocation -> {
                 try {
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))

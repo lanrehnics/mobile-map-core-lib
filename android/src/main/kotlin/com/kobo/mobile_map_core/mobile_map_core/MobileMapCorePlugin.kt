@@ -2,6 +2,7 @@ package com.kobo.mobile_map_core.mobile_map_core
 
 import android.content.Context
 import android.content.Intent
+import android.preference.PreferenceManager
 import androidx.core.content.ContextCompat.startActivity
 import com.kobo.mobile_map_core.mobile_map_core.map.MapsActivity
 import io.flutter.plugin.common.MethodCall
@@ -13,9 +14,10 @@ import io.flutter.plugin.common.PluginRegistry.Registrar
 class MobileMapCorePlugin : MethodCallHandler {
 
     companion object {
-        var KEY_CUSTOMER_STATION_URL: String? = "customer_stations_url"
-        var KEY_AUTH_TOKEN: String? = "auth_token"
-        var KEY_CUSTOMER_ID: String? = "customer_id"
+        var KEY_URL: String? = "url"
+        var KEY_APP_TYPE: String? = "appType"
+        var KEY_AUTH_TOKEN: String? = "authToken"
+        var KEY_ID: String? = "id"
 
         private var reg: Registrar? = null
 
@@ -30,7 +32,24 @@ class MobileMapCorePlugin : MethodCallHandler {
     override fun onMethodCall(call: MethodCall, result: Result) {
         if (call.method == "prepareMap") {
             val intent = Intent(getActiveContext(), MapsActivity::class.java)
-            getActiveContext()?.let { startActivity(it, intent, null) }
+
+            val args = call.arguments() as? ArrayList<*>
+            val url = args!![0] as String
+            val appType = args[1] as String
+            val authToken = args[2] as String
+            val id = args[3] as String
+
+            getActiveContext()?.let {
+                PreferenceManager.getDefaultSharedPreferences(it)
+                        .edit()
+                        .putString(KEY_URL, url)
+                        .putString(KEY_APP_TYPE, appType)
+                        .putString(KEY_AUTH_TOKEN, "Bearer $authToken")
+                        .putString(KEY_ID, id)
+                        .apply()
+
+                startActivity(it, intent, null)
+            }
             result.success("done")
 
         } else {

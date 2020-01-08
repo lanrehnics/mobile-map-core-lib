@@ -87,9 +87,8 @@ class MapService constructor(private val mContext: Context) {
 
         var customersLocations: CustomersLocations? = null
 
-        val url: String? = getDefaultSharedPreferences(mContext).getString(MapsActivity.KEY_CUSTOMER_STATION_URL, null)
+        val url: String? = getDefaultSharedPreferences(mContext).getString(MobileMapCorePlugin.KEY_URL, null)
         val token: String? = getDefaultSharedPreferences(mContext).getString(MobileMapCorePlugin.KEY_AUTH_TOKEN, null)
-        val custormerId: String? = getDefaultSharedPreferences(mContext).getString(MobileMapCorePlugin.KEY_CUSTOMER_ID, null)
 
         if (url != null) {
             val headers: ArrayMap<String, String> = ArrayMap()

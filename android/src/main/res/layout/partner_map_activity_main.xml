@@ -92,20 +92,20 @@
         </FrameLayout>
 
 
-<!--        <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-<!--            android:id="@+id/fabSearch"-->
-<!--            style="@style/Widget.MaterialComponents.FloatingActionButton"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_alignParentEnd="true"-->
-<!--            android:layout_alignParentRight="true"-->
-<!--            android:layout_centerVertical="true"-->
-<!--            android:layout_marginRight="7dp"-->
-<!--            android:elevation="5dp"-->
-<!--            app:fabSize="mini"-->
-<!--            app:backgroundTint="@android:color/white"-->
-<!--            app:srcCompat="@drawable/search"-->
-<!--            tools:ignore="RelativeOverlap,RtlHardcoded" />-->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabSearch"
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="7dp"
+            android:elevation="5dp"
+            app:fabSize="mini"
+            app:backgroundTint="@android:color/white"
+            app:srcCompat="@drawable/search"
+            tools:ignore="RelativeOverlap,RtlHardcoded" />
 
     </RelativeLayout>
 
