@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>349148006760-apt8lmqno3hhkqkeet2ivddgse8afl2r.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.349148006760-apt8lmqno3hhkqkeet2ivddgse8afl2r</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAdqX-yF8Djk-d1MxYFAzxnABkuDex1e24</string>
+	<key>GCM_SENDER_ID</key>
+	<string>349148006760</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.kobo.mobilemapcore.mobileMapCoreExample</string>
+	<key>PROJECT_ID</key>
+	<string>battlefield-425ae</string>
+	<key>STORAGE_BUCKET</key>
+	<string>battlefield-425ae.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:349148006760:ios:0ca42bc6cafe2485a86edd</string>
+	<key>DATABASE_URL</key>
+	<string>https://battlefield-425ae.firebaseio.com</string>
+</dict>
+</plist>
