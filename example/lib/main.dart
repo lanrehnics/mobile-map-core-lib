@@ -13,6 +13,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
+  String stuff = "nvlkxjvl";
 
   @override
   void initState() {
@@ -25,9 +26,9 @@ class _MyAppState extends State<MyApp> {
     String platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      platformVersion = await MobileMapCore.platformVersion;
+      platformVersion = await MobileMapCore.prepareMap;
     } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+      platformVersion = 'Failed to prepare map.';
     }
 
     // If the widget was removed from the tree while the asynchronous platform
@@ -48,8 +49,26 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
-        ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text('Running on: $_platformVersion\n'),
+
+              SizedBox(height: 50,),
+
+              RaisedButton(
+                onPressed: () async{
+                  MobileMapCore.loadMap({
+                    "token": "",
+                    "id": 0,
+                    "user_type": "squad",
+                  });
+                },
+                child: Text("Open map"),
+              )
+            ],
+          ),
+        )
       ),
     );
   }
