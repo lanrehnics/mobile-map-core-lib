@@ -35,7 +35,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     companion object {
-        const val TAG = "MapsActivity ::: ===>"
+        const val TAG = "MapsActivity : :: ===>"
         val QUERY_CENTER = GeoPoint( 9.0649869,7.3277417) //Using Abuja As Centre
         const val QUERY_RADIUS = 855.0
         const val LOCATION_PERMISSION_REQUEST_CODE = 1
