@@ -48,9 +48,8 @@ struct NetworkUtil {
         task.resume()
     }
     
-    func getKoboStations(_ geohash: String, _ token: String, onCompleted: @escaping (HubLocation) -> Void) {
-        let url = URL(string: "https://api.kobo360.com/admin/station/getall?geohash=s14me")!
-        var request = URLRequest(url: url)
+    func getHubLocations(url: String, _ token: String, onCompleted: @escaping (HubLocation) -> Void) {
+        var request = URLRequest(url: URL(string: url)!)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         let task = session.dataTask(with: request){data, response, error in
             if error != nil && data == nil {
@@ -73,7 +72,6 @@ struct NetworkUtil {
                  print("JSON error: \(error.localizedDescription)")
             }
         }
-        
         task.resume()
     }
 }

@@ -17,6 +17,8 @@ public class SwiftMobileMapCorePlugin: NSObject, FlutterPlugin {
         let platformArgs = call.arguments as! [String: Any]
         let model = ConfigModel(userType: UserType(rawValue: platformArgs["app_type"] as! String)!,
                                 authToken: platformArgs["token"] as! String,
+                                koboStationsUrl: platformArgs["kobo_stations_url"] as! String,
+                                customerLocationsUrl: platformArgs["customer_locations_url"] as! String,
                                 userTypeId: platformArgs["id"] as! Int)
         print("config model:", model)
         mainContentVC.setConfigurationModel(model: model)
