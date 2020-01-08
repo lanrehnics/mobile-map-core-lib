@@ -3,6 +3,7 @@ package com.kobo.mobile_map_core.mobile_map_core.map
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.preference.PreferenceManager
 import android.util.Log
 import android.view.View
 import android.widget.*
@@ -18,14 +19,13 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.navigation.NavigationView
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.GeoPoint
-import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.*
 import com.google.maps.android.clustering.ClusterManager
+import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
 import com.kobo.mobile_map_core.mobile_map_core.R
 import com.kobo.mobile_map_core.mobile_map_core.animation.LatLngInterpolator
 import com.kobo.mobile_map_core.mobile_map_core.animation.MarkerAnimation
+import com.kobo.mobile_map_core.mobile_map_core.enums.AppType
 import com.kobo.mobile_map_core.mobile_map_core.models.ClearCommand
 import com.kobo.mobile_map_core.mobile_map_core.models.DisplayMode
 import com.kobo.mobile_map_core.mobile_map_core.models.TripStatus
@@ -48,8 +48,8 @@ abstract class BaseMapActivity : AppCompatActivity() {
     //Private properties
     private var fireStoreSearchEventListener: ListenerRegistration? = null
     private val db = FirebaseFirestore.getInstance()
-    private val collectionRef = FirebaseFirestore.getInstance().collection("Trucks")
-    private val geoFireStore = GeoFirestore(collectionRef)
+    private lateinit var collectionRef: CollectionReference
+    private lateinit var geoFireStore: GeoFirestore
     private lateinit var polylineOptions: PolylineOptions
     private lateinit var blackPolylineOptions: PolylineOptions
     private lateinit var blackPolyline: Polyline
@@ -67,7 +67,7 @@ abstract class BaseMapActivity : AppCompatActivity() {
     protected lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     protected lateinit var fabMyLocation: View
     protected lateinit var fabTripFilter: View
-//    protected lateinit var fabOpenSearch: View
+    protected lateinit var fabOpenSearch: View
     protected lateinit var btnApply: Button
     protected lateinit var backArrowButton: ImageButton
     protected lateinit var btnCloseDrawer: View
@@ -102,6 +102,8 @@ abstract class BaseMapActivity : AppCompatActivity() {
 
     protected lateinit var tripFilterLinearLayout: LinearLayout
 
+    private var parserCounter = 0
+
     protected var truckMarkerManager: MutableMap<String, TruckModelDataParser> = mutableMapOf()
     var pickUpStations: MutableMap<Marker, Locations> = mutableMapOf()
     var selectedTruck: TruckModelDataParser? = null
@@ -115,7 +117,6 @@ abstract class BaseMapActivity : AppCompatActivity() {
     protected fun showMessage(context: Context, message: String) {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
-
 
 
     private fun focusOnTruck(truckId: String) {
@@ -320,8 +321,10 @@ abstract class BaseMapActivity : AppCompatActivity() {
         geoQuery.addGeoQueryDataEventListener(object : GeoQueryDataEventListener {
             override fun onDocumentEntered(documentSnapshot: DocumentSnapshot, location: GeoPoint) {
                 try {
-                    val model = documentSnapshot.toObject(TruckModelDataParser::class.java)
-                    addTrucks(model)
+                    if (truckMarkerManager.size < 200) {
+                        val model = documentSnapshot.toObject(TruckModelDataParser::class.java)
+                        addTrucks(model)
+                    }
                 } catch (error: Exception) {
                     Log.e(MapsActivity.TAG, "Error parsing data")
                 }
@@ -338,6 +341,7 @@ abstract class BaseMapActivity : AppCompatActivity() {
             }
 
             override fun onDocumentMoved(documentSnapshot: DocumentSnapshot, location: GeoPoint) {
+
                 try {
                     val model = documentSnapshot.toObject(TruckModelDataParser::class.java)
                     val truckModelDataParser = truckMarkerManager[model?.d?.reg_number]
@@ -372,6 +376,7 @@ abstract class BaseMapActivity : AppCompatActivity() {
                     }
                     clusterManager.cluster()
                 } catch (e: Exception) {
+                    parserCounter++
                     print(e.message)
                 }
             }
@@ -381,6 +386,8 @@ abstract class BaseMapActivity : AppCompatActivity() {
             }
 
             override fun onGeoQueryReady() {
+
+                Log.e(MapsActivity.TAG, "Unable to parse: $parserCounter Truck info")
 
 
                 try {
@@ -473,6 +480,27 @@ abstract class BaseMapActivity : AppCompatActivity() {
         }
     }
 
+
+    protected fun configureCollectionReferenceForApp() {
+        val appType: String? = PreferenceManager.getDefaultSharedPreferences(context).getString(MobileMapCorePlugin.KEY_APP_TYPE, null)
+        val id: String? = PreferenceManager.getDefaultSharedPreferences(context).getString(MobileMapCorePlugin.KEY_ID, null)
+
+        when (appType?.let { AppType.valueOf(it) }) {
+            AppType.Squad -> {
+                collectionRef = FirebaseFirestore.getInstance().collection("Trucks")
+            }
+            AppType.Customer -> {
+                collectionRef = FirebaseFirestore.getInstance().collection("Customers/$id/TripList")
+            }
+            AppType.Transporter -> {
+                collectionRef = FirebaseFirestore.getInstance().collection("Trucks")
+            }
+        }
+
+        geoFireStore = GeoFirestore(collectionRef)
+
+    }
+
     protected fun truckFromStatus(model: TruckModelDataParser): BitmapDescriptor? {
         return BitmapDescriptorFactory.fromResource(
                 when {
@@ -493,11 +521,13 @@ abstract class BaseMapActivity : AppCompatActivity() {
     }
 
     private fun verifyCurrentLocation(geoPoint: GeoPoint): GeoPoint {
-        return if (geoPoint.latitude > 0 && geoPoint.longitude > 0) {
-            geoPoint
-        } else {
-            MapsActivity.QUERY_CENTER
-        }
+//        return if (geoPoint.latitude > 0 && geoPoint.longitude > 0) {
+//            geoPoint
+//        } else {
+//            MapsActivity.QUERY_CENTER
+//        }
+
+        return MapsActivity.QUERY_CENTER
 
     }
 }
