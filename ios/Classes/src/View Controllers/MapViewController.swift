@@ -18,6 +18,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     var truckRedIcon: UIImageView?
     var truckBlueIcon: UIImageView?
     var custLocationsIcon: UIImageView?
+    var koboStationIcon: UIImageView?
     var defaultMarker: GMSMarker?
     var truckDetailsViewController: TruckDetailsViewController!
     var visualEffectView: UIVisualEffectView!
@@ -46,7 +47,10 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     var currentQuery: GFSCircleQuery!
     var singleDocListener: ListenerRegistration?
     var configModel: ConfigModel!
-    
+    var customerLocations: [Hub] = []
+    var koboStations: [Hub] = []
+    var loadingAlert: UIAlertController!
+
     private var markers: [String : POIItem] = [:]
     private var trucks: [String : Truck] = [:]
 
@@ -87,6 +91,9 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        showLoader()
+        loadTrucks()
+        loadKoboStations();
     }
     
     func setUpMarkerCluster() {
@@ -157,10 +164,12 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
         let blue = UIImage(named: "truck_blue")
         let red = UIImage(named: "truck_red")
         let custLoc = UIImage(named: "customer_locations")
+        let koboStation = UIImage(named: "kobo_stations")
+        koboStationIcon = UIImageView(image: koboStation)
         custLocationsIcon = UIImageView(image: custLoc)
         truckBlueIcon = UIImageView(image: blue)
         truckRedIcon = UIImageView(image: red)
-        mapView.setMinZoom(8, maxZoom: 19)
+        mapView.setMinZoom(8, maxZoom: 18)
         
 
 //        do {
@@ -172,7 +181,6 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
 //        } catch {
 //           NSLog("one or more of the file styles failed to ooad")
 //        }
-        loadTrucks()
     }
     
     func loadTrucks() {
@@ -199,6 +207,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
         })
         
         let _ = currentQuery.observeReady {
+            self.stopLoader()
             self.clusterManager.cluster()
             self.mapView.animate(with: GMSCameraUpdate.fit(self.bounds, withPadding: 20))
         }
@@ -287,21 +296,37 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
         let marker = GMSMarker()
         marker.position = poiItem.position
         bounds = bounds.includingCoordinate(marker.position)
-        marker.title = "\(poiItem.data.regNumber)"
-        marker.rotation = Double(poiItem.data.bearing)!
-        poiItem.data.isClustered = false
-        if(poiItem.data.flagged) {
-            marker.iconView = self.truckRedIcon
-            
-        } else if poiItem.data.active == 1 {
-            marker.iconView = self.truckGreenIcon
-        } else if(poiItem.data.speed > 0) {
-            marker.iconView = self.truckGreenIcon
-        } else {
-            marker.iconView = self.truckBlueIcon
+        switch poiItem.markerType {
+        case .truck:
+            var truck = poiItem.data as! Truck
+            marker.title = "\(truck.regNumber)"
+            marker.rotation = Double(truck.bearing)!
+            truck.isClustered = false
+            if(truck.flagged) {
+                marker.iconView = self.truckRedIcon
+            } else if truck.active == 1 {
+                marker.iconView = self.truckGreenIcon
+            } else if(truck.speed > 0) {
+                marker.iconView = self.truckGreenIcon
+            } else {
+                marker.iconView = self.truckBlueIcon
+            }
+            poiItem.marker = marker
+            markers[truck.regNumber] = poiItem
+        case .customerLocation:
+            let hub = poiItem.data as! Hub
+            marker.title = "\(hub.name)"
+            marker.snippet = "\(hub.address)"
+            marker.iconView = self.custLocationsIcon
+        case .koboStation:
+            let hub = poiItem.data as! Hub
+            marker.title = "\(hub.name)"
+            marker.snippet = "\(hub.address)"
+            marker.iconView = self.koboStationIcon
+        case .none:
+            print("none")
         }
-        poiItem.marker = marker
-        markers[poiItem.data.regNumber] = poiItem
+        marker.map = self.mapView
         return marker
     }
     
@@ -368,7 +393,6 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     }
     
     @objc func onSearchButtonClicked() {
-        loadKoboStations();
         let searchVc = SearchViewController()
         searchVc.modalPresentationStyle = .formSheet
         searchVc.collectionRef = firebaseColRef
@@ -409,7 +433,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
         if (marker.title == nil) {return false}
         
         if let truck = markers[marker.title!]?.data {
-            onSingleTruckFocus(truck)
+            onSingleTruckFocus(truck as! Truck)
             return true
         } else {
             return false
@@ -436,8 +460,14 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
         self.isFirstTImeLoad = true
         clusterManager.clearItems()
         mapDataState = .filtering
+        if (model.customerLocations) {
+            addCustomerLocationsToCluster()
+        }
+        if model.koboStations {
+            addKoboStationToCluster()
+        }
         for marker in markers.values {
-            filterTruck(marker.data)
+            filterTruck(marker.data as! Truck)
         }
         self.clusterManager.cluster()
         self.mapView.animate(with: GMSCameraUpdate.fit(self.bounds, withPadding: 20))
@@ -452,6 +482,8 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
         mapDataState = .initial
         markers = [:]
         loadTrucks()
+        addCustomerLocationsToCluster()
+        addKoboStationToCluster()
     }
     
     func search(searchModel: SearchResultModel) {
@@ -517,15 +549,58 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     }
     
     func loadKoboStations() {
-        let geohash = currentUserLocation.geohash(length: 5)
+        var geohash = currentUserLocation.geohash(length: 5)
+        geohash = "s14mk"
         let url = configModel.koboStationsUrl + "?geohash=\(geohash)"
         print("stations url ", url)
         networkUtil.getHubLocations(url: url, configModel.authToken, onCompleted: { hubLocation in
             print("hublocations total record is", hubLocation.hubs.count)
+            self.koboStations.append(contentsOf: hubLocation.hubs)
+            self.addKoboStationToCluster()
         })
+        if(configModel.userType != .partner) {
+            let custUrl = configModel.customerLocationsUrl + "?geohash=\(geohash)";
+            networkUtil.getHubLocations(url: custUrl, configModel.authToken, onCompleted: { hubLocation in
+                print("customer locations total record is", hubLocation.hubs.count)
+                self.customerLocations.append(contentsOf: hubLocation.hubs)
+                self.addCustomerLocationsToCluster()
+            })
+        }
     }
-
     
+    func addKoboStationToCluster() {
+        self.koboStations.forEach{ hub in
+            let position = CLLocationCoordinate2D(latitude: Double(hub.lat)!, longitude: Double(hub.long)!)
+            bounds = bounds.includingCoordinate(position)
+            let item = POIItem(position: position, data: hub, type: .koboStation)
+            clusterManager.add(item)
+        }
+    }
+    
+    func addCustomerLocationsToCluster() {
+        self.customerLocations.forEach{ hub in
+            let position = CLLocationCoordinate2D(latitude: Double(hub.lat)!, longitude: Double(hub.long)!)
+            bounds = bounds.includingCoordinate(position)
+            let item = POIItem(position: position, data: hub, type: .customerLocation)
+            clusterManager.add(item)
+        }
+    }
+    
+    func showLoader() {
+        loadingAlert = UIAlertController(title: nil, message: "Loading Map ...", preferredStyle: .alert)
+        let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
+        loadingIndicator.hidesWhenStopped = true
+        loadingIndicator.activityIndicatorViewStyle = UIActivityIndicatorView.Style.gray
+        loadingIndicator.startAnimating();
+        loadingAlert.view.addSubview(loadingIndicator)
+        present(loadingAlert, animated: true, completion: nil)
+    }
+    
+    func stopLoader() {
+        if let vc = self.presentedViewController, vc is UIAlertController {
+            loadingAlert?.dismiss(animated: false, completion: nil)
+        }
+    }
     /*
     // MARK: - Navigation
 
