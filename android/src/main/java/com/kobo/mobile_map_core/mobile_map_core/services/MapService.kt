@@ -87,7 +87,7 @@ class MapService constructor(private val mContext: Context) {
 
         var customersLocations: CustomersLocations? = null
 
-        val url: String? = getDefaultSharedPreferences(mContext).getString(MobileMapCorePlugin.KEY_URL, null)
+        val url: String? = getDefaultSharedPreferences(mContext).getString(MobileMapCorePlugin.KEY_KOBO_CUSTOMER_URL, null)
         val token: String? = getDefaultSharedPreferences(mContext).getString(MobileMapCorePlugin.KEY_AUTH_TOKEN, null)
 
         if (url != null) {
