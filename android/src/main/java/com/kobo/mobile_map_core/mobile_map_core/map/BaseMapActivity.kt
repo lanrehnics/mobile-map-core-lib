@@ -44,7 +44,6 @@ import java.util.*
 
 abstract class BaseMapActivity : AppCompatActivity() {
 
-
     //Private properties
     private var fireStoreSearchEventListener: ListenerRegistration? = null
     private val db = FirebaseFirestore.getInstance()
@@ -67,7 +66,7 @@ abstract class BaseMapActivity : AppCompatActivity() {
     protected lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     protected lateinit var fabMyLocation: View
     protected lateinit var fabTripFilter: View
-    protected lateinit var fabOpenSearch: View
+//    protected lateinit var fabOpenSearch: View
     protected lateinit var btnApply: Button
     protected lateinit var backArrowButton: ImageButton
     protected lateinit var btnCloseDrawer: View
@@ -483,16 +482,16 @@ abstract class BaseMapActivity : AppCompatActivity() {
 
     protected fun configureCollectionReferenceForApp() {
         val appType: String? = PreferenceManager.getDefaultSharedPreferences(context).getString(MobileMapCorePlugin.KEY_APP_TYPE, null)
-        val id: String? = PreferenceManager.getDefaultSharedPreferences(context).getString(MobileMapCorePlugin.KEY_ID, null)
+        val id: Int? = PreferenceManager.getDefaultSharedPreferences(context).getInt(MobileMapCorePlugin.KEY_ID, -1)
 
-        when (appType?.let { AppType.valueOf(it) }) {
-            AppType.Squad -> {
+        when (appType?.let { AppType.valueOf(it.toUpperCase(Locale.getDefault())) }) {
+            AppType.SQUAD -> {
                 collectionRef = FirebaseFirestore.getInstance().collection("Trucks")
             }
-            AppType.Customer -> {
+            AppType.CUSTOMER -> {
                 collectionRef = FirebaseFirestore.getInstance().collection("Customers/$id/TripList")
             }
-            AppType.Transporter -> {
+            AppType.TRANSPORTER -> {
                 collectionRef = FirebaseFirestore.getInstance().collection("Trucks")
             }
         }

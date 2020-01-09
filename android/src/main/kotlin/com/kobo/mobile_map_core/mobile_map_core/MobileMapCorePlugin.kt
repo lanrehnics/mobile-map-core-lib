@@ -14,9 +14,11 @@ import io.flutter.plugin.common.PluginRegistry.Registrar
 class MobileMapCorePlugin : MethodCallHandler {
 
     companion object {
-        var KEY_URL: String? = "url"
-        var KEY_APP_TYPE: String? = "appType"
-        var KEY_AUTH_TOKEN: String? = "authToken"
+
+        var KEY_KOBO_CUSTOMER_URL: String? = "customer_locations_url"
+        var KEY_KOBO_STATIONS_URL: String? = "kobo_stations_url"
+        var KEY_APP_TYPE: String? = "app_type"
+        var KEY_AUTH_TOKEN: String? = "token"
         var KEY_ID: String? = "id"
 
         private var reg: Registrar? = null
@@ -30,22 +32,24 @@ class MobileMapCorePlugin : MethodCallHandler {
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
-        if (call.method == "prepareMap") {
+        if (call.method == "launch_map") {
             val intent = Intent(getActiveContext(), MapsActivity::class.java)
 
-            val args = call.arguments() as? ArrayList<*>
-            val url = args!![0] as String
-            val appType = args[1] as String
-            val authToken = args[2] as String
-            val id = args[3] as String
+            val args = call.arguments() as? Map<String, Any>
+            val koboCustomerUrl = args!![KEY_KOBO_CUSTOMER_URL] as String
+            val koboStationsUrl = args[KEY_KOBO_STATIONS_URL] as String
+            val appType = args[KEY_APP_TYPE] as String
+            val authToken = args[KEY_AUTH_TOKEN] as String
+            val id = args[KEY_ID] as Int
 
             getActiveContext()?.let {
                 PreferenceManager.getDefaultSharedPreferences(it)
                         .edit()
-                        .putString(KEY_URL, url)
+                        .putString(KEY_KOBO_CUSTOMER_URL, koboCustomerUrl)
+                        .putString(KEY_KOBO_STATIONS_URL, koboStationsUrl)
                         .putString(KEY_APP_TYPE, appType)
                         .putString(KEY_AUTH_TOKEN, "Bearer $authToken")
-                        .putString(KEY_ID, id)
+                        .putInt(KEY_ID, id)
                         .apply()
 
                 startActivity(it, intent, null)

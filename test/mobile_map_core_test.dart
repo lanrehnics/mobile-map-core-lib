@@ -16,6 +16,6 @@ void main() {
   });
 
   test('getPlatformVersion', () async {
-    expect(await MobileMapCore.prepareMap, '42');
+    expect(await MobileMapCore.loadMap({}), '42');
   });
 }
