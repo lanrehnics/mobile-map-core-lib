@@ -1,7 +1,6 @@
 package com.kobo.mobile_map_core.mobile_map_core.map
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -97,7 +96,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
 
         toolbar = findViewById(R.id.toolbar)
         fabTripFilter = findViewById(R.id.fabTripFilter)
-        fabOpenSearch = findViewById(R.id.fabSearch)
+//        fabOpenSearch = findViewById(R.id.fabSearch)
         fabMyLocation = findViewById(R.id.fabMyLocation)
         drawerLayout = findViewById(R.id.drawer_layout)
 
@@ -145,7 +144,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
                 if (fabMyLocation.visibility == View.VISIBLE) {
                     fabTripFilter.visibility = View.INVISIBLE
                     fabMyLocation.visibility = View.INVISIBLE
-                    fabOpenSearch.visibility = View.INVISIBLE
+//                    fabOpenSearch.visibility = View.INVISIBLE
 
                 }
             }
@@ -156,7 +155,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
 
         fabTripFilter.setOnClickListener(this)
         fabMyLocation.setOnClickListener(this)
-        fabOpenSearch.setOnClickListener(this)
+//        fabOpenSearch.setOnClickListener(this)
         btnApply.setOnClickListener(this)
         btnApply.visibility = View.INVISIBLE
         btnCloseDrawer.setOnClickListener(this)
@@ -186,12 +185,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json))
 
         mMap.uiSettings.setAllGesturesEnabled(true)
-//        mMap.addMarker(MarkerOptions()
-//            .position(headOffice)
-//            .title("Head office")
-//            .icon(BitmapDescriptorFactory.fromResource(R.drawable.kobo_truck_blue))
-//        )
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(headOffice))
+
         mMap.moveCamera(
                 CameraUpdateFactory.newCameraPosition(
                         CameraPosition.Builder()
@@ -202,11 +196,6 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
                                 .build()
                 )
         )
-//        loadTrucks()
-
-//        bootStrapPickupStationsAndTrucks()
-
-//        polyLineList = decodePoly("")
         mMap.setOnMarkerClickListener(this)
         setUpLocationPermission()
         fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
@@ -230,40 +219,6 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
 
         backArrowButton.visibility = View.INVISIBLE
         btnCloseTruckInfo.visibility = View.VISIBLE
-//        selectedMarker = marker
-
-//        if (truckMarkers.containsKey(marker)) {
-//            btnCloseTruckInfo.visibility = View.VISIBLE
-//            selectedTruck = truckMarkers[marker]!!
-//            currentDisplayMode = DisplayMode.SINGLE
-//            setTruckDetails()
-//            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-//                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-//            }
-//            val destinationLatitude: Double =
-//                    selectedTruck.d.deliveryStation.location.coordinates[0]
-//            val destinationLongitude: Double =
-//                    selectedTruck.d.deliveryStation.location.coordinates[1]
-//
-//            if (destinationLatitude > 0 && destinationLongitude > 0)
-//                GlobalScope.launch(Dispatchers.Main) {
-//                    try {
-//                        val origin = GeoPoint(marker.position.latitude, marker.position.longitude)
-//                        val destination = GeoPoint(destinationLatitude, destinationLongitude)
-//                        val polyLineList = mapService.getPolyline(origin, destination)
-//                        if (polyLineList.isNotEmpty()) {
-//                            drawPolyLine(polyLineList)
-//                        }
-//                        removeOtherMarkersExcept(marker)
-//                    } catch (e: Exception) {
-//                        Log.e(TAG, "Error fetching customers locations ${e.message}")
-//                    }
-//                }
-//
-//        } else {
-//            marker.showInfoWindow()
-//        }
-
         return true
     }
 
@@ -277,10 +232,10 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
                 }
             }
 
-            R.id.fabSearch -> {
-                val searchIntent = Intent(this, SearchActivity::class.java)
-                startActivity(searchIntent)
-            }
+//            R.id.fabSearch -> {
+//                val searchIntent = Intent(this, SearchActivity::class.java)
+//                startActivity(searchIntent)
+//            }
             R.id.fabMyLocation -> {
                 try {
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
@@ -292,15 +247,11 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
             R.id.btn_apply -> {
                 if (!isMappedFiltered) {
                     if (listTripStatusFilter.isNotEmpty()) {
-
-
                         val filteredTruckList = truckMarkerManager.values.toList().filter { truckModel ->
-
                             val activeTrip: String =
                                     if (truckModel.d.active == 1) TripStatus.STATUS_ACTIVE_TRIPS else ""
                             val flaaggedTrip: String =
                                     if (truckModel.d.flagged) TripStatus.STATUS_FLAGGED_TRIP else ""
-
                             listTripStatusFilter.contains(
                                     truckModel.d.status.toLowerCase(
                                             Locale.getDefault()

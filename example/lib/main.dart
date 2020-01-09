@@ -26,7 +26,7 @@ class _MyAppState extends State<MyApp> {
     String platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      platformVersion = await MobileMapCore.prepareMap();
+      platformVersion = await MobileMapCore.loadMap({});
     } on PlatformException {
       platformVersion = 'Failed to prepare map.';
     }
@@ -45,31 +45,30 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text('Running on: $_platformVersion\n'),
-
-              SizedBox(height: 50,),
-
-              RaisedButton(
-                onPressed: () async{
-                  MobileMapCore.loadMap({
-                    "token": "",
-                    "id": 0,
-                    "user_type": "squad",
-                  });
-                },
-                child: Text("Open map"),
-              )
-            ],
+          appBar: AppBar(
+            title: const Text('Plugin example app'),
           ),
-        )
-      ),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text('Running on: $_platformVersion\n'),
+                SizedBox(
+                  height: 50,
+                ),
+                RaisedButton(
+                  onPressed: () async {
+                    MobileMapCore.loadMap({
+                      "token": "",
+                      "id": 0,
+                      "user_type": "squad",
+                    });
+                  },
+                  child: Text("Open map"),
+                )
+              ],
+            ),
+          )),
     );
   }
 }
