@@ -8,14 +8,13 @@ class MarkerClusterItem(
         val truckModelDataParser: TruckModelDataParser
 ) : ClusterItem {
 
-
     override fun getSnippet(): String {
-        return truckModelDataParser.d.reg_number
+        return truckModelDataParser.d.deliveryStation.address
     }
 
     override fun getTitle(): String {
         // be very careful when changing this, the title is use to filter the markerManager in clusterManager
-        return truckModelDataParser.d.reg_number
+        return truckModelDataParser.d.customerName
     }
 
     override fun getPosition(): LatLng {

@@ -2,18 +2,21 @@ package com.kobo.mobile_map_core.mobile_map_core.models
 
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.PropertyName
+import com.kobo360.models.Locations
+import org.imperiumlabs.geofirestore.core.GeoHash
 
 data class TruckModelDataParser(
-        @PropertyName("d") val d: TruckModel = TruckModel(),
-        @PropertyName("g") val g: String = "",
-        @PropertyName("l") val l: GeoPoint = GeoPoint(0.0, 0.0)
+        @PropertyName("d") var d: TruckModel = TruckModel(),
+        @PropertyName("g") var g: String = "",
+        @PropertyName("l") var l: GeoPoint = GeoPoint(0.0, 0.0)
 
-)
+) {
+    constructor(koboLocationData: Locations, resourceType: String) : this(TruckModel(koboLocationData,resourceType), GeoHash(koboLocationData.lat, koboLocationData.long).geoHashString, GeoPoint(koboLocationData.lat, koboLocationData.long))
+}
 
 data class BattleFieldSearch(var id: Int, var regNumber: String, var tripId: String, var tag: SearchTag) {
     constructor (id: Int, truckModel: TruckModelDataParser, tag: SearchTag) : this(id, truckModel.d.reg_number, truckModel.d.tripId, tag)
 }
-
 
 data class TruckModel(
         @PropertyName("lastConnectionTime") val lastConnectionTime: String = "",
@@ -47,8 +50,41 @@ data class TruckModel(
         @PropertyName("sourceCountry") val sourceCountry: String = "",
         @PropertyName("deliveryStation") val deliveryStation: DeliveryStation = DeliveryStation(),
         @PropertyName("pickupStation") val pickUpStation: PickUpStation = PickUpStation(),
-        @PropertyName("nextPosition") val nextPosition: NextPosition = NextPosition()
-)
+        @PropertyName("nextPosition") val nextPosition: NextPosition = NextPosition(),
+        val resourceType: String = "truck"
+) {
+    constructor(koboLocationData: Locations, resourceType: String) : this("",
+            koboLocationData.id.toString(), "", "0.0",
+            GeoHash(koboLocationData.lat, koboLocationData.long).geoHashString,
+            koboLocationData.lat,
+            koboLocationData.long,
+            0,
+            0,
+            false,
+            koboLocationData.customer_id,
+            0,
+            "",
+            koboLocationData.name,
+            false,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            DeliveryStation("", koboLocationData.address),
+            PickUpStation(),
+            NextPosition(),
+            resourceType
+    )
+}
 
 data class DeliveryStation(
         @PropertyName("_id") val id: String = "",

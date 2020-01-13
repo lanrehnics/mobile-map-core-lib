@@ -26,18 +26,16 @@ import com.kobo.mobile_map_core.mobile_map_core.R
 import com.kobo.mobile_map_core.mobile_map_core.animation.LatLngInterpolator
 import com.kobo.mobile_map_core.mobile_map_core.animation.MarkerAnimation
 import com.kobo.mobile_map_core.mobile_map_core.enums.AppType
-import com.kobo.mobile_map_core.mobile_map_core.models.ClearCommand
-import com.kobo.mobile_map_core.mobile_map_core.models.DisplayMode
-import com.kobo.mobile_map_core.mobile_map_core.models.TripStatus
-import com.kobo.mobile_map_core.mobile_map_core.models.TruckModelDataParser
+import com.kobo.mobile_map_core.mobile_map_core.enums.KoboLocationType
+import com.kobo.mobile_map_core.mobile_map_core.models.*
 import com.kobo360.map.MarkerClusterRenderer
-import com.kobo360.models.CustomersLocations
 import com.kobo360.models.Locations
 import com.kobo.mobile_map_core.mobile_map_core.services.MapService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.imperiumlabs.geofirestore.GeoFirestore
+import org.imperiumlabs.geofirestore.core.GeoHash
 import org.imperiumlabs.geofirestore.listeners.GeoQueryDataEventListener
 import java.lang.Exception
 import java.util.*
@@ -54,11 +52,15 @@ abstract class BaseMapActivity : AppCompatActivity() {
     private lateinit var blackPolyline: Polyline
     private lateinit var greyPolyLine: Polyline
 
-
     //Protected variables ...
     protected lateinit var context: Context
     protected var isMappedFiltered = false
-    protected var customersLocations: CustomersLocations? = null
+    protected var isMappedFilteredByCustomer = false
+    protected var isMappedFilteredByStations = false
+    private var customersLocations: KoboLocations? = null
+    protected var customerLocationList: MutableList<Locations?>? = arrayListOf()
+    private var koboStationLocations: KoboLocations? = null
+    protected var koboStationLocationsList: MutableList<Locations?>? = arrayListOf()
     protected lateinit var fusedLocationClient: FusedLocationProviderClient
     protected lateinit var mapService: MapService
     protected lateinit var mMap: GoogleMap
@@ -66,7 +68,7 @@ abstract class BaseMapActivity : AppCompatActivity() {
     protected lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
     protected lateinit var fabMyLocation: View
     protected lateinit var fabTripFilter: View
-//    protected lateinit var fabOpenSearch: View
+    //    protected lateinit var fabOpenSearch: View
     protected lateinit var btnApply: Button
     protected lateinit var backArrowButton: ImageButton
     protected lateinit var btnCloseDrawer: View
@@ -82,6 +84,8 @@ abstract class BaseMapActivity : AppCompatActivity() {
     protected lateinit var statusAvailable: CheckBox
     protected lateinit var activeTrips: CheckBox
     protected lateinit var flaggedTrips: CheckBox
+    protected lateinit var customers: CheckBox
+    protected lateinit var stations: CheckBox
     protected lateinit var btnCloseTruckInfo: ImageButton
     protected lateinit var currentLatLng: LatLng
     protected lateinit var bottomSheetHeader: LinearLayout
@@ -108,7 +112,7 @@ abstract class BaseMapActivity : AppCompatActivity() {
     var selectedTruck: TruckModelDataParser? = null
 
     //    protected val listTruckModel: MutableList<TruckModelDataParser?> = ArrayList()
-    protected val listTripStatusFilter: MutableList<String?> = ArrayList()
+    protected val listFilterTerms: MutableList<String?> = ArrayList()
 
     protected lateinit var selectedMarker: Marker
     protected var currentDisplayMode: DisplayMode = DisplayMode.ALL
@@ -118,49 +122,47 @@ abstract class BaseMapActivity : AppCompatActivity() {
     }
 
 
-    private fun focusOnTruck(truckId: String) {
-        backArrowButton.visibility = View.INVISIBLE
-        btnCloseTruckInfo.visibility = View.VISIBLE
-
-        val docRef = db.collection("Trucks").document(truckId)
-        fireStoreSearchEventListener = docRef.addSnapshotListener { snapshot, e ->
-            if (e != null) {
-                Log.w(MapsActivity.TAG, "Listen failed.", e)
-                return@addSnapshotListener
-            }
-            if (snapshot != null && snapshot.exists()) {
-
-                fireStoreSearchEventListener?.remove()
-                Log.d(MapsActivity.TAG, "Current data: ${snapshot.data}")
-                val searchResult = snapshot.toObject(TruckModelDataParser::class.java)
-
-                if (searchResult != null) {
-                    isSearchOn = true
-                    mMap.uiSettings.isRotateGesturesEnabled = true
-                    mMap.addMarker(
-                            MarkerOptions()
-                                    .position(toLatLng(searchResult.l))
-                                    .title(searchResult.d.reg_number)
-                                    .rotation(searchResult.d.bearing.toFloat())
-                                    .icon(truckFromStatus(searchResult))
-                    )
-                    mMap.animateCamera(
-                            CameraUpdateFactory.newCameraPosition(
-                                    CameraPosition.Builder().target(
-                                            LatLng(searchResult.l.latitude, searchResult.l.longitude)
-                                    )
-                                            .zoom(16.5f).build()
-                            )
-                    )
-                }
-
-
-            } else {
-                Log.d(MapsActivity.TAG, "Current data: null")
-            }
-        }
-
-    }
+//    private fun focusOnTruck(truckId: String) {
+//        backArrowButton.visibility = View.INVISIBLE
+//        btnCloseTruckInfo.visibility = View.VISIBLE
+//
+//        val docRef = db.collection("Trucks").document(truckId)
+//        fireStoreSearchEventListener = docRef.addSnapshotListener { snapshot, e ->
+//            if (e != null) {
+//                Log.w(MapsActivity.TAG, "Listen failed.", e)
+//                return@addSnapshotListener
+//            }
+//            if (snapshot != null && snapshot.exists()) {
+//
+//                fireStoreSearchEventListener?.remove()
+//                Log.d(MapsActivity.TAG, "Current data: ${snapshot.data}")
+//                val searchResult = snapshot.toObject(TruckModelDataParser::class.java)
+//
+//                if (searchResult != null) {
+//                    isSearchOn = true
+//                    mMap.uiSettings.isRotateGesturesEnabled = true
+//                    mMap.addMarker(
+//                            MarkerOptions()
+//                                    .position(toLatLng(searchResult.l))
+//                                    .title(searchResult.d.reg_number)
+//                                    .rotation(searchResult.d.bearing.toFloat())
+//                                    .icon(truckFromStatus(searchResult))
+//                    )
+//                    mMap.animateCamera(
+//                            CameraUpdateFactory.newCameraPosition(
+//                                    CameraPosition.Builder().target(
+//                                            LatLng(searchResult.l.latitude, searchResult.l.longitude)
+//                                    )
+//                                            .zoom(16.5f).build()
+//                            )
+//                    )
+//                }
+//            } else {
+//                Log.d(MapsActivity.TAG, "Current data: null")
+//            }
+//        }
+//
+//    }
 
     protected fun toLatLng(geoPoint: GeoPoint): LatLng {
         return LatLng(geoPoint.latitude, geoPoint.longitude)
@@ -173,6 +175,9 @@ abstract class BaseMapActivity : AppCompatActivity() {
     protected fun clearMapAndData(command: ClearCommand) {
 
         clusterManager.clearItems()
+        customerLocationList?.clear()
+        koboStationLocationsList?.clear()
+
         when (command) {
             ClearCommand.MAP -> {
                 mMap.clear()
@@ -181,7 +186,7 @@ abstract class BaseMapActivity : AppCompatActivity() {
             ClearCommand.DATA -> {
                 truckMarkerManager.clear()
                 markerManager.clear()
-                listTripStatusFilter.clear()
+                listFilterTerms.clear()
             }
             ClearCommand.WITHOUT_VIEW -> {
                 mMap.clear()
@@ -194,7 +199,7 @@ abstract class BaseMapActivity : AppCompatActivity() {
                 truckMarkerManager.clear()
                 backArrowButton.visibility = View.VISIBLE
                 btnCloseTruckInfo.visibility = View.INVISIBLE
-                listTripStatusFilter.clear()
+                listFilterTerms.clear()
             }
         }
     }
@@ -225,25 +230,33 @@ abstract class BaseMapActivity : AppCompatActivity() {
 
     }
 
-    protected fun addStations(model: Locations?) {
+    private fun addStations(model: Locations?, locationType: KoboLocationType) {
         try {
             if (model != null && model.lat > 0.0 && model.long > 0.0) {
                 val marker = mMap.addMarker(
-                        MarkerOptions().position(LatLng(model.lat, model.long))
-                                .icon(
-                                        BitmapDescriptorFactory.fromResource(
+                        when (locationType) {
+                            KoboLocationType.CUSTOMER -> {
+                                MarkerOptions().position(LatLng(model.lat, model.long))
+                                        .icon(BitmapDescriptorFactory.fromResource(
                                                 R.drawable.warehouse
+                                        )).title(model.contact_name).snippet("Customer address: ${model.address}")
+                            }
+                            KoboLocationType.STATION -> {
+                                MarkerOptions().position(LatLng(model.lat, model.long))
+                                        .icon(BitmapDescriptorFactory.fromResource(
+                                                R.drawable.customer
                                         )
-                                )
-                                .title(model.contact_name)
-                                .snippet("Pick up location at ${model.address}")
+                                        )
+                                        .title(model.contact_name)
+                                        .snippet("KoboStation address: ${model.address}")
+                            }
+                        }
                 )
                 pickUpStations[marker] = model
             }
         } catch (error: Exception) {
             Log.d("partner", error.message)
         }
-
     }
 
     protected fun setTruckDetails() {
@@ -304,14 +317,33 @@ abstract class BaseMapActivity : AppCompatActivity() {
         clearMapAndData(ClearCommand.ALL)
         GlobalScope.launch(Dispatchers.Main) {
             try {
+                customersLocations = mapService.fetchCustomersLocations(toGeoHash(currentLatLng))
+                customerLocationList = customersLocations?.data?.locations?.toMutableList()
+                koboStationLocations = mapService.fetchKoboStations(toGeoHash(currentLatLng))
+                koboStationLocationsList = koboStationLocations?.data?.locations?.toMutableList()
+
+                customerLocationList?.forEach { model -> addTrucks(model?.let { TruckModelDataParser(it, "customer") }) }
+                koboStationLocationsList?.forEach { model -> addTrucks(model?.let { TruckModelDataParser(it, "station") }) }
+
                 runGeoQuery(verifyCurrentLocation(toGeoPoint(currentLatLng)))
-                customersLocations = mapService.fetchCustomersLocations()
-                customersLocations?.data?.locations?.forEach { pickUpStation ->
-                    addStations(pickUpStation)
-                }
             } catch (e: Exception) {
                 Log.e(MapsActivity.TAG, "Error fetching customers locations ${e.message}")
             }
+        }
+    }
+
+
+    protected fun refreshCustomers() {
+        customerLocationList = customersLocations?.data?.locations?.toMutableList()
+        customerLocationList?.forEach { pickUpStation ->
+            addStations(pickUpStation, KoboLocationType.CUSTOMER)
+        }
+    }
+
+    protected fun refreshStations() {
+        koboStationLocationsList = koboStationLocations?.data?.locations?.toMutableList()
+        koboStationLocationsList?.forEach { koboStation ->
+            addStations(koboStation, KoboLocationType.STATION)
         }
     }
 
@@ -327,7 +359,6 @@ abstract class BaseMapActivity : AppCompatActivity() {
                 } catch (error: Exception) {
                     Log.e(MapsActivity.TAG, "Error parsing data")
                 }
-
 //                Log.i(MapsActivity.TAG, listTruckModel.size.toString())
             }
 
@@ -340,7 +371,6 @@ abstract class BaseMapActivity : AppCompatActivity() {
             }
 
             override fun onDocumentMoved(documentSnapshot: DocumentSnapshot, location: GeoPoint) {
-
                 try {
                     val model = documentSnapshot.toObject(TruckModelDataParser::class.java)
                     val truckModelDataParser = truckMarkerManager[model?.d?.reg_number]
@@ -385,10 +415,8 @@ abstract class BaseMapActivity : AppCompatActivity() {
             }
 
             override fun onGeoQueryReady() {
-
                 Log.e(MapsActivity.TAG, "Unable to parse: $parserCounter Truck info")
-
-
+                //Fetch Customers and stations and Transform the data into the truckMarkerManager
                 try {
                     val boundsBuilder = LatLngBounds.Builder()
                     truckMarkerManager.values.toList().map { model ->
@@ -400,21 +428,16 @@ abstract class BaseMapActivity : AppCompatActivity() {
                         )
                     }
 
-
                     val bounds = boundsBuilder.build()
-
                     val cu: CameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 50)
                     if (currentDisplayMode == DisplayMode.ALL) {
                         mMap.uiSettings.isRotateGesturesEnabled = false
                     }
                     mMap.animateCamera(cu)
                     setupClusterManager()
-
 //                    moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.center, 10.0F))
-
                 } catch (e: Exception) {
                 }
-
             }
 
             override fun onGeoQueryError(exception: Exception) {
@@ -443,7 +466,6 @@ abstract class BaseMapActivity : AppCompatActivity() {
             val locationButton = (mMapView.findViewById<View>(Integer.parseInt("1")).parent as View).findViewById<View>(Integer.parseInt("2"))
 
             locationButton.visibility = View.INVISIBLE
-
 //
 //            val rlp=locationButton.layoutParams as (RelativeLayout.LayoutParams)
 //            // position on right bottom
@@ -454,14 +476,15 @@ abstract class BaseMapActivity : AppCompatActivity() {
     }
 
     protected fun manageTripFilterParam(filterWith: String, bool: Boolean) {
+
         if (bool) {
-            listTripStatusFilter.add(filterWith)
+            listFilterTerms.add(filterWith)
         } else {
-            listTripStatusFilter.remove(filterWith)
+            listFilterTerms.remove(filterWith)
         }
 
         btnApply.visibility =
-                if (listTripStatusFilter.isNotEmpty()) View.VISIBLE else View.INVISIBLE
+                if (listFilterTerms.isNotEmpty()) View.VISIBLE else View.INVISIBLE
 
     }
 
@@ -485,19 +508,16 @@ abstract class BaseMapActivity : AppCompatActivity() {
         val id: Int? = PreferenceManager.getDefaultSharedPreferences(context).getInt(MobileMapCorePlugin.KEY_ID, -1)
 
         when (appType?.let { AppType.valueOf(it.toUpperCase(Locale.getDefault())) }) {
-            AppType.SQUAD -> {
-                collectionRef = FirebaseFirestore.getInstance().collection("Trucks")
-            }
             AppType.CUSTOMER -> {
                 collectionRef = FirebaseFirestore.getInstance().collection("Customers/$id/TripList")
+                customers.visibility = View.GONE
+                stations.visibility = View.GONE
             }
-            AppType.TRANSPORTER -> {
+            else ->
                 collectionRef = FirebaseFirestore.getInstance().collection("Trucks")
-            }
         }
 
         geoFireStore = GeoFirestore(collectionRef)
-
     }
 
     protected fun truckFromStatus(model: TruckModelDataParser): BitmapDescriptor? {
@@ -507,6 +527,8 @@ abstract class BaseMapActivity : AppCompatActivity() {
                     model.d.flagged -> R.drawable.kobo_truck_red
                     else -> R.drawable.kobo_truck_green
                 }
+
+
         )
     }
 
@@ -525,8 +547,10 @@ abstract class BaseMapActivity : AppCompatActivity() {
 //        } else {
 //            MapsActivity.QUERY_CENTER
 //        }
-
         return MapsActivity.QUERY_CENTER
+    }
 
+    private fun toGeoHash(latLng: LatLng): String {
+        return GeoHash(latLng.latitude, latLng.longitude, 5).geoHashString
     }
 }
