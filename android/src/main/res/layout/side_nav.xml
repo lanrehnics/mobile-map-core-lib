@@ -121,6 +121,24 @@
                 android:text="Flagged trips"
                 android:textColor="@android:color/black" />
 
+            <CheckBox
+                android:id="@+id/customers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:buttonTint="@color/green"
+                android:text="Customers"
+                android:textColor="@android:color/black" />
+
+            <CheckBox
+                android:id="@+id/stations"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:buttonTint="@color/green"
+                android:text="Stations"
+                android:textColor="@android:color/black" />
+
         </LinearLayout>
 
         <Button

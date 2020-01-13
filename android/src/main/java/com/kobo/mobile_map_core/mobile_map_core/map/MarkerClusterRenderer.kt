@@ -14,9 +14,9 @@ import com.kobo.mobile_map_core.mobile_map_core.models.TripStatus
 
 
 class MarkerClusterRenderer<T : ClusterItem> internal constructor(
-    context: Context,
-    googleMap: GoogleMap,
-    val clusterManager: ClusterManager<T>
+        context: Context,
+        googleMap: GoogleMap,
+        val clusterManager: ClusterManager<T>
 ) : DefaultClusterRenderer<T>(context, googleMap, clusterManager) {
 
 
@@ -27,13 +27,15 @@ class MarkerClusterRenderer<T : ClusterItem> internal constructor(
     override fun onBeforeClusterItemRendered(item: T, markerOptions: MarkerOptions?) {
         val markerClusterItem: MarkerClusterItem = item as MarkerClusterItem
         markerOptions?.icon(
-            BitmapDescriptorFactory.fromResource(
-                when {
-                    markerClusterItem.truckModelDataParser.d.status == TripStatus.STATUS_DELIVERED -> R.drawable.kobo_truck_blue
-                    markerClusterItem.truckModelDataParser.d.flagged -> R.drawable.kobo_truck_red
-                    else -> R.drawable.kobo_truck_green
-                }
-            )
+                BitmapDescriptorFactory.fromResource(
+                        when {
+                            markerClusterItem.truckModelDataParser.d.resourceType == "customer" -> R.drawable.warehouse
+                            markerClusterItem.truckModelDataParser.d.resourceType == "station" -> R.drawable.kobo_hub
+                            markerClusterItem.truckModelDataParser.d.status == TripStatus.STATUS_DELIVERED -> R.drawable.kobo_truck_blue
+                            markerClusterItem.truckModelDataParser.d.flagged -> R.drawable.kobo_truck_red
+                            else -> R.drawable.kobo_truck_green
+                        }
+                )
         )
         markerOptions?.rotation(markerClusterItem.truckModelDataParser.d.bearing.toFloat())
         markerOptions?.snippet(item.snippet)

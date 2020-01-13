@@ -9,10 +9,11 @@ import com.google.firebase.firestore.GeoPoint
 import com.google.gson.Gson
 import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
 import com.kobo.mobile_map_core.mobile_map_core.client.LiteHttp
-import com.kobo.mobile_map_core.mobile_map_core.map.MapsActivity
+import com.kobo.mobile_map_core.mobile_map_core.enums.AppType
+import com.kobo.mobile_map_core.mobile_map_core.models.KoboLocations
 import com.kobo360.models.polyline.PolylineJsonDecoder
-import com.kobo360.models.CustomersLocations
-import java.util.ArrayList
+import org.imperiumlabs.geofirestore.core.GeoHash
+import java.util.*
 
 class MapService constructor(private val mContext: Context) {
 
@@ -83,23 +84,53 @@ class MapService constructor(private val mContext: Context) {
         return poly
     }
 
-    suspend fun fetchCustomersLocations(): CustomersLocations? {
+    suspend fun fetchCustomersLocations(geoHash: String): KoboLocations? {
 
-        var customersLocations: CustomersLocations? = null
+        var customersLocations: KoboLocations? = null
 
-        val url: String? = getDefaultSharedPreferences(mContext).getString(MobileMapCorePlugin.KEY_KOBO_CUSTOMER_URL, null)
+        val customerUrl: String? = getDefaultSharedPreferences(mContext).getString(MobileMapCorePlugin.KEY_KOBO_CUSTOMER_URL, null)
         val token: String? = getDefaultSharedPreferences(mContext).getString(MobileMapCorePlugin.KEY_AUTH_TOKEN, null)
+        val appType: String? = getDefaultSharedPreferences(mContext).getString(MobileMapCorePlugin.KEY_APP_TYPE, null)
 
-        if (url != null) {
+        if (customerUrl != null && customerUrl.isNotEmpty()) {
             val headers: ArrayMap<String, String> = ArrayMap()
             headers["Authorization"] = token
-            val res = LiteHttp.instance?.get(url, headers, null)
-            customersLocations = Gson().fromJson(res, CustomersLocations::class.java)
-
+            val res = LiteHttp.instance?.get(
+                    when (appType?.let { AppType.valueOf(it.toUpperCase(Locale.getDefault())) }) {
+                        AppType.SQUAD -> "$customerUrl?geohash=$geoHash"
+                        else -> customerUrl
+                    }
+                    , headers, null)
+            customersLocations = Gson().fromJson(res, KoboLocations::class.java)
         } else {
-            Log.e("url:  ", "No URL SET")
+            Log.e("customerUrl:  ", "No SET")
         }
         return customersLocations
+    }
+
+    suspend fun fetchKoboStations(geoHash: String): KoboLocations? {
+
+        var koboStations: KoboLocations? = null
+
+        val stationUrl: String? = getDefaultSharedPreferences(mContext).getString(MobileMapCorePlugin.KEY_KOBO_STATIONS_URL, null)
+        val token: String? = getDefaultSharedPreferences(mContext).getString(MobileMapCorePlugin.KEY_AUTH_TOKEN, null)
+        val appType: String? = getDefaultSharedPreferences(mContext).getString(MobileMapCorePlugin.KEY_APP_TYPE, null)
+
+        if (stationUrl != null && stationUrl.isNotEmpty()) {
+
+
+            val headers: ArrayMap<String, String> = ArrayMap()
+            headers["Authorization"] = token
+            val res = LiteHttp.instance?.get(
+                    when (appType?.let { AppType.valueOf(it.toUpperCase(Locale.getDefault())) }) {
+                        AppType.SQUAD -> "$stationUrl?geohash=$geoHash"
+                        else -> stationUrl
+                    }, headers, null)
+            koboStations = Gson().fromJson(res, KoboLocations::class.java)
+        } else {
+            Log.e("koboStationUrl:  ", "No SET")
+        }
+        return koboStations
     }
 
 }

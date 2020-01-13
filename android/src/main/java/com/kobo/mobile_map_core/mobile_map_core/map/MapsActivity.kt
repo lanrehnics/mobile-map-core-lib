@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import com.kobo.mobile_map_core.mobile_map_core.R
+import com.kobo.mobile_map_core.mobile_map_core.enums.KoboLocationType
 import com.kobo.mobile_map_core.mobile_map_core.models.ClearCommand
 import com.kobo.mobile_map_core.mobile_map_core.models.DisplayMode
 import com.kobo.mobile_map_core.mobile_map_core.models.TripStatus
@@ -35,7 +36,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
 
     companion object {
         const val TAG = "MapsActivity : :: ===>"
-        val QUERY_CENTER = GeoPoint( 9.0649869,7.3277417) //Using Abuja As Centre
+        val QUERY_CENTER = GeoPoint(9.0649869, 7.3277417) //Using Abuja As Centre
         const val QUERY_RADIUS = 855.0
         const val LOCATION_PERMISSION_REQUEST_CODE = 1
     }
@@ -43,30 +44,25 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.partner_map_activity_main)
+
+        //Initialize views and click listeners
+        initializeViews()
+
+
+        //Pass context
         context = this@MapsActivity
 
+        // Configure som initialization base on app type
         configureCollectionReferenceForApp()
 
+
+        // Initialize map, services, bottom sheet and drawer
         mapService = MapService(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-        tvTripId = findViewById(R.id.trip_id)
-        tvTripStatus = findViewById(R.id.trip_status)
-        tvCustName = findViewById(R.id.cust_name)
-        tvPickUp = findViewById(R.id.pickup)
-        tvDestination = findViewById(R.id.destination)
-        tvDriverName = findViewById(R.id.driver_name)
-        tvDriverMobile = findViewById(R.id.driver_mobile)
-        tvRegNumber = findViewById(R.id.reg_number)
-        tvEtt = findViewById(R.id.ett)
-        backArrowButton = findViewById(R.id.back_arrow_button)
-
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mMapView = mapFragment.view!!
         mapFragment.getMapAsync(this)
-
-        bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.layout_bottom_sheet))
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
@@ -94,33 +90,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
             }
         })
 
-        toolbar = findViewById(R.id.toolbar)
-        fabTripFilter = findViewById(R.id.fabTripFilter)
-//        fabOpenSearch = findViewById(R.id.fabSearch)
-        fabMyLocation = findViewById(R.id.fabMyLocation)
-        drawerLayout = findViewById(R.id.drawer_layout)
 
-        navigationView = findViewById(R.id.navigationView)
-
-        bottomSheetHeader = findViewById(R.id.bottomSheetHeader)
-
-        val headerView: View = navigationView.getHeaderView(0)
-        btnApply = headerView.findViewById(R.id.btn_apply)
-        btnCloseDrawer = headerView.findViewById(R.id.btn_close_drawer)
-        statusPositioned = headerView.findViewById(R.id.status_positioned)
-        statusInpremise = headerView.findViewById(R.id.status_inpremise)
-        statusLoaded = headerView.findViewById(R.id.status_loaded)
-        btnCloseTruckInfo = findViewById(R.id.btn_close_truck_info)
-        btnCloseTruckInfo.visibility = View.INVISIBLE
-
-        statusTransporting = headerView.findViewById(R.id.status_transporting)
-        statusAtDestination = headerView.findViewById(R.id.status_at_destination)
-        statusAvailable = headerView.findViewById(R.id.status_available)
-
-        tripFilterLinearLayout = headerView.findViewById(R.id.tripFilterLinearLayout)
-
-        activeTrips = headerView.findViewById(R.id.active_trips)
-        flaggedTrips = headerView.findViewById(R.id.flagged_trips)
 
         toggle = object : ActionBarDrawerToggle(
                 this,
@@ -153,25 +123,12 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
-        fabTripFilter.setOnClickListener(this)
-        fabMyLocation.setOnClickListener(this)
-//        fabOpenSearch.setOnClickListener(this)
-        btnApply.setOnClickListener(this)
-        btnApply.visibility = View.INVISIBLE
-        btnCloseDrawer.setOnClickListener(this)
-        statusPositioned.setOnCheckedChangeListener(this)
-        statusInpremise.setOnCheckedChangeListener(this)
-        statusLoaded.setOnCheckedChangeListener(this)
-        statusTransporting.setOnCheckedChangeListener(this)
-        statusAtDestination.setOnCheckedChangeListener(this)
-        statusAvailable.setOnCheckedChangeListener(this)
-        activeTrips.setOnCheckedChangeListener(this)
-        flaggedTrips.setOnCheckedChangeListener(this)
-        bottomSheetHeader.setOnClickListener(this)
-        btnCloseTruckInfo.setOnClickListener(this)
-        backArrowButton.setOnClickListener(this)
 
+        //Hide some unnecessary view
+        btnCloseTruckInfo.visibility = View.INVISIBLE
+        btnApply.visibility = View.INVISIBLE
     }
+
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
@@ -199,7 +156,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
         mMap.setOnMarkerClickListener(this)
         setUpLocationPermission()
         fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
-            // Got last known location. In some rare situations this can be null.
+            // Get last known location. In some rare situations this can be null.
             // 3
             if (location != null) {
 //                lastLocation = location
@@ -246,23 +203,18 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
 
             R.id.btn_apply -> {
                 if (!isMappedFiltered) {
-                    if (listTripStatusFilter.isNotEmpty()) {
+                    if (listFilterTerms.isNotEmpty()) {
                         val filteredTruckList = truckMarkerManager.values.toList().filter { truckModel ->
-                            val activeTrip: String =
-                                    if (truckModel.d.active == 1) TripStatus.STATUS_ACTIVE_TRIPS else ""
-                            val flaaggedTrip: String =
-                                    if (truckModel.d.flagged) TripStatus.STATUS_FLAGGED_TRIP else ""
-                            listTripStatusFilter.contains(
-                                    truckModel.d.status.toLowerCase(
-                                            Locale.getDefault()
-                                    )
-                            ) ||
-                                    listTripStatusFilter.contains(activeTrip.toLowerCase(Locale.getDefault())) ||
-                                    listTripStatusFilter.contains(flaaggedTrip.toLowerCase(Locale.getDefault()))
+                            val activeTrip: String = if (truckModel.d.active == 1) TripStatus.STATUS_ACTIVE_TRIPS else ""
+                            val flaggedTrip: String = if (truckModel.d.flagged) TripStatus.STATUS_FLAGGED_TRIP else ""
+
+                            listFilterTerms.contains(truckModel.d.status.toLowerCase(Locale.getDefault()))
+                                    || listFilterTerms.contains(activeTrip.toLowerCase(Locale.getDefault()))
+                                    || listFilterTerms.contains(flaggedTrip.toLowerCase(Locale.getDefault()))
+                                    || listFilterTerms.contains(truckModel.d.resourceType)
                         }
 
                         if (filteredTruckList.isNotEmpty()) {
-
                             clearMapAndData(ClearCommand.MAP)
                             addClusters(filteredTruckList)
                             val boundsBuilder = LatLngBounds.Builder()
@@ -291,6 +243,9 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
 
                 } else {
 
+                    isMappedFilteredByCustomer = false
+                    isMappedFilteredByStations = false
+
                     bootStrapPickupStationsAndTrucks()
 
                     btnApply.text = "Apply Filter"
@@ -303,13 +258,15 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
                     statusAvailable.isChecked = false
                     flaggedTrips.isChecked = false
                     activeTrips.isChecked = false
+                    customers.isChecked = false
+                    stations.isChecked = false
 
 
-                    customersLocations?.let {
-                        it.data.locations.forEach { pickUpStation ->
-                            addStations(pickUpStation)
-                        }
-                    }
+//                    customersLocations?.let {
+//                        it.data.locations.forEach { pickUpStation ->
+//                            addStations(pickUpStation, KoboLocationType.CUSTOMER)
+//                        }
+//                    }
 
 
                 }
@@ -404,6 +361,26 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
                         value
                 )
             }
+
+            R.id.customers -> {
+
+
+                manageTripFilterParam(
+                        "customers".toLowerCase(Locale.getDefault()),
+                        value
+                )
+
+                if (customerLocationList?.isNotEmpty()!!) {
+                    refreshCustomers()
+                }
+            }
+
+            R.id.stations -> {
+                manageTripFilterParam(
+                        "stations".toLowerCase(Locale.getDefault()),
+                        value
+                )
+            }
         }
     }
 
@@ -456,17 +433,15 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
                     })
             true
         }
-
         clusterManager.setOnClusterItemClickListener {
             mMap.animateCamera(
                     CameraUpdateFactory.newLatLng(it.position),
                     object : GoogleMap.CancelableCallback {
                         override fun onFinish() {
-                            backArrowButton.visibility = View.INVISIBLE
-                            btnCloseTruckInfo.visibility = View.VISIBLE
 
-                            // Clear all geopoints and clustered markers
-                            clearMapAndData(ClearCommand.MAP)
+
+
+
                             selectedTruck = truckMarkerManager[it.title]!!
 
                             // clusterManager has access to display markers
@@ -474,60 +449,126 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
                             selectedMarker = getMarkerFromClusterCollections(it)
 
 
-//                        if (truckMarkers.containsKey(marker)) {
-                            btnCloseTruckInfo.visibility = View.VISIBLE
-                            currentDisplayMode = DisplayMode.SINGLE
-                            setTruckDetails()
-                            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-                                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                            }
-                            val destinationLatitude: Double =
-                                    selectedTruck!!.d.deliveryStation.location.coordinates[0]
-                            val destinationLongitude: Double =
-                                    selectedTruck!!.d.deliveryStation.location.coordinates[1]
-
-
-                            val origin = toGeoPoint(selectedMarker.position)
-
-                            val marker = mMap.addMarker(
-                                    MarkerOptions()
-                                            .position(toLatLng(origin))
-                                            .title(selectedTruck!!.d.reg_number)
-                                            .rotation(selectedTruck!!.d.bearing.toFloat())
-                                            .icon(truckFromStatus(selectedTruck!!))
-                            )
-
-                            // Reset marker after adding new marker
-                            selectedMarker = marker
-                            markerManager[selectedTruck!!.d.reg_number] = marker
-
-                            val destination =
-                                    GeoPoint(destinationLatitude, destinationLongitude)
-
-                            if (destinationLatitude > 0 && destinationLongitude > 0)
-                                GlobalScope.launch(Dispatchers.Main) {
-                                    try {
-                                        val polyLineList =
-                                                mapService.getPolyline(origin, destination)
-                                        if (polyLineList.isNotEmpty()) {
-                                            drawPolyLine(polyLineList)
-                                        }
-                                    } catch (e: Exception) {
-                                        Log.e(
-                                                TAG,
-                                                "Error fetching customers locations ${e.message}"
-                                        )
-                                    }
+                            if (selectedTruck?.d?.resourceType == "truck") {
+                                // Clear all geopoints and clustered markers
+                                clearMapAndData(ClearCommand.MAP)
+                                backArrowButton.visibility = View.INVISIBLE
+                                btnCloseTruckInfo.visibility = View.VISIBLE
+                                btnCloseTruckInfo.visibility = View.VISIBLE
+                                currentDisplayMode = DisplayMode.SINGLE
+                                setTruckDetails()
+                                if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                                 }
+                                val destinationLatitude: Double =
+                                        selectedTruck!!.d.deliveryStation.location.coordinates[0]
+                                val destinationLongitude: Double =
+                                        selectedTruck!!.d.deliveryStation.location.coordinates[1]
 
-//                        } else {
-//                            marker.showInfoWindow()
-//                        }
+
+                                val origin = toGeoPoint(selectedMarker.position)
+
+                                val marker = mMap.addMarker(
+                                        MarkerOptions()
+                                                .position(toLatLng(origin))
+                                                .title(selectedTruck!!.d.reg_number)
+                                                .rotation(selectedTruck!!.d.bearing.toFloat())
+                                                .icon(truckFromStatus(selectedTruck!!))
+                                )
+
+                                // Reset marker after adding new marker
+                                selectedMarker = marker
+                                markerManager[selectedTruck!!.d.reg_number] = marker
+
+                                val destination = GeoPoint(destinationLatitude, destinationLongitude)
+
+                                if (destinationLatitude > 0 && destinationLongitude > 0)
+                                    GlobalScope.launch(Dispatchers.Main) {
+                                        try {
+                                            val polyLineList =
+                                                    mapService.getPolyline(origin, destination)
+                                            if (polyLineList.isNotEmpty()) {
+                                                drawPolyLine(polyLineList)
+                                            }
+                                        } catch (e: Exception) {
+                                            Log.e(
+                                                    TAG,
+                                                    "Error fetching customers locations ${e.message}"
+                                            )
+                                        }
+                                    }
+
+                            } else {
+                                selectedMarker.showInfoWindow()
+                            }
                         }
 
                         override fun onCancel() {}
                     })
             true
         }
+    }
+
+    private fun initializeViews() {
+        tvTripId = findViewById(R.id.trip_id)
+        tvTripStatus = findViewById(R.id.trip_status)
+        tvCustName = findViewById(R.id.cust_name)
+        tvPickUp = findViewById(R.id.pickup)
+        tvDestination = findViewById(R.id.destination)
+        tvDriverName = findViewById(R.id.driver_name)
+        tvDriverMobile = findViewById(R.id.driver_mobile)
+        tvRegNumber = findViewById(R.id.reg_number)
+        tvEtt = findViewById(R.id.ett)
+        backArrowButton = findViewById(R.id.back_arrow_button)
+
+        toolbar = findViewById(R.id.toolbar)
+        fabTripFilter = findViewById(R.id.fabTripFilter)
+//        fabOpenSearch = findViewById(R.id.fabSearch)
+        fabMyLocation = findViewById(R.id.fabMyLocation)
+        drawerLayout = findViewById(R.id.drawer_layout)
+
+        navigationView = findViewById(R.id.navigationView)
+
+        bottomSheetHeader = findViewById(R.id.bottomSheetHeader)
+
+        val headerView: View = navigationView.getHeaderView(0)
+        btnApply = headerView.findViewById(R.id.btn_apply)
+        btnCloseDrawer = headerView.findViewById(R.id.btn_close_drawer)
+        statusPositioned = headerView.findViewById(R.id.status_positioned)
+        statusInpremise = headerView.findViewById(R.id.status_inpremise)
+        statusLoaded = headerView.findViewById(R.id.status_loaded)
+        btnCloseTruckInfo = findViewById(R.id.btn_close_truck_info)
+
+        bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.layout_bottom_sheet))
+
+        statusTransporting = headerView.findViewById(R.id.status_transporting)
+        statusAtDestination = headerView.findViewById(R.id.status_at_destination)
+        statusAvailable = headerView.findViewById(R.id.status_available)
+
+        tripFilterLinearLayout = headerView.findViewById(R.id.tripFilterLinearLayout)
+
+        activeTrips = headerView.findViewById(R.id.active_trips)
+        flaggedTrips = headerView.findViewById(R.id.flagged_trips)
+        customers = headerView.findViewById(R.id.customers)
+        stations = headerView.findViewById(R.id.stations)
+
+        fabTripFilter.setOnClickListener(this)
+        fabMyLocation.setOnClickListener(this)
+//        fabOpenSearch.setOnClickListener(this)
+        btnApply.setOnClickListener(this)
+        btnCloseDrawer.setOnClickListener(this)
+        statusPositioned.setOnCheckedChangeListener(this)
+        statusInpremise.setOnCheckedChangeListener(this)
+        statusLoaded.setOnCheckedChangeListener(this)
+        statusTransporting.setOnCheckedChangeListener(this)
+        statusAtDestination.setOnCheckedChangeListener(this)
+        statusAvailable.setOnCheckedChangeListener(this)
+        activeTrips.setOnCheckedChangeListener(this)
+        flaggedTrips.setOnCheckedChangeListener(this)
+        customers.setOnCheckedChangeListener(this)
+        stations.setOnCheckedChangeListener(this)
+        bottomSheetHeader.setOnClickListener(this)
+        btnCloseTruckInfo.setOnClickListener(this)
+        backArrowButton.setOnClickListener(this)
     }
 }

@@ -42,6 +42,7 @@ class MobileMapCorePlugin : MethodCallHandler {
             val authToken = args[KEY_AUTH_TOKEN] as String
             val id = args[KEY_ID] as Int
 
+
             getActiveContext()?.let {
                 PreferenceManager.getDefaultSharedPreferences(it)
                         .edit()
