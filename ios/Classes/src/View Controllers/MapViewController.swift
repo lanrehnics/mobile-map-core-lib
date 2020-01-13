@@ -148,7 +148,8 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     
     override func loadView() {
         currentUserLocation = CLLocationCoordinate2D(latitude: 9.076479, longitude: 7.398574)
-        let camera = GMSCameraPosition(latitude: 9.076479, longitude: 7.398574, zoom: 15)
+        //let camera = GMSCameraPosition(latitude: 9.076479, longitude: 7.398574, zoom: 15)
+        let camera = GMSCameraPosition(target: CLLocationCoordinate2DMake(9.076479, 7.398574), zoom: 15, bearing: .leastNormalMagnitude, viewingAngle: 0)
         mapView = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
         mapView.isTrafficEnabled = false
         mapView.isMyLocationEnabled = true
@@ -186,9 +187,9 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     func loadTrucks() {
         switch configModel.userType {
         case .customer:
-            firebaseColRef = Firestore.firestore().collection("Customers/76/TripList")
+            firebaseColRef = Firestore.firestore().collection("Customers/\(configModel.userTypeId)/TripList")
         case .partner:
-            firebaseColRef = Firestore.firestore().collection("Partners/2291/TruckList")
+            firebaseColRef = Firestore.firestore().collection("Partners/\(configModel.userTypeId)/TruckList")
         case .squad:
             firebaseColRef = Firestore.firestore().collection("Trucks")
         }
@@ -407,7 +408,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
             mapDataState = .initial
             singleDocListener?.remove()
             mapView.clear();
-            mapView.animate(with: GMSCameraUpdate.setCamera(GMSCameraPosition(latitude: currentUserLocation.latitude, longitude: currentUserLocation.longitude, zoom: 12)))
+            mapView.animate(with: GMSCameraUpdate.setCamera(GMSCameraPosition(target: CLLocationCoordinate2DMake(currentUserLocation.latitude, currentUserLocation.longitude), zoom: 12, bearing: .leastNormalMagnitude, viewingAngle: 0)))
             markers = [:]
             filterButton.isHidden = false
             searchButton.isHidden = false
@@ -539,7 +540,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
          }
         
         singleDocListener = firebaseColRef.document(truck.regNumber).addSnapshotListener { ( snapshot: DocumentSnapshot?, err) in
-            if err != nil || snapshot == nil{
+            if err != nil || snapshot == nil || snapshot?.data() == nil{
                 return
             }
             if let truck = TruckModel(data: snapshot!.data()!)?.truck {
@@ -551,7 +552,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
     func loadKoboStations() {
         var geohash = currentUserLocation.geohash(length: 5)
         geohash = "s14mk"
-        let url = configModel.koboStationsUrl + "?geohash=\(geohash)"
+        let url = configModel.koboStationsUrl + "&geohash=\(geohash)"
         print("stations url ", url)
         networkUtil.getHubLocations(url: url, configModel.authToken, onCompleted: { hubLocation in
             print("hublocations total record is", hubLocation.hubs.count)
@@ -559,7 +560,7 @@ class MapViewController: UIViewController, GMSMapViewDelegate,UISearchBarDelegat
             self.addKoboStationToCluster()
         })
         if(configModel.userType != .partner) {
-            let custUrl = configModel.customerLocationsUrl + "?geohash=\(geohash)";
+            let custUrl = configModel.customerLocationsUrl + "&geohash=\(geohash)";
             networkUtil.getHubLocations(url: custUrl, configModel.authToken, onCompleted: { hubLocation in
                 print("customer locations total record is", hubLocation.hubs.count)
                 self.customerLocations.append(contentsOf: hubLocation.hubs)
