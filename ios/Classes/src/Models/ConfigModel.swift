@@ -18,6 +18,6 @@ struct ConfigModel {
 
 enum UserType: String {
     case customer = "customer"
-    case partner = "partner"
+    case partner = "transporter"
     case squad = "squad"
 }
