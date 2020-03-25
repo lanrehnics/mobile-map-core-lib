@@ -386,8 +386,7 @@ class MapsActivity : BaseMapActivity(), OnMapReadyCallback,
 
     override fun onRequestPermissionsResult(
             requestCode: Int, permissions: Array<String>,
-            grantResults: IntArray
-    ) {
+            grantResults: IntArray) {
         Log.i(TAG, "onRequestPermissionResult")
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             when {
