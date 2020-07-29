@@ -28,6 +28,7 @@ class ActiveTripsFragmentList : Fragment() {
     private lateinit var getActiveTripsViewModel: ActiveTripsViewModel
     private lateinit var adapter: ActiveTripsFragmentListAdapter
     private lateinit var listShimmerActiveTrips: ShimmerRecyclerView
+    private  var token: String? = ""
 
     private var mode: Int? = 0
 
@@ -60,6 +61,7 @@ class ActiveTripsFragmentList : Fragment() {
             PreferenceManager.getDefaultSharedPreferences(it)
         }
         val userTypeAndId = shaper.getString(MobileMapCorePlugin.KEY_USER_TYPE_AND_ID, "")
+         token = shaper.getString(MobileMapCorePlugin.KEY_AUTH_TOKEN, "")
         userTypeAndId?.let {
             getActiveTripsViewModel.fetchActiveTrips(userTypeAndId = it)
         }
@@ -80,7 +82,7 @@ class ActiveTripsFragmentList : Fragment() {
     private fun setupViewModel() {
         getActiveTripsViewModel = ViewModelProviders.of(
                 this,
-                ViewModelFactory(ApiHelper(ApiServiceImpl()))
+                ViewModelFactory(ApiHelper(ApiServiceImpl(token)))
         ).get(ActiveTripsViewModel::class.java)
     }
 

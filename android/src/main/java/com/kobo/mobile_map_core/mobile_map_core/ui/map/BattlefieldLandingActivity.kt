@@ -4,6 +4,7 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.Autocom
 import SelectedAddrss
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
@@ -60,6 +61,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     private var searchRadius: Int? = 1
     private var searchForAvailableTrucks: Boolean = false
     private lateinit var trkData: TruckData
+    private lateinit var shaper: SharedPreferences
     private var overviewW: Overview? = null
 
     override fun onAttachFragment(fragment: Fragment) {
@@ -78,6 +80,11 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.battlefield_landing_activity_main)
+        context = this@BattlefieldLandingActivity
+
+        shaper = this.let {
+            PreferenceManager.getDefaultSharedPreferences(it)
+        }
 
 
         //Initialize views and click listeners
@@ -87,7 +94,6 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
 
         //Pass context
-        context = this@BattlefieldLandingActivity
 
         // Configure som initialization base on app type
 //        configureCollectionReferenceForApp()
@@ -202,7 +208,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     private fun setupViewModel() {
         mapLandingViewModel = ViewModelProviders.of(
                 this,
-                ViewModelFactory(ApiHelper(ApiServiceImpl()))
+                ViewModelFactory(ApiHelper(ApiServiceImpl(shaper.getString(MobileMapCorePlugin.KEY_AUTH_TOKEN, ""))))
         ).get(MapLandingViewModel::class.java)
     }
 
@@ -323,9 +329,8 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     }
 
     private fun fetchAndSubscribeForLocationOverview() {
-        val shaper = this.let {
-            PreferenceManager.getDefaultSharedPreferences(it)
-        }
+
+
         tvHello.text = "Hello ${shaper.getString(MobileMapCorePlugin.KEY_USER_FIRST_NAME, "")}"
         val userTypeAndId = shaper.getString(MobileMapCorePlugin.KEY_USER_TYPE_AND_ID, "")
 

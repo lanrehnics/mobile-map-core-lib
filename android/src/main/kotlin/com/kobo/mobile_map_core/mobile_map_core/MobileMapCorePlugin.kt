@@ -3,7 +3,8 @@ package com.kobo.mobile_map_core.mobile_map_core
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat.startActivity
-import androidx.preference.PreferenceManager.*
+import androidx.preference.PreferenceManager.getDefaultSharedPreferences
+import com.androidnetworking.AndroidNetworking
 import com.kobo.mobile_map_core.mobile_map_core.data.models.NavigationData
 import com.kobo.mobile_map_core.mobile_map_core.ui.map.BattlefieldLandingActivity
 import com.kobo.mobile_map_core.mobile_map_core.ui.map.NavigationActivity
@@ -25,9 +26,9 @@ class MobileMapCorePlugin : MethodCallHandler {
         var KEY_ID: String? = "id"
         var KEY_DESTINATION: String? = "destination"
         var KEY_USER_FIRST_NAME: String? = "user_name"
-        val KEY_TRUCK_REG_NUMBER = "regNumber"
-        val KEY_TRIP_ID = "tripId"
-        val KEY_READABLE_TRIP_ID = "tripReadId"
+        val KEY_TRUCK_REG_NUMBER = "reg_number"
+        val KEY_TRIP_ID = "trip_id"
+        val KEY_READABLE_TRIP_ID = "trip_read_id"
 
         private var reg: Registrar? = null
 
@@ -40,6 +41,11 @@ class MobileMapCorePlugin : MethodCallHandler {
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
+
+//        AndroidNetworking.initialize(getActiveContext())
+
+
+
         when (call.method) {
             "launch_map" -> {
                 val intent = Intent(getActiveContext(), BattlefieldLandingActivity::class.java)
@@ -47,10 +53,6 @@ class MobileMapCorePlugin : MethodCallHandler {
 
                 val args = call.arguments() as? Map<String, Any?>?
                 val appType = args?.get(KEY_APP_TYPE) as String?
-                val truckRegNumber = args?.get(KEY_TRUCK_REG_NUMBER) as String?
-                val tripReadId = args?.get(KEY_READABLE_TRIP_ID) as String?
-                val tripId = args?.get(KEY_TRIP_ID) as String?
-                val destination = args?.get(KEY_DESTINATION) as List<Double>?
                 val userTypeAndId = args?.get(KEY_USER_TYPE_AND_ID) as String?
                 val authToken = args?.get(KEY_AUTH_TOKEN) as String?
                 val id = args?.get(KEY_ID) as Int
@@ -67,18 +69,8 @@ class MobileMapCorePlugin : MethodCallHandler {
                             .putInt(KEY_ID, id)
                             .apply()
 
-                    when (appType) {
-                        "driver" -> {
-                            val navigationActivity = Intent(getActiveContext(), NavigationActivity::class.java)
-                            val navigationData = NavigationData(regNumber = truckRegNumber, tripId = tripId, tripReadId = tripReadId, destination = destination)
-                            navigationActivity.putExtra(NavigationActivity.NAVIGATION_DATA, navigationData)
-                            startActivity(it, navigationActivity, null)
-                        }
-                        else -> {
-                            startActivity(it, intent, null)
-                        }
-                    }
 
+                    startActivity(it, intent, null)
 
                 }
 

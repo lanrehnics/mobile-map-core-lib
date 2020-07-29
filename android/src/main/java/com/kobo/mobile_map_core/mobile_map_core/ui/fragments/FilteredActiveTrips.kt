@@ -33,6 +33,7 @@ class FilteredActiveTrips : Fragment(), OnActiveTripItemClickListener {
     private lateinit var callback: OnTripInfoClickedListener
     private lateinit var callBack: OnTripInfoCloseButtonClickListener
     private lateinit var switchToMapClickListener: SwitchToMapClickListener
+    private lateinit var token: String
 
 
     fun setOnTripInfoClickedListener(callback: OnTripInfoClickedListener) {
@@ -95,6 +96,7 @@ class FilteredActiveTrips : Fragment(), OnActiveTripItemClickListener {
         }
 
         val userTypeAndId = shaper.getString(MobileMapCorePlugin.KEY_USER_TYPE_AND_ID, "")
+        token = shaper.getString(MobileMapCorePlugin.KEY_AUTH_TOKEN, "")!!
         userTypeAndId?.let {
             getActiveTripsViewModel.fetchActiveTrips(userTypeAndId = it, filterBy = filterBy)
         }
@@ -115,7 +117,7 @@ class FilteredActiveTrips : Fragment(), OnActiveTripItemClickListener {
     private fun setupViewModel() {
         getActiveTripsViewModel = ViewModelProviders.of(
                 this,
-                ViewModelFactory(ApiHelper(ApiServiceImpl()))
+                ViewModelFactory(ApiHelper(ApiServiceImpl(token)))
         ).get(ActiveTripsViewModel::class.java)
     }
 

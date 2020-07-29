@@ -12,9 +12,11 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
 import com.kobo.mobile_map_core.mobile_map_core.R
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiHelper
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiServiceImpl
@@ -55,6 +57,8 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
     private var mode: Int? = 0
     private var param2: String? = null
     private var overview: Overview? = null
+    private var token: String? = ""
+
 
     private lateinit var searchForPlacesViewModel: SearchForPlacesViewModel
     private lateinit var suggestedPlacesRecyclerView: RecyclerView
@@ -109,6 +113,18 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
         setupViewModel()
         return view
     }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        val shaper = requireActivity().let {
+            PreferenceManager.getDefaultSharedPreferences(it)
+        }
+
+        val userTypeAndId = shaper.getString(MobileMapCorePlugin.KEY_USER_TYPE_AND_ID, "")
+        token = shaper.getString(MobileMapCorePlugin.KEY_AUTH_TOKEN, "")
+
+    }
+
 
     private fun setUpTextWatcher() {
 
@@ -237,7 +253,7 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
     private fun setupViewModel() {
         searchForPlacesViewModel = ViewModelProviders.of(
                 this,
-                ViewModelFactory(ApiHelper(ApiServiceImpl()))
+                ViewModelFactory(ApiHelper(ApiServiceImpl(token)))
         ).get(SearchForPlacesViewModel::class.java)
     }
 

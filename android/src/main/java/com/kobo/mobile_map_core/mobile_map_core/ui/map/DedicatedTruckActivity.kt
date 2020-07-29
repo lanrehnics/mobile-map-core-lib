@@ -1,6 +1,7 @@
 package com.kobo.mobile_map_core.mobile_map_core.ui.map
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -44,11 +45,16 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
     private lateinit var dedicatedTruckBottomSheet: BottomSheetBehavior<View>
     private lateinit var bottomSheetView: View
     private lateinit var dedicatedTruckData: DedicatedTruckData
+    private lateinit var shaper: SharedPreferences
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dedicated_truck)
+
+        shaper = this.let {
+            PreferenceManager.getDefaultSharedPreferences(it)
+        }
         listShimmerDedicatedTrucks = findViewById(R.id.listShimmerDedicatedTrucks)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -84,7 +90,7 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
     private fun setupViewModel() {
         dedicatedTruckViewModel = ViewModelProviders.of(
                 this,
-                ViewModelFactory(ApiHelper(ApiServiceImpl()))
+                ViewModelFactory(ApiHelper(ApiServiceImpl(shaper.getString(MobileMapCorePlugin.KEY_AUTH_TOKEN, ""))))
         ).get(DedicatedTruckViewModel::class.java)
     }
 
@@ -115,7 +121,7 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
                                         toLatLng(it.coordinates)?.let { it1 ->
                                             MarkerOptions()
                                                     .position(it1)
-                                //                                                .title(selectedTruck!!.d.reg_number)
+                                                    //                                                .title(selectedTruck!!.d.reg_number)
                                                     .rotation(truckInfo.bearing.toFloat())
                                                     .icon(truckFromStatus(truckInfo))
                                         }

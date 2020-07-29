@@ -2,6 +2,7 @@ package com.kobo.mobile_map_core.mobile_map_core.ui.map
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -55,6 +56,8 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
     private lateinit var tripInfoBottomSheet: BottomSheetBehavior<View>
     private lateinit var bottomSheetView: View
     private lateinit var activeTripsData: ActiveTripsData
+    private lateinit var shaper: SharedPreferences
+
 
     val TRIP_INFO = "trip_info"
 
@@ -64,6 +67,9 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
 //        Pass context
         context = this@TrackActiveTrips
         setContentView(R.layout.activity_track_active_trips)
+        shaper = this.let {
+            PreferenceManager.getDefaultSharedPreferences(it)
+        }
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         toggle = findViewById(R.id.toggle)
         toggleDetails = findViewById(R.id.toggleDetails)
@@ -170,7 +176,7 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
     private fun setupViewModel() {
         getActiveTripsViewModel = ViewModelProviders.of(
                 this,
-                ViewModelFactory(ApiHelper(ApiServiceImpl()))
+                ViewModelFactory(ApiHelper(ApiServiceImpl(shaper.getString(MobileMapCorePlugin.KEY_AUTH_TOKEN, ""))))
         ).get(ActiveTripsViewModel::class.java)
     }
 
