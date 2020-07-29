@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:paddingHorizontal="16dp">
+
+    <ImageView
+        android:id="@+id/imageTripEventIcon"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_trip_started" />
+
+    <TextView
+        android:id="@+id/tvTripEvent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:fontFamily="@font/avenir_book"
+        android:textColor="@color/colorPrimaryText"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/imageTripEventIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Trip starts" />
+
+    <TextView
+        android:id="@+id/tvTripEventTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:fontFamily="@font/avenir_book"
+        android:textColor="@color/transparentColorPrimaryText"
+        android:textSize="10sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="10 Jan 20, 10:02am" />
+
+    <ImageView
+        android:id="@+id/imageTripCurrentLocation"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="2dp"
+        android:src="@drawable/ic_locationtarget"
+        app:layout_constraintStart_toEndOf="@+id/imageTripEventIcon"
+        app:layout_constraintTop_toBottomOf="@+id/tvTripEvent" />
+
+
+    <TextView
+        android:id="@+id/tvTripEventAddress"
+        android:layout_width="245dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="10dp"
+        android:fontFamily="@font/avenir_book"
+        android:textColor="@color/colorPrimaryText"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/imageTripCurrentLocation"
+        app:layout_constraintTop_toBottomOf="@+id/tvTripEvent"
+        tools:text="No 22 Ikorodu road, Jibowu Bus stop, Lagos" />
+
+    <View
+        android:id="@+id/viewLine1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="17dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/colorBorder"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTripEventAddress"
+        app:layout_constraintVertical_bias="0.0" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

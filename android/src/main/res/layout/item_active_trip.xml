@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+
+    <ImageView
+        android:layout_width="34dp"
+        android:id="@+id/imRed"
+        android:layout_height="34dp"
+        android:layout_centerVertical="true"
+        android:contentDescription="icon for trips in traffic"
+        android:src="@drawable/ic_trip_in_traffic" />
+
+    <ImageView
+        android:layout_width="34dp"
+        android:id="@+id/imGreen"
+        android:layout_height="34dp"
+        android:layout_centerVertical="true"
+        android:contentDescription="icon for trips in traffic"
+        android:src="@drawable/ic_trips_by_location" />
+
+
+    <TextView
+        android:id="@+id/tvLocationDescription"
+        android:layout_width="wrap_content"
+        android:textSize="12sp"
+        android:fontFamily="@font/avenir_regular"
+        android:textColor="@color/colorPrimaryTextDark"
+        android:layout_centerVertical="true"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="44dp"
+        tools:text="Around Lagos-Ibadan Express way" />
+
+    <TextView
+        android:layout_alignParentEnd="true"
+        android:id="@+id/tvLocationCounter"
+        android:layout_width="wrap_content"
+        android:textSize="16sp"
+        android:fontFamily="@font/avenir_heavy"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_centerVertical="true"
+        android:layout_height="wrap_content"
+        tools:text="19" />
+
+
+</RelativeLayout>

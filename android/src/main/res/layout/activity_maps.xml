@@ -1,17 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MapsActivity" />
+        android:layout_height="match_parent">
 
-    <include layout="@layout/fragment_truck_details" />
+        <fragment
+            android:id="@+id/map"
+            class="com.google.android.libraries.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            map:mapId="@string/map_id"
+            tools:context=".MapsActivity" />
+
+        <ImageView
+            android:id="@+id/switchToList"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginVertical="16dp"
+            android:onClick="switchToListFromMap"
+            android:src="@drawable/ic_floatingactionbtn"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+
+    <include layout="@layout/fragment_user_options" />
+
+    <include layout="@layout/search_available_truck" />
+
+    <include layout="@layout/dedicated_truck_bottom_sheet" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
