@@ -12,12 +12,6 @@ import GoogleMaps
     GMSServices.provideAPIKey("AIzaSyCZsmroa6P94FfCXaWIlVd9PcVpVpQYdqs")
    
     super.application(application, didFinishLaunchingWithOptions: launchOptions)
-    
-    let mainVc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "DammyViewController")
-    
-    window?.rootViewController = mainVc
-    window?.makeKeyAndVisible()
-    
     return true;
   }
 }
