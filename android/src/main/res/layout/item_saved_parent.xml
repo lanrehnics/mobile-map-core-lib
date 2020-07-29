@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+
+        <ImageView
+            android:id="@+id/imageViewAvatar"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:padding="4dp"
+            android:src="@drawable/ic_saved_locations"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/imageViewAvatar"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvSavedLocation"
+                style="@style/TextAppearance.AppCompat.Large"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/avenir_heavy"
+                android:text="Saved locations"
+                android:textColor="@color/colorPrimaryText"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvSavedLocationCounts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/avenir_regular"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="12sp"
+                tools:text="25 places" />
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/chevrondown"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"
+            android:src="@drawable/ic_chevrondown"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/chevronside"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="20dp"
+            android:src="@drawable/ic_chevronside"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorDividerGrey" />
+</LinearLayout>

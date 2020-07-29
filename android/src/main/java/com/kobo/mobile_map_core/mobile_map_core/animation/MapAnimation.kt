@@ -3,18 +3,18 @@ package com.kobo.mobile_map_core.mobile_map_core.animation
 import android.os.Handler
 import android.os.SystemClock
 import android.view.animation.AccelerateDecelerateInterpolator
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
+import com.google.android.libraries.maps.model.LatLng
+import com.google.android.libraries.maps.model.Marker
 
 
 class MarkerAnimation {
 
     companion object {
         fun animateMarkerToGB(
-          marker: Marker?,
-          finalPosition: LatLng?,
-          bearing: String,
-          latLngInterpolator: LatLngInterpolator
+                marker: Marker?,
+                finalPosition: LatLng?,
+                bearing: String,
+                latLngInterpolator: LatLngInterpolator
       ) {
           val startPosition = marker?.position
           val handler = Handler()

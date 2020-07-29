@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="16dp">
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:id="@+id/linearFirst"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="26dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tvTruckId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:fontFamily="@font/avenir_heavy"
+            android:textColor="@color/colorPrimaryText"
+            android:textSize="16sp"
+            tools:text="Flatbed 40ft" />
+
+        <TextView
+            android:id="@+id/tvAssetType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:fontFamily="@font/avenir_book"
+            android:textColor="@color/green"
+            android:textSize="12sp"
+            app:layout_constraintStart_toEndOf="@+id/tvTruckId"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Flatbed 40ft" />
+
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/relative"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearFirst">
+
+        <TextView
+            android:id="@+id/tvLastKnownLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:drawableLeft="@drawable/ic_navigation_orange"
+            android:drawablePadding="10dp"
+            android:fontFamily="@font/avenir_medium"
+            android:textColor="@color/colorPrimaryText"
+            android:textSize="12sp"
+            tools:text="No 22 Ikorodu road, Jibowu Bus stop, Lagos" />
+
+        <ImageView
+            android:id="@+id/imageTrackingIndicator"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_locationtarget" />
+
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:id="@+id/linearBottom"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/relative">
+
+        <TextView
+            android:id="@+id/tvEtaTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/avenir_book"
+            android:text="Last update"
+            android:textColor="@color/green"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvLastUpdated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:fontFamily="@font/avenir_book"
+            android:textColor="@color/colorTextGreyLight"
+            android:textSize="12sp"
+            app:layout_constraintStart_toEndOf="@+id/tvEtaTitle"
+            app:layout_constraintTop_toBottomOf="@+id/tvLastKnownLocation"
+            tools:text="5 minutes ago" />
+
+    </LinearLayout>
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="15dp"
+        android:background="@color/colorBorder"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearBottom" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,646 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.map.TrackActiveTrips">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/mainActiveTripsHome"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white">
+
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fitsSystemWindows="true"
+                android:theme="@style/AppTheme.AppBarOverlay"
+                app:elevation="0dp">
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="@android:color/white"
+                    app:layout_scrollFlags="scroll|enterAlways"
+                    app:popupTheme="@style/AppTheme.PopupOverlay"
+                    app:title="Active trips"
+                    app:titleTextAppearance="@style/TitleTextAppearance"
+                    app:titleTextColor="@color/colorPrimaryText" />
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/headerViewer"
+                android:layout_width="match_parent"
+                android:layout_height="99dp"
+                android:layout_below="@+id/appBar"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bottom_sheet_bg">
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardView"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="15dp"
+                    app:cardCornerRadius="12dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/white"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_truck" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:fontFamily="@font/avenir_roman"
+                    android:text="Total"
+                    android:textColor="@color/colorPrimaryTextLight"
+                    android:textSize="18sp"
+                    app:layout_constraintStart_toEndOf="@+id/cardView"
+                    app:layout_constraintTop_toTopOf="@+id/cardView" />
+
+
+                <TextView
+                    android:id="@+id/tvTotalActiveTrips"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:fontFamily="@font/avenir_heavy"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/cardView"
+                    app:layout_constraintStart_toEndOf="@+id/cardView"
+                    tools:text="20,600" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignTop="@+id/headerViewer"
+                android:layout_marginTop="80dp"
+                android:background="@drawable/bottom_sheet_bg_white"
+                android:orientation="vertical">
+
+                <HorizontalScrollView
+                    android:id="@+id/horizontalScrollView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="9dp"
+                    android:layout_marginTop="24dp">
+
+                    <LinearLayout
+
+                        android:id="@+id/shapeLayout"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <RelativeLayout
+                            android:layout_width="60dp"
+                            android:layout_height="119dp"
+                            android:layout_marginHorizontal="9dp"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
+
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/ePickupCard"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
+                                android:layout_centerHorizontal="true"
+                                android:onClick="openFragmentFilteredToPickUp"
+                                app:cardCornerRadius="12dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@android:color/white">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@color/transparentColorAccent"
+                                        android:gravity="center">
+
+                                        <ImageView
+                                            android:layout_width="24dp"
+                                            android:layout_height="24dp"
+                                            android:src="@drawable/ic_yellow_truck" />
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                            </androidx.cardview.widget.CardView>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/ePickupCard"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="6dp"
+                                android:fontFamily="@font/avenir_heavy"
+                                android:gravity="center"
+                                android:text="Enroute to pickup"
+                                android:textColor="@color/colorTextGrey"
+                                android:textSize="10sp" />
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="wrap_content"
+                                android:layout_height="16dp"
+                                android:layout_alignParentBottom="true"
+                                app:cardCornerRadius="12dp">
+
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/colorAccent"
+                                    android:gravity="center">
+
+                                    <TextView
+                                        android:id="@+id/tvEnroutePickUp"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/avenir_heavy"
+                                        android:gravity="center"
+                                        android:paddingHorizontal="10dp"
+                                        android:textColor="@android:color/white"
+                                        android:textSize="10sp"
+                                        tools:text="2,000" />
+
+                                </LinearLayout>
+
+                            </androidx.cardview.widget.CardView>
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="60dp"
+                            android:layout_height="119dp"
+                            android:layout_marginHorizontal="9dp"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
+
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/etToDeliveryCard"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
+                                android:onClick="openFragmentFilteredToDelivery"
+                                app:cardCornerRadius="12dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@android:color/white">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@color/transparentColorPrimaryDark"
+                                        android:gravity="center">
+
+                                        <ImageView
+                                            android:layout_width="24dp"
+                                            android:layout_height="24dp"
+                                            android:src="@drawable/ic_truck" />
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                            </androidx.cardview.widget.CardView>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/etToDeliveryCard"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="6dp"
+                                android:fontFamily="@font/avenir_heavy"
+                                android:gravity="center"
+                                android:text="Enroute to delivery"
+                                android:textColor="@color/colorTextGrey"
+                                android:textSize="10sp" />
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="wrap_content"
+                                android:layout_height="16dp"
+                                android:layout_alignParentBottom="true"
+                                android:layout_centerHorizontal="true"
+                                app:cardCornerRadius="12dp">
+
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/tcolorPrimaryDark"
+                                    android:gravity="center">
+
+                                    <TextView
+                                        android:id="@+id/tvEnrouteDelivery"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/avenir_heavy"
+                                        android:gravity="center"
+                                        android:paddingHorizontal="10dp"
+                                        android:textColor="@android:color/white"
+                                        android:textSize="10sp"
+                                        tools:text="2,000" />
+
+                                </LinearLayout>
+
+                            </androidx.cardview.widget.CardView>
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="60dp"
+                            android:layout_height="119dp"
+                            android:layout_marginHorizontal="9dp"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
+
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/waitingCard"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
+                                android:onClick="openFragmentFilteredAtDestination"
+                                app:cardCornerRadius="12dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@android:color/white">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@color/transparentColorGreen"
+                                        android:gravity="center">
+
+                                        <ImageView
+                                            android:layout_width="24dp"
+                                            android:layout_height="24dp"
+                                            android:src="@drawable/ic_package" />
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                            </androidx.cardview.widget.CardView>
+
+                            <TextView
+
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/waitingCard"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="6dp"
+                                android:fontFamily="@font/avenir_heavy"
+                                android:gravity="center"
+                                android:text="Waiting at destination"
+                                android:textColor="@color/colorTextGrey"
+                                android:textSize="10sp" />
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="wrap_content"
+                                android:layout_height="16dp"
+                                android:layout_alignParentBottom="true"
+                                android:layout_centerHorizontal="true"
+                                app:cardCornerRadius="12dp">
+
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/tcolorGreen"
+                                    android:gravity="center">
+
+                                    <TextView
+                                        android:id="@+id/tvWaitingAtDestination"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/avenir_heavy"
+                                        android:gravity="center"
+                                        android:paddingHorizontal="10dp"
+                                        android:textColor="@android:color/white"
+                                        android:textSize="10sp"
+                                        tools:text="2,000" />
+
+                                </LinearLayout>
+
+                            </androidx.cardview.widget.CardView>
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="60dp"
+                            android:layout_height="119dp"
+                            android:layout_marginHorizontal="9dp"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
+
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/stoppedCard"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
+                                android:onClick="openFragmentFilteredStopped"
+                                app:cardCornerRadius="12dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@android:color/white">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@color/transparentColorRed"
+                                        android:gravity="center">
+
+                                        <ImageView
+                                            android:layout_width="24dp"
+                                            android:layout_height="24dp"
+                                            android:src="@drawable/ic_xoctagon" />
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                            </androidx.cardview.widget.CardView>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/stoppedCard"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="6dp"
+                                android:fontFamily="@font/avenir_heavy"
+                                android:gravity="center"
+                                android:text="Stopped"
+                                android:textColor="@color/colorTextGrey"
+                                android:textSize="10sp" />
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="wrap_content"
+                                android:layout_height="16dp"
+                                android:layout_alignParentBottom="true"
+                                android:layout_centerHorizontal="true"
+                                app:cardCornerRadius="12dp">
+
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/tcolorRed"
+                                    android:gravity="center">
+
+                                    <TextView
+                                        android:id="@+id/tvStopped"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/avenir_heavy"
+                                        android:gravity="center"
+                                        android:paddingHorizontal="10dp"
+                                        android:textColor="@android:color/white"
+                                        android:textSize="10sp"
+                                        tools:text="2,000" />
+
+                                </LinearLayout>
+
+                            </androidx.cardview.widget.CardView>
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="60dp"
+                            android:layout_height="119dp"
+                            android:layout_marginHorizontal="9dp"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
+
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/divertedCard"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
+                                android:layout_centerHorizontal="true"
+                                android:onClick="openFragmentFilteredDiverted"
+                                app:cardCornerRadius="12dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@android:color/white">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="@color/transparentColorBlack"
+                                        android:gravity="center">
+
+                                        <ImageView
+                                            android:layout_width="24dp"
+                                            android:layout_height="24dp"
+                                            android:src="@drawable/ic_info" />
+
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                            </androidx.cardview.widget.CardView>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/divertedCard"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="6dp"
+                                android:layout_marginBottom="13dp"
+                                android:fontFamily="@font/avenir_heavy"
+                                android:gravity="center"
+                                android:text="Diverted"
+                                android:textColor="@color/colorTextGrey"
+                                android:textSize="10sp" />
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="wrap_content"
+                                android:layout_height="16dp"
+                                android:layout_alignParentBottom="true"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginBottom="0dp"
+                                app:cardCornerRadius="12dp">
+
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/tcolorBlack"
+                                    android:gravity="center">
+
+                                    <TextView
+                                        android:id="@+id/tvDiverted"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/avenir_heavy"
+                                        android:gravity="center"
+                                        android:paddingHorizontal="10dp"
+                                        android:textColor="@android:color/white"
+                                        android:textSize="10sp"
+                                        tools:text="2,000" />
+
+                                </LinearLayout>
+
+                            </androidx.cardview.widget.CardView>
+
+                        </RelativeLayout>
+
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="22dp"
+                    android:layout_marginTop="25dp"
+                    android:background="@color/colorBorder" />
+
+                <RadioGroup
+                    android:id="@+id/toggle"
+                    android:layout_width="match_parent"
+                    android:layout_height="38dp"
+                    android:layout_marginHorizontal="17dp"
+                    android:layout_marginTop="25dp"
+                    android:background="@drawable/holo_bg"
+                    android:checkedButton="@+id/offer"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/setDisplayTripsByLocation"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="1dp"
+                        android:layout_marginTop="1dp"
+                        android:layout_marginBottom="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/toggle_widget_background"
+                        android:button="@null"
+                        android:checked="true"
+                        android:fontFamily="@font/avenir_regular"
+                        android:gravity="center"
+                        android:onClick="displayTripsByLocation"
+                        android:text="Trips by location"
+                        android:textColor="@color/colorPrimaryText"
+                        android:textFontWeight="800" />
+
+                    <RadioButton
+                        android:id="@+id/setDisplayTripsInTraffic"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="1dp"
+                        android:layout_marginRight="1dp"
+                        android:layout_marginBottom="1dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/toggle_widget_background"
+                        android:button="@null"
+                        android:checked="false"
+                        android:fontFamily="@font/avenir_regular"
+                        android:gravity="center"
+                        android:onClick="displayTripsInTraffic"
+                        android:text="Trips in traffic"
+                        android:textColor="@color/colorPrimaryText"
+                        android:textFontWeight="800" />
+                </RadioGroup>
+
+                <androidx.viewpager.widget.ViewPager
+                    android:id="@+id/vpPager"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="17dp"
+                    android:layout_marginTop="16dp"></androidx.viewpager.widget.ViewPager>
+
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="98dp">
+
+                <ImageView
+                    android:layout_centerInParent="true"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:onClick="openMapFragmentWithAllTrucks"
+                    android:src="@drawable/ic_fab_map" />
+
+                <ProgressBar
+                    android:indeterminateDrawable="@drawable/progress"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/pBar"
+                    android:visibility="gone"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp">
+                </ProgressBar>
+
+            </RelativeLayout>
+
+
+            <ImageView
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="16dp"
+                android:onClick="openFragmentFilteredActiveTrips"
+                android:src="@drawable/ic_floatingactionbtn" />
+
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="72dp"
+            android:id="@+id/switchToList"
+            android:layout_height="72dp"
+            android:visibility="gone"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginVertical="16dp"
+            android:onClick="switchToListFromMap"
+            android:src="@drawable/ic_floatingactionbtn" />
+
+    </RelativeLayout>
+
+
+    <include layout="@layout/trip_details_bottom_sheet" />
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

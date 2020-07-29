@@ -1,6 +1,6 @@
 package com.kobo.mobile_map_core.mobile_map_core.animation
 
-import com.google.android.gms.maps.model.LatLng
+import com.google.android.libraries.maps.model.LatLng
 import java.lang.Math.*
 import kotlin.math.cos
 import kotlin.math.sin

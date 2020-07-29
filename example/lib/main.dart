@@ -24,9 +24,17 @@ class _MyAppState extends State<MyApp> {
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      platformVersion = await MobileMapCore.loadMap({});
+      var config = {
+        "app_type": "customer",
+        "user_type_and_id": "customerId=1190",
+        "token": "token",
+        "id": 1190,
+        "kobo_stations_url": "",
+        "customer_locations_url": "",
+        "user_first_name": "Olanrewaju",
+      };
+      platformVersion = await MobileMapCore.loadMap(config);
     } on PlatformException {
       platformVersion = 'Failed to prepare map.';
     }
@@ -60,10 +68,12 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () async {
                     MobileMapCore.loadMap({
                       "app_type": "customer",
-                      "token": "jjjsdjkfkjsf",
-                      "id": 1990,
-                      "user_name": "Mobiro",
-                      "user_type": "customer",
+                      "user_type_and_id": "customerId=1190",
+                      "token": "token",
+                      "id": 1190,
+                      "kobo_stations_url": "",
+                      "customer_locations_url": "",
+                      "user_first_name": "Olanrewaju",
                     });
                   },
                   child: Text("Open map"),
