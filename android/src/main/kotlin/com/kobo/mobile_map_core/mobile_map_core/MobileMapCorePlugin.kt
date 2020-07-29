@@ -19,14 +19,12 @@ class MobileMapCorePlugin : MethodCallHandler {
         val NAVIGATION_DATA = "NAVIGATION_DATA"
 
 
-        var KEY_KOBO_CUSTOMER_URL: String? = "customer_locations_url"
         var KEY_USER_TYPE_AND_ID: String? = "user_type_and_id"
-        var KEY_KOBO_STATIONS_URL: String? = "kobo_stations_url"
         var KEY_APP_TYPE: String? = "app_type"
         var KEY_AUTH_TOKEN: String? = "token"
         var KEY_ID: String? = "id"
         var KEY_DESTINATION: String? = "destination"
-        var KEY_USER_FIRST_NAME: String? = "user_first_name"
+        var KEY_USER_FIRST_NAME: String? = "user_name"
         val KEY_TRUCK_REG_NUMBER = "regNumber"
         val KEY_TRIP_ID = "tripId"
         val KEY_READABLE_TRIP_ID = "tripReadId"
@@ -42,56 +40,93 @@ class MobileMapCorePlugin : MethodCallHandler {
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
-        if (call.method == "launch_map") {
-            val intent = Intent(getActiveContext(), BattlefieldLandingActivity::class.java)
+        when (call.method) {
+            "launch_map" -> {
+                val intent = Intent(getActiveContext(), BattlefieldLandingActivity::class.java)
 
 
-            val args = call.arguments() as? Map<String, Any?>?
-            val koboCustomerUrl = args?.get(KEY_KOBO_CUSTOMER_URL) as String
-            val koboStationsUrl = args[KEY_KOBO_STATIONS_URL] as String?
-            val appType = args[KEY_APP_TYPE] as String?
-            val truckRegNumber = args[KEY_TRUCK_REG_NUMBER] as String?
-            val tripReadId = args[KEY_READABLE_TRIP_ID] as String?
-            val tripId = args[KEY_TRIP_ID] as String?
-            val destination = args[KEY_DESTINATION] as List<Double>?
-            val userTypeAndId = args[KEY_USER_TYPE_AND_ID] as String?
-            val authToken = args[KEY_AUTH_TOKEN] as String?
-            val id = args[KEY_ID] as Int
-            val userFirstName = args[KEY_USER_FIRST_NAME] as String?
+                val args = call.arguments() as? Map<String, Any?>?
+                val appType = args?.get(KEY_APP_TYPE) as String?
+                val truckRegNumber = args?.get(KEY_TRUCK_REG_NUMBER) as String?
+                val tripReadId = args?.get(KEY_READABLE_TRIP_ID) as String?
+                val tripId = args?.get(KEY_TRIP_ID) as String?
+                val destination = args?.get(KEY_DESTINATION) as List<Double>?
+                val userTypeAndId = args?.get(KEY_USER_TYPE_AND_ID) as String?
+                val authToken = args?.get(KEY_AUTH_TOKEN) as String?
+                val id = args?.get(KEY_ID) as Int
+                val userFirstName = args[KEY_USER_FIRST_NAME] as String?
 
 
-            getActiveContext()?.let {
-                getDefaultSharedPreferences(it)
-                        .edit()
-                        .putString(KEY_USER_TYPE_AND_ID, userTypeAndId)
-                        .putString(KEY_USER_FIRST_NAME, userFirstName)
-                        .putString(KEY_KOBO_CUSTOMER_URL, koboCustomerUrl)
-                        .putString(KEY_KOBO_STATIONS_URL, koboStationsUrl)
-                        .putString(KEY_APP_TYPE, appType)
-                        .putString(KEY_AUTH_TOKEN, "Bearer $authToken")
-                        .putInt(KEY_ID, id)
-                        .apply()
+                getActiveContext()?.let {
+                    getDefaultSharedPreferences(it)
+                            .edit()
+                            .putString(KEY_USER_TYPE_AND_ID, userTypeAndId)
+                            .putString(KEY_USER_FIRST_NAME, userFirstName)
+                            .putString(KEY_APP_TYPE, appType)
+                            .putString(KEY_AUTH_TOKEN, "Bearer $authToken")
+                            .putInt(KEY_ID, id)
+                            .apply()
 
-                when (appType) {
-                    "driver" -> {
-                        val navigationActivity = Intent(getActiveContext(), NavigationActivity::class.java)
-                        val navigationData = NavigationData(regNumber = truckRegNumber, tripId = tripId, tripReadId = tripReadId, destination = destination)
-                        navigationActivity.putExtra(NavigationActivity.NAVIGATION_DATA, navigationData)
-                        startActivity(it, navigationActivity, null)
+                    when (appType) {
+                        "driver" -> {
+                            val navigationActivity = Intent(getActiveContext(), NavigationActivity::class.java)
+                            val navigationData = NavigationData(regNumber = truckRegNumber, tripId = tripId, tripReadId = tripReadId, destination = destination)
+                            navigationActivity.putExtra(NavigationActivity.NAVIGATION_DATA, navigationData)
+                            startActivity(it, navigationActivity, null)
+                        }
+                        else -> {
+                            startActivity(it, intent, null)
+                        }
                     }
-                    else -> {
-                        startActivity(it, intent, null)
-                    }
+
+
                 }
 
+
+                result.success("done")
 
             }
 
 
-            result.success("done")
+            "navigate_driver" -> {
 
-        } else {
-            result.notImplemented()
+                val args = call.arguments() as? Map<String, Any?>?
+                val appType = args?.get(KEY_APP_TYPE) as String?
+                val truckRegNumber = args?.get(KEY_TRUCK_REG_NUMBER) as String?
+                val tripReadId = args?.get(KEY_READABLE_TRIP_ID) as String?
+                val tripId = args?.get(KEY_TRIP_ID) as String?
+                val destination = args?.get(KEY_DESTINATION) as List<Double>?
+                val userTypeAndId = args?.get(KEY_USER_TYPE_AND_ID) as String?
+                val authToken = args?.get(KEY_AUTH_TOKEN) as String?
+                val id = args?.get(KEY_ID) as Int
+                val userFirstName = args[KEY_USER_FIRST_NAME] as String?
+
+
+                getActiveContext()?.let {
+                    getDefaultSharedPreferences(it)
+                            .edit()
+                            .putString(KEY_USER_TYPE_AND_ID, userTypeAndId)
+                            .putString(KEY_USER_FIRST_NAME, userFirstName)
+                            .putString(KEY_APP_TYPE, appType)
+                            .putString(KEY_AUTH_TOKEN, "Bearer $authToken")
+                            .putInt(KEY_ID, id)
+                            .apply()
+
+
+                    val navigationActivity = Intent(getActiveContext(), NavigationActivity::class.java)
+                    val navigationData = NavigationData(regNumber = truckRegNumber, tripId = tripId, tripReadId = tripReadId, destination = destination)
+                    navigationActivity.putExtra(NavigationActivity.NAVIGATION_DATA, navigationData)
+                    startActivity(it, navigationActivity, null)
+
+                }
+
+
+                result.success("done")
+
+            }
+            else -> {
+                result.notImplemented()
+            }
         }
     }
 

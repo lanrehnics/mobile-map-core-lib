@@ -30,9 +30,7 @@ class _MyAppState extends State<MyApp> {
         "user_type_and_id": "customerId=1190",
         "token": "token",
         "id": 1190,
-        "kobo_stations_url": "",
-        "customer_locations_url": "",
-        "user_first_name": "Olanrewaju",
+        "user_name": "Olanrewaju"
       };
       platformVersion = await MobileMapCore.loadMap(config);
     } on PlatformException {
@@ -71,9 +69,7 @@ class _MyAppState extends State<MyApp> {
                       "user_type_and_id": "customerId=1190",
                       "token": "token",
                       "id": 1190,
-                      "kobo_stations_url": "",
-                      "customer_locations_url": "",
-                      "user_first_name": "Olanrewaju",
+                      "user_name": "Olanrewaju"
                     });
                   },
                   child: Text("Open map"),
