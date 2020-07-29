@@ -9,9 +9,6 @@
 /* Begin PBXBuildFile section */
 		11843A108902B3CBA3ACDCE8 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DFDDD96BC01C42DAF7D7EAC4 /* Pods_Runner.framework */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
-		1FB80C2624D03FCC00F95759 /* ExampleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB80C2424D03FCC00F95759 /* ExampleViewController.swift */; };
-		1FB80C2724D03FCC00F95759 /* ExampleViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1FB80C2524D03FCC00F95759 /* ExampleViewController.xib */; };
-		1FB80C2924D0411800F95759 /* DammyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB80C2824D0411800F95759 /* DammyViewController.swift */; };
 		1FEB44F32388A5E800B8D70F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1FEB44F22388A5E700B8D70F /* GoogleService-Info.plist */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		3B80C3941E831B6300D905FE /* App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B80C3931E831B6300D905FE /* App.framework */; };
@@ -61,9 +58,6 @@
 		1F3CF4212388962400FEF3B8 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		1F3CF4222388962400FEF3B8 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		1F693A7F2387402000ADDAF6 /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
-		1FB80C2424D03FCC00F95759 /* ExampleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleViewController.swift; sourceTree = "<group>"; };
-		1FB80C2524D03FCC00F95759 /* ExampleViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ExampleViewController.xib; sourceTree = "<group>"; };
-		1FB80C2824D0411800F95759 /* DammyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DammyViewController.swift; sourceTree = "<group>"; };
 		1FEB44F22388A5E700B8D70F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		3B80C3931E831B6300D905FE /* App.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = App.framework; path = Flutter/App.framework; sourceTree = "<group>"; };
@@ -101,9 +95,6 @@
 		1FB1269023B0C3C400C31FBE /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				1FB80C2424D03FCC00F95759 /* ExampleViewController.swift */,
-				1FB80C2524D03FCC00F95759 /* ExampleViewController.xib */,
-				1FB80C2824D0411800F95759 /* DammyViewController.swift */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -280,7 +271,6 @@
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 				1FEB44F32388A5E800B8D70F /* GoogleService-Info.plist in Resources */,
-				1FB80C2724D03FCC00F95759 /* ExampleViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -376,8 +366,6 @@
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
-				1FB80C2624D03FCC00F95759 /* ExampleViewController.swift in Sources */,
-				1FB80C2924D0411800F95759 /* DammyViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

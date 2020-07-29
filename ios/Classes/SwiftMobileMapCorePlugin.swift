@@ -2,6 +2,8 @@ import Flutter
 import UIKit
 import GoogleMaps
 import Pulley
+import BattleFieldIOS
+
 
 public class SwiftMobileMapCorePlugin: NSObject, FlutterPlugin {
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -16,12 +18,7 @@ public class SwiftMobileMapCorePlugin: NSObject, FlutterPlugin {
             let model = UserConfigModel(
                      userType: platformArgs["app_type"] as! String, userTypeId: platformArgs["id"] as! Int, token: platformArgs["token"] as! String, userName: platformArgs["user_name"] as! String)
              print("config model:", model)
-            let vc = TestViewController()
-            vc.title = "Test View Controller"
-            let navController = UINavigationController(rootViewController: vc)
-            navController.modalPresentationStyle = .overFullScreen
-            UIApplication.shared.keyWindow?.rootViewController?.present(navController, animated: true, completion: nil)
-            //loadViewController(model)
+            loadViewController(model)
         } else if call.method == "navigate_driver" {
             let regNumber = platformArgs["reg_number"] as! String
             let destination = platformArgs["destination"] as? [Double]
