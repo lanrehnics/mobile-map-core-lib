@@ -18,7 +18,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    initPlatformState();
+    //initPlatformState();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -59,9 +59,11 @@ class _MyAppState extends State<MyApp> {
                 RaisedButton(
                   onPressed: () async {
                     MobileMapCore.loadMap({
-                      "token": "",
-                      "id": 0,
-                      "user_type": "squad",
+                      "app_type": "customer",
+                      "token": "jjjsdjkfkjsf",
+                      "id": 1990,
+                      "user_name": "Mobiro",
+                      "user_type": "customer",
                     });
                   },
                   child: Text("Open map"),
