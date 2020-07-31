@@ -18,6 +18,7 @@ public class SwiftMobileMapCorePlugin: NSObject, FlutterPlugin {
             let model = UserConfigModel(
                      userType: platformArgs["app_type"] as! String, userTypeId: platformArgs["id"] as! Int, token: platformArgs["token"] as! String, userName: platformArgs["user_name"] as! String)
              print("config model:", model)
+            SessionManager.saveUserDetails(model: model)
             loadViewController(model)
         } else if call.method == "navigate_driver" {
             let regNumber = platformArgs["reg_number"] as! String
