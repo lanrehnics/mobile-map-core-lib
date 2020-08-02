@@ -17,7 +17,7 @@ public class SwiftMobileMapCorePlugin: NSObject, FlutterPlugin {
         if call.method == "launch_map" {
             let model = UserConfigModel(
                 userType: platformArgs["app_type"] as! String, userTypeId: platformArgs["id"] as! Int, token: platformArgs["token"] as! String, userName: platformArgs["user_name"] as! String, koboUrl: platformArgs["kobo_base_url"] as! String,
-                gpsBaseUrl: platformArgs["gps_base_url"] as! String
+                gpsBaseUrl: platformArgs["gps_base_url"] as! String, environment: platformArgs["environment"] as! String
             )
              print("config model:", model)
             SessionManager.saveUserDetails(model: model)

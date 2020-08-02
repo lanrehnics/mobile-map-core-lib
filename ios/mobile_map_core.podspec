@@ -15,7 +15,7 @@ A new flutter plugin project.
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
-  s.dependency 'BattleFieldIOS', '~> 0.1.0'
+  s.dependency 'BattleFieldIOS'
   s.static_framework = true
   s.ios.deployment_target = '11.0'
 end

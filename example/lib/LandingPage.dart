@@ -37,6 +37,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                     "user_name": SessionManager.name,
                     "kobo_base_url": "https://stage.api.kobo360.com/",
                     "gps_base_url": "https://stagegpsapi.kobo360.com/v2/",
+                    "environment": "staging",
                   });
                 },
                 child: Text("Open map"),
