@@ -1,8 +1,12 @@
 package com.kobo.mobile_map_core.mobile_map_core.ui.map
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.provider.Settings
+import android.provider.Settings.Secure
+import android.provider.Settings.System
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -11,32 +15,42 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.libraries.maps.*
 import com.google.android.libraries.maps.model.*
+import com.google.gson.Gson
 import com.google.maps.android.clustering.ClusterManager
+import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
 import com.kobo.mobile_map_core.mobile_map_core.R
+import com.kobo.mobile_map_core.mobile_map_core.animation.LatLngInterpolator
+import com.kobo.mobile_map_core.mobile_map_core.animation.MarkerAnimation
+import com.kobo.mobile_map_core.mobile_map_core.animation.TruckMover
 import com.kobo.mobile_map_core.mobile_map_core.data.models.ClearCommand
 import com.kobo.mobile_map_core.mobile_map_core.data.models.TruckClusterItem
 import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.Events
+import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.Location
 import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.Trips
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.Trucks
+import com.kobo.mobile_map_core.mobile_map_core.data.models.mqttmessage.LiveLocationData
+import com.kobo.mobile_map_core.mobile_map_core.data.models.mqttmessage.TruckLiveLocationResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.services.MapService
 import com.kobo.mobile_map_core.mobile_map_core.enums.FocusFrom
 import com.kobo.mobile_map_core.mobile_map_core.enums.MapDisplayMode
 import com.kobo360.map.MarkerClusterRenderer
 import com.mapbox.geojson.Point
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
+import org.json.JSONObject
 import java.util.*
+
 
 abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
-    private val CLOUDMQTT_HOST = "tcp://smart-journalist.cloudmqtt.com:1883"
-    private val CLOUDMQTT_PORT = "1883"
-    private val CLOUDMQTT_USER = "mobileand"
-    private val CLOUDMQTT_PASS = "kbMob20@ge"
-
-    private lateinit var mqttAndroidClient: MqttAndroidClient
-    private lateinit var mqttTopic: String
+    protected var mqttAndroidClient: MqttAndroidClient? = null
+    protected var mqttTopic: String? = null
 
 
     private lateinit var travelledPolylineOptions: PolylineOptions
@@ -44,10 +58,13 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var currentBestRoutePolyline: Polyline
     private lateinit var travelledPathPolyline: Polyline
 
+    var truckMover: TruckMover? = null
+    protected var keepListening: Boolean = false
+
 
     protected lateinit var context: Context
+    protected lateinit var shaper: SharedPreferences
     protected lateinit var mapService: MapService
-    protected lateinit var tripInfo: Trucks
     protected lateinit var truckInfo: Trucks
     protected lateinit var mMap: GoogleMap
     protected lateinit var mMapView: View
@@ -61,6 +78,7 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     protected lateinit var displayMode: MapDisplayMode
     protected lateinit var focusFrom: FocusFrom
+    protected var selectedMarker: Marker? = null
 
     protected fun initMapStuffs() {
         displayMode = MapDisplayMode.UserFocusMode
@@ -255,27 +273,26 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
     fun tripTruckFocusMode() {
 
         clearMapAndData(ClearCommand.MAP)
-        if (tripInfo.tripDetail?.travelledRoutePolyline?.isNotEmpty()!! && tripInfo.tripDetail?.currentBestRoute?.isNotEmpty()!!) {
-            drawPolyLine(travelledPolyList = mapService.decodePoly(tripInfo.tripDetail?.travelledRoutePolyline!!),
-                    currentBestPolyList = mapService.decodePoly(tripInfo.tripDetail?.currentBestRoute!!))
+        if (truckInfo.tripDetail?.travelledRoutePolyline?.isNotEmpty()!! && truckInfo.tripDetail?.currentBestRoute?.isNotEmpty()!!) {
+            drawPolyLine(travelledPolyList = mapService.decodePoly(truckInfo.tripDetail?.travelledRoutePolyline!!),
+                    currentBestPolyList = mapService.decodePoly(truckInfo.tripDetail?.currentBestRoute!!))
         }
 
-        val marker = mMap.addMarker(
-                tripInfo.lastKnownLocation?.coordinates?.let { it1 -> toLatLng(it1) }?.let { it2 ->
+        selectedMarker = mMap.addMarker(
+                truckInfo.lastKnownLocation?.coordinates?.let { it1 -> toLatLng(it1) }?.let { it2 ->
                     MarkerOptions()
                             .position(it2)
                             //                                                .title(selectedTruck!!.d.reg_number)
-                            .rotation(tripInfo.bearing.toFloat())
-                            .icon(truckFromStatus(tripInfo))
+                            .rotation(truckInfo.bearing.toFloat())
+                            .icon(truckFromStatus(truckInfo))
                 }
         )
 
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(tripInfo.lastKnownLocation?.coordinates?.let { latLngFromList(it) }, 12f))
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(truckInfo.lastKnownLocation?.coordinates?.let { latLngFromList(it) }, 12f))
 
-        mqttTopic = "client/track/${tripInfo.regNumber}".toLowerCase(Locale.getDefault())
+        mqttTopic = "client/track/${truckInfo.regNumber}".toLowerCase(Locale.getDefault())
         setUpMQTT()
-
-        tripInfo.events?.let { events ->
+        truckInfo.events?.let { events ->
             events.forEach { ev ->
 
                 ev?.let { it ->
@@ -299,20 +316,30 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
     fun truckFocusMode() {
 
         clearMapAndData(ClearCommand.MAP)
-        if (truckInfo.tripDetail?.travelledRoutePolyline?.isNotEmpty()!! && truckInfo.tripDetail?.currentBestRoute?.isNotEmpty()!!) {
-            drawPolyLine(travelledPolyList = mapService.decodePoly(truckInfo.tripDetail?.travelledRoutePolyline!!),
-                    currentBestPolyList = mapService.decodePoly(truckInfo.tripDetail?.currentBestRoute!!))
-        }
+//        try {
+//            if (truckInfo.tripDetail?.travelledRoutePolyline?.isNotEmpty()!! && truckInfo.tripDetail?.currentBestRoute?.isNotEmpty()!!) {
+//                drawPolyLine(travelledPolyList = mapService.decodePoly(truckInfo.tripDetail?.travelledRoutePolyline!!),
+//                        currentBestPolyList = mapService.decodePoly(truckInfo.tripDetail?.currentBestRoute!!))
+//            }
+//        } catch (e: Exception) {
+//
+//        }
 
-        val marker = mMap.addMarker(
-                truckInfo.lastKnownLocation?.coordinates?.let { it1 -> toLatLng(it1) }?.let { it2 ->
+
+        truckInfo.lastKnownLocation?.let { lkl ->
+            val marker = mMap.addMarker(
                     MarkerOptions()
-                            .position(it2)
-                            //                                                .title(selectedTruck!!.d.reg_number)
+                            .position(toLatLngNotNull(lkl.coordinates))
                             .rotation(truckInfo.bearing.toFloat())
                             .icon(truckFromStatus(truckInfo))
-                }
-        )
+            )
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(toLatLngNotNull(lkl.coordinates), 17f))
+
+        }
+
+
+
+
 
         truckInfo.events?.let { events ->
             events.forEach { ev ->
@@ -349,6 +376,10 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         fun toLatLng(list: List<Double>?): LatLng? {
             return list?.get(1)?.let { LatLng(it, list[0]) }
+        }
+
+        fun toLatLngNotNull(list: List<Double>?): LatLng {
+            return list?.get(1)?.let { LatLng(it, list[0]) }!!
         }
 
         fun toPoint(list: List<Double>?): Point {
@@ -520,34 +551,28 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
-    private fun setUpMQTT() {
-
-
+    protected fun setUpMQTT() {
         val mqttConnectOptions = MqttConnectOptions()
-        mqttConnectOptions.userName = CLOUDMQTT_USER
-        mqttConnectOptions.password = CLOUDMQTT_PASS.toCharArray()
-
-
-        mqttAndroidClient = MqttAndroidClient(applicationContext, CLOUDMQTT_HOST, "hbvhubiohpio")
-        mqttAndroidClient.setCallback(object : MqttCallback {
-            override fun connectionLost(cause: Throwable) {
-                Log.i(NewBaseMapActivity::class.java.name, "connection lost")
-            }
-
-            @Throws(Exception::class)
-            override fun messageArrived(topic: String, message: MqttMessage) {
-                Log.i(NewBaseMapActivity::class.java.name, "topic: " + topic + ", msg: " + String(message.payload))
-            }
-
-            override fun deliveryComplete(token: IMqttDeliveryToken) {
-                Log.i(NewBaseMapActivity::class.java.name, "msg delivered")
-            }
-        })
-
+        mqttConnectOptions.userName = shaper.getString(MobileMapCorePlugin.KEY_CLOUDMQTT_USER, "")
+        mqttConnectOptions.password = shaper.getString(MobileMapCorePlugin.KEY_CLOUDMQTT_PASS, "")?.toCharArray()
+        val androidID = Settings.System.getString(this.contentResolver, Settings.Secure.ANDROID_ID)
+        mqttAndroidClient = MqttAndroidClient(applicationContext, shaper.getString(MobileMapCorePlugin.KEY_CLOUDMQTT_HOST, ""), androidID)
         try {
-            mqttAndroidClient.connect(mqttConnectOptions, null, object : IMqttActionListener {
+            mqttAndroidClient?.connect(mqttConnectOptions, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken) {
-                    Log.i(NewBaseMapActivity::class.java.name, "connect succeed")
+                    keepListening = true
+
+
+                    if (truckMover == null) {
+                        truckMover = TruckMover(mMap, context, selectedMarker)
+                    }
+
+                    truckMover?.let { tMover ->
+                        selectedMarker?.position?.let { position -> tMover.showDefaultLocationOnMap(position) }
+                        tMover.startTruckMovementTimer()
+                    }
+
+
                     subscribeTopic(mqttTopic)
                 }
 
@@ -555,42 +580,143 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     Log.i(NewBaseMapActivity::class.java.name, "connect failed")
                 }
             })
+
+
+            mqttAndroidClient?.setCallback(object : MqttCallback {
+                override fun connectionLost(cause: Throwable) {
+                    //connectionStatus = false
+                    // Give your callback on failure here
+                    Log.i(NewBaseMapActivity::class.java.name, "connection lost")
+
+                }
+
+                override fun messageArrived(topic: String, message: MqttMessage) {
+                    try {
+                        val data = String(message.payload, charset("UTF-8"))
+
+
+                        if (keepListening) {
+                            val response = JSONObject(data)
+                            val liveLocationData: String = response.getString("data")
+                            val liveLocationDataObject = Gson().fromJson(liveLocationData, LiveLocationData::class.java)
+
+
+
+
+                            liveLocationDataObject.locations?.let {
+                                truckMover?.addMoreLocation(it)
+                            }
+                        }
+
+                    } catch (e: Exception) {
+                        // Give your callback on error here
+                        Log.i(NewBaseMapActivity::class.java.name, "Message Exception: ${e.message}")
+                    }
+                }
+
+                override fun deliveryComplete(token: IMqttDeliveryToken) {
+                    Log.i(NewBaseMapActivity::class.java.name, "msg delivered")
+                }
+            })
+
         } catch (e: MqttException) {
             e.printStackTrace()
         }
 
+
+//        mqttAndroidClient.setCallback(object : MqttCallback {
+//            override fun connectionLost(cause: Throwable) {
+//                Log.i(NewBaseMapActivity::class.java.name, "connection lost")
+//            }
+//
+////            @Throws(Exception::class)
+//            override fun messageArrived(topic: String, message: MqttMessage) {
+//                Log.i(NewBaseMapActivity::class.java.name, "topic: " + topic + ", msg: " + String(message.payload))
+//            }
+//
+//            override fun deliveryComplete(token: IMqttDeliveryToken) {
+//                Log.i(NewBaseMapActivity::class.java.name, "msg delivered")
+//            }
+//        })
+
+
+    }
+
+    private fun moveTruck(locationList: List<Location>) {
+        println("")
+        GlobalScope.launch(Dispatchers.Main) {
+            try {
+                locationList.asFlow() // a flow of requests
+                        .map { location ->
+                            println(location.toString())
+                            MarkerAnimation.animateMarkerToGB(selectedMarker, toLatLngNotNull(location.coordinates), location.bearing.toString(),
+                                    LatLngInterpolator.Spherical())
+                            mMap.uiSettings.isRotateGesturesEnabled = true
+                            mMap.animateCamera(
+                                    CameraUpdateFactory.newCameraPosition(
+                                            CameraPosition.Builder().target(
+                                                    toLatLngNotNull(location.coordinates)
+                                            )
+                                                    .zoom(16.5f).build()
+                                    )
+                            )
+
+
+                        }
+//
+//            MarkerAnimation.animateMarkerToGB(
+//                    selectedMarker, null, "0f",
+//                    LatLngInterpolator.Spherical()
+//            )
+            } catch (e: java.lang.Exception) {
+                Log.e(BattlefieldLandingActivity.TAG, "Error fetching customers locations ${e.message}")
+            }
+        }
     }
 
     fun subscribeTopic(topic: String?) {
-        try {
-            mqttAndroidClient.subscribe(topic, 0, null, object : IMqttActionListener {
-                override fun onSuccess(asyncActionToken: IMqttToken) {
-                    Log.i(NewBaseMapActivity::class.java.name, "subscribed succeed")
-                }
+        topic?.let {
+            try {
+                mqttAndroidClient?.subscribe(it, 0, null, object : IMqttActionListener {
+                    override fun onSuccess(asyncActionToken: IMqttToken) {
+                        Log.i(NewBaseMapActivity::class.java.name, "subscribed succeed")
+                    }
 
-                override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
-                    Log.i(NewBaseMapActivity::class.java.name, "subscribed failed")
-                }
-            })
-        } catch (e: MqttException) {
-            e.printStackTrace()
+                    override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
+                        Log.i(NewBaseMapActivity::class.java.name, "subscribed failed")
+                    }
+                })
+            } catch (e: MqttException) {
+                e.printStackTrace()
+            }
         }
+
     }
 
-    fun unSubscribe(topic: String) {
-        try {
-            val unsubToken = mqttAndroidClient.unsubscribe(topic)
-            unsubToken.actionCallback = object : IMqttActionListener {
-                override fun onSuccess(asyncActionToken: IMqttToken) {
-                    // Give your callback on unsubscribing here
+    fun unSubscribe(topic: String?) {
+        topic?.let {
+            try {
+                val unsubToken = mqttAndroidClient?.unsubscribe(it)
+
+                unsubToken?.let { it2 ->
+                    it2.actionCallback = object : IMqttActionListener {
+                        override fun onSuccess(asyncActionToken: IMqttToken) {
+                            println("Topic Unsub")
+                            // Give your callback on unsubscribing here
+                        }
+
+                        override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
+                            println("Error Unsub")
+                            // Give your callback on failure here
+                        }
+                    }
                 }
-                override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
-                    // Give your callback on failure here
-                }
+
+            } catch (e: MqttException) {
+                // Give your callback on failure here
             }
-        } catch (e: MqttException) {
-            // Give your callback on failure here
         }
+
     }
 
 

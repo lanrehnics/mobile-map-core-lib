@@ -9,6 +9,10 @@ data class Location(
         @SerializedName("coordinates") val coordinates: List<Double>,
         @SerializedName("address") val address: String,
         @SerializedName("geohash") val geohash: String,
-        @SerializedName("lat") val lat : Double,
-        @SerializedName("lng") val lng : Double
+        @SerializedName("lat") val lat: Double,
+        @SerializedName("lng") val lng: Double,
+        @SerializedName("bearing") val bearing: Double,
+        @SerializedName("speed") val speed: Double,
+        @SerializedName("timestamp") val timestamp: String,
+        @SerializedName("_id") val _id: String
 ) : Serializable

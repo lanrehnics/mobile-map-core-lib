@@ -18,6 +18,7 @@ data class Trips (
 		@SerializedName("stopped") val stopped : Boolean,
 		@SerializedName("diverted") val diverted : Boolean,
 		@SerializedName("lastKnownLocation") val lastKnownLocation : LastKnownLocation?,
+		@SerializedName("locations") val locations : List<Location>,
 		@SerializedName("lastFiveLocations") val lastFiveLocations : List<LastFiveLocations>,
 		@SerializedName("lastConnectionTime") val lastConnectionTime : String,
 		@SerializedName("assetClass") val assetClass : Asset?,

@@ -28,7 +28,7 @@ class ActiveTripsFragmentList : Fragment() {
     private lateinit var getActiveTripsViewModel: ActiveTripsViewModel
     private lateinit var adapter: ActiveTripsFragmentListAdapter
     private lateinit var listShimmerActiveTrips: ShimmerRecyclerView
-    private  var token: String? = ""
+    private var userTypeAndId: String? = null
 
     private var mode: Int? = 0
 
@@ -39,6 +39,19 @@ class ActiveTripsFragmentList : Fragment() {
             mode = it.getInt(ARG_PARAM1)
         }
 
+        val shaper = requireActivity().let {
+            PreferenceManager.getDefaultSharedPreferences(it)
+        }
+        userTypeAndId = shaper.getString(MobileMapCorePlugin.KEY_USER_TYPE_AND_ID, "")
+
+
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        userTypeAndId?.let {
+            getActiveTripsViewModel.fetchActiveTrips(userTypeAndId = it)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -55,20 +68,6 @@ class ActiveTripsFragmentList : Fragment() {
     }
 
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        val shaper = requireActivity().let {
-            PreferenceManager.getDefaultSharedPreferences(it)
-        }
-        val userTypeAndId = shaper.getString(MobileMapCorePlugin.KEY_USER_TYPE_AND_ID, "")
-         token = shaper.getString(MobileMapCorePlugin.KEY_AUTH_TOKEN, "")
-        userTypeAndId?.let {
-            getActiveTripsViewModel.fetchActiveTrips(userTypeAndId = it)
-        }
-
-    }
-
-
     companion object {
         @JvmStatic
         fun newInstance(mode: Int) =
@@ -82,7 +81,7 @@ class ActiveTripsFragmentList : Fragment() {
     private fun setupViewModel() {
         getActiveTripsViewModel = ViewModelProviders.of(
                 this,
-                ViewModelFactory(ApiHelper(ApiServiceImpl(token)))
+                ViewModelFactory(ApiHelper(ApiServiceImpl(requireActivity())))
         ).get(ActiveTripsViewModel::class.java)
     }
 

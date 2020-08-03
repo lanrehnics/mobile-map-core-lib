@@ -1,11 +1,13 @@
 package com.kobo.mobile_map_core.mobile_map_core.ui.map
 
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.location.Location
 import android.os.Bundle
 import android.os.Environment
 import android.preference.PreferenceManager
+import android.provider.Settings
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
@@ -26,6 +28,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
+import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
 import com.kobo.mobile_map_core.mobile_map_core.R
 import com.kobo.mobile_map_core.mobile_map_core.data.models.MQTTPayload
 import com.kobo.mobile_map_core.mobile_map_core.data.models.NavigationData
@@ -71,21 +74,11 @@ class NavigationActivity(
 
     private lateinit var mqttAndroidClient: MqttAndroidClient
     private lateinit var mqttTopic: String
+    private lateinit var shaper: SharedPreferences
 
     private lateinit var ORIGIN: Point
     private lateinit var DESTINATION: Point
     private var navigationData: NavigationData? = null
-
-
-    private val PRODUCTKEY = "a11xsrW****"
-    private val DEVICENAME = "paho_android"
-    private val DEVICESECRET = "tLMT9QWD36U2SArglGqcHCDK9rK9****"
-
-    private val CLOUDMQTT_HOST = "tcp://smart-journalist.cloudmqtt.com:1883"
-    private val CLOUDMQTT_PORT = "1883"
-    private val CLOUDMQTT_USER = "mobileand"
-    private val CLOUDMQTT_PASS = "kbMob20@ge"
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,6 +92,11 @@ class NavigationActivity(
         Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
         initNavParams()
         setContentView(R.layout.activity_navigation)
+
+
+        shaper = this.let {
+            androidx.preference.PreferenceManager.getDefaultSharedPreferences(it)
+        }
         setUpMQTT()
         navigationView = findViewById(R.id.navigationView)
         navigationView!!.setStatusBarBackgroundColor(resources.getColor(R.color.colorPrimary))
@@ -248,7 +246,7 @@ class NavigationActivity(
         val options = NavigationViewOptions.builder()
                 .navigationListener(this)
                 .directionsRoute(directionsRoute)
-                .shouldSimulateRoute(true)
+                .shouldSimulateRoute(shaper.getBoolean(MobileMapCorePlugin.KEY_SIMULATE_ROUTE_FOR_DRIVER, false))
                 .progressChangeListener(this)
 //                .instructionListListener(this)
 //                .speechAnnouncementListener(this)
@@ -453,11 +451,13 @@ class NavigationActivity(
 
         val mqttConnectOptions = MqttConnectOptions()
 
-        mqttConnectOptions.userName = CLOUDMQTT_USER
-        mqttConnectOptions.password = CLOUDMQTT_PASS.toCharArray()
+        mqttConnectOptions.userName = shaper.getString(MobileMapCorePlugin.KEY_CLOUDMQTT_USER, "")
+        mqttConnectOptions.password = shaper.getString(MobileMapCorePlugin.KEY_CLOUDMQTT_PASS, "")?.toCharArray()
+
+        val androidID = Settings.System.getString(this.contentResolver, Settings.Secure.ANDROID_ID)
 
 
-        mqttAndroidClient = MqttAndroidClient(applicationContext, CLOUDMQTT_HOST, "hbvhubiohpio")
+        mqttAndroidClient = MqttAndroidClient(applicationContext, shaper.getString(MobileMapCorePlugin.KEY_CLOUDMQTT_HOST, ""), androidID)
         mqttAndroidClient.setCallback(object : MqttCallback {
             override fun connectionLost(cause: Throwable) {
                 Log.i(NavigationActivity::class.java.name, "connection lost")

@@ -33,7 +33,7 @@ class FilteredActiveTrips : Fragment(), OnActiveTripItemClickListener {
     private lateinit var callback: OnTripInfoClickedListener
     private lateinit var callBack: OnTripInfoCloseButtonClickListener
     private lateinit var switchToMapClickListener: SwitchToMapClickListener
-    private lateinit var token: String
+    private var userTypeAndId: String? = null
 
 
     fun setOnTripInfoClickedListener(callback: OnTripInfoClickedListener) {
@@ -62,6 +62,20 @@ class FilteredActiveTrips : Fragment(), OnActiveTripItemClickListener {
         arguments?.let {
             filterBy = it.getString(ARG_PARAM1)
         }
+
+        val shaper = requireActivity().let {
+            PreferenceManager.getDefaultSharedPreferences(it)
+        }
+
+        userTypeAndId = shaper.getString(MobileMapCorePlugin.KEY_USER_TYPE_AND_ID, "")
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        userTypeAndId?.let {
+            getActiveTripsViewModel.fetchActiveTrips(userTypeAndId = it, filterBy = filterBy)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -89,20 +103,6 @@ class FilteredActiveTrips : Fragment(), OnActiveTripItemClickListener {
     }
 
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        val shaper = requireActivity().let {
-            PreferenceManager.getDefaultSharedPreferences(it)
-        }
-
-        val userTypeAndId = shaper.getString(MobileMapCorePlugin.KEY_USER_TYPE_AND_ID, "")
-        token = shaper.getString(MobileMapCorePlugin.KEY_AUTH_TOKEN, "")!!
-        userTypeAndId?.let {
-            getActiveTripsViewModel.fetchActiveTrips(userTypeAndId = it, filterBy = filterBy)
-        }
-
-    }
-
     companion object {
 
         @JvmStatic
@@ -117,7 +117,7 @@ class FilteredActiveTrips : Fragment(), OnActiveTripItemClickListener {
     private fun setupViewModel() {
         getActiveTripsViewModel = ViewModelProviders.of(
                 this,
-                ViewModelFactory(ApiHelper(ApiServiceImpl(token)))
+                ViewModelFactory(ApiHelper(ApiServiceImpl( requireActivity())))
         ).get(ActiveTripsViewModel::class.java)
     }
 

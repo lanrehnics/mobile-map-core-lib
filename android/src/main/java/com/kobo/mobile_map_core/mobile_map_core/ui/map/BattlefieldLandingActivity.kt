@@ -208,7 +208,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     private fun setupViewModel() {
         mapLandingViewModel = ViewModelProviders.of(
                 this,
-                ViewModelFactory(ApiHelper(ApiServiceImpl(shaper.getString(MobileMapCorePlugin.KEY_AUTH_TOKEN, ""))))
+                ViewModelFactory(ApiHelper(ApiServiceImpl(this)))
         ).get(MapLandingViewModel::class.java)
     }
 
@@ -731,22 +731,17 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     }
 
     override fun onSelect(selectedAddress: SelectedAddrss) {
-        when (searchMode) {
+        when (selectedAddress.mode) {
             0 -> {
-// TODO Get return mode from fragment response
                 globalSelectedAdd.pickUp = selectedAddress.pickUp
                 etPickUpLocation.text = selectedAddress.pickUp?.description?.toEditable()
                 selectedAddress.pickUp!!.placeId?.let { bootstrapLatLng(it, globalSelectedAdd.pickUp) }
-
             }
             else -> {
-
                 searchRadius = null
                 globalSelectedAdd.destination = selectedAddress.destination
                 editTextToLocation.text = selectedAddress.destination?.description?.toEditable()
                 selectedAddress.destination!!.placeId?.let { bootstrapLatLng(it, globalSelectedAdd.destination) }
-
-
             }
         }
         onBackPressed()
@@ -814,6 +809,31 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         overview?.trucks?.let {
             setupClusterManager(it as List<Trucks>)
         }
+
+
+        overview?.customerLocations?.let {
+            it.forEach { cl ->
+                cl?.location?.let { loc ->
+                    mMap.addMarker(
+                            MarkerOptions()
+                                    .position(NewBaseMapActivity.toLatLngNotNull(loc.coordinates))
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_customerlocation)))
+                }
+            }
+
+
+        }
+
+//        overview?.kobocareStations?.let {
+//            it.forEach { cl ->
+//                cl?.location?.let { loc ->
+//                    mMap.addMarker(
+//                            MarkerOptions()
+//                                    .position(NewBaseMapActivity.toLatLngNotNull(loc.coordinates))
+//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_kobostation)))
+//                }
+//            }
+//        }
         mMap.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(currentLatLng, 14.5F),
                 object : GoogleMap.CancelableCallback {

@@ -30,7 +30,7 @@ class MarkerClusterRenderer<T : ClusterItem> internal constructor(
             superWouldCluster = currentZoomLevel < maxZoomLevel
         }
 
-        return superWouldCluster && cluster.size > 1
+        return superWouldCluster && cluster.size > 20
     }
 
 

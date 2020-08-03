@@ -119,7 +119,7 @@ class FragmentTripDetails : Fragment() {
         tvDropOffAddressTwo.text = "____"
         tvDeliveryAddress.text = trips.tripDetail?.deliveryLocation?.address
         tvEta.text = trips.tripDetail?.expectedETAObject?.text
-        tvSalesNo.text =  trips.tripDetail?.salesOrderNo
+        tvSalesNo.text = trips.tripDetail?.salesOrderNo
         tvWaybillNo.text = trips.tripDetail?.waybillNo
         tvTruckRegNo.text = trips.regNumber
         tvAssetInfo.text = "${trips.assetClass?.type} ${trips.assetClass?.size}${trips.assetClass?.unit}"

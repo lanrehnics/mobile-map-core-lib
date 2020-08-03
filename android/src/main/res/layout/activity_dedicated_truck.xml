@@ -37,27 +37,27 @@
                     app:titleTextColor="@color/colorPrimaryText" />
             </com.google.android.material.appbar.AppBarLayout>
 
-            <EditText
-                android:id="@+id/etPickUpLocation"
-                android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:layout_below="@+id/appBar"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/search_bg"
-                android:fontFamily="@font/avenir_regular"
-                android:hint="Search trip"
-                android:paddingLeft="13dp"
-                android:textColor="@color/colorPrimaryText"
-                android:textColorHint="@color/transparentColorPrimaryText"
-                android:textSize="16sp" />
+<!--            <EditText-->
+<!--                android:id="@+id/etPickUpLocation"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="42dp"-->
+<!--                android:layout_below="@+id/appBar"-->
+<!--                android:layout_marginHorizontal="16dp"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:background="@drawable/search_bg"-->
+<!--                android:fontFamily="@font/avenir_regular"-->
+<!--                android:hint="Search trip"-->
+<!--                android:paddingLeft="13dp"-->
+<!--                android:textColor="@color/colorPrimaryText"-->
+<!--                android:textColorHint="@color/transparentColorPrimaryText"-->
+<!--                android:textSize="16sp" />-->
 
 
             <com.todkars.shimmer.ShimmerRecyclerView
                 android:id="@+id/listShimmerDedicatedTrucks"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/etPickUpLocation"
+                android:layout_below="@+id/appBar"
                 android:layout_marginTop="8dp"
                 android:orientation="vertical"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

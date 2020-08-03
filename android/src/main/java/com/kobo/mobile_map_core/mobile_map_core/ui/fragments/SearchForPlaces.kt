@@ -57,7 +57,6 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
     private var mode: Int? = 0
     private var param2: String? = null
     private var overview: Overview? = null
-    private var token: String? = ""
 
 
     private lateinit var searchForPlacesViewModel: SearchForPlacesViewModel
@@ -114,17 +113,6 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
         return view
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        val shaper = requireActivity().let {
-            PreferenceManager.getDefaultSharedPreferences(it)
-        }
-
-        val userTypeAndId = shaper.getString(MobileMapCorePlugin.KEY_USER_TYPE_AND_ID, "")
-        token = shaper.getString(MobileMapCorePlugin.KEY_AUTH_TOKEN, "")
-
-    }
-
 
     private fun setUpTextWatcher() {
 
@@ -137,7 +125,16 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
                     return
 
                 searchFor = searchText
-                mode = 0
+
+                if (linearWhereIAmGoing.visibility == View.GONE) {
+                    // The logic is on entering this class mode is set from outside,
+                    // but on getting here since the editText for current location is set to previously selected or current user location,
+                    // The mode will change as this activate textWatcher,
+
+                    // So, if user is coming to select destination the linearWhereIAmGoing view should ve visible
+                    // if visible, then the mode shouldn't change
+                    mode = 0
+                }
 
                 launch {
                     delay(300)  //debounce timeOut
@@ -253,7 +250,7 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
     private fun setupViewModel() {
         searchForPlacesViewModel = ViewModelProviders.of(
                 this,
-                ViewModelFactory(ApiHelper(ApiServiceImpl(token)))
+                ViewModelFactory(ApiHelper(ApiServiceImpl( requireActivity())))
         ).get(SearchForPlacesViewModel::class.java)
     }
 
@@ -275,10 +272,10 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
                 view.setOnClickListener {
                     when (mode) {
                         0 -> {
-                            callback.onSelect(SelectedAddrss(model, null))
+                            callback.onSelect(SelectedAddrss(model, null, mode))
                         }
                         else -> {
-                            callback.onSelect(SelectedAddrss(null, model))
+                            callback.onSelect(SelectedAddrss(null, model, mode))
                         }
                     }
                 }
@@ -310,10 +307,10 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
     override fun onItemClicked(address: Autocomplete) {
         when (mode) {
             0 -> {
-                callback.onSelect(SelectedAddrss(address, null))
+                callback.onSelect(SelectedAddrss(address, null,mode))
             }
             else -> {
-                callback.onSelect(SelectedAddrss(null, address))
+                callback.onSelect(SelectedAddrss(null, address, mode))
             }
         }
     }
