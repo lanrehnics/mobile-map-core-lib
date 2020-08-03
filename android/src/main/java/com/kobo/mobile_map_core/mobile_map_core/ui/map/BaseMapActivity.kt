@@ -272,21 +272,13 @@ abstract class BaseMapActivity : AppCompatActivity() {
         val mCameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 100)
         mMap.animateCamera(mCameraUpdate)
 
-        polylineOptions = PolylineOptions()
-        polylineOptions.color(Color.BLACK)
-        polylineOptions.width(10f)
-        polylineOptions.startCap(SquareCap())
-        polylineOptions.endCap(SquareCap())
-        polylineOptions.jointType(JointType.ROUND)
-        polylineOptions.addAll(polyLineList)
-        greyPolyLine = mMap.addPolyline(polylineOptions)
-
         blackPolylineOptions = PolylineOptions()
         blackPolylineOptions.width(10f)
         blackPolylineOptions.color(Color.BLACK)
         blackPolylineOptions.startCap(SquareCap())
         blackPolylineOptions.endCap(SquareCap())
         blackPolylineOptions.jointType(JointType.ROUND)
+        blackPolylineOptions.addAll(polyLineList)
         blackPolyline = mMap.addPolyline(blackPolylineOptions)
     }
 

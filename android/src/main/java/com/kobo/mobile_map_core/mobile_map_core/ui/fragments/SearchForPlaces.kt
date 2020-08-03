@@ -12,9 +12,11 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
 import com.kobo.mobile_map_core.mobile_map_core.R
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiHelper
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiServiceImpl
@@ -55,6 +57,7 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
     private var mode: Int? = 0
     private var param2: String? = null
     private var overview: Overview? = null
+
 
     private lateinit var searchForPlacesViewModel: SearchForPlacesViewModel
     private lateinit var suggestedPlacesRecyclerView: RecyclerView
@@ -110,6 +113,7 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
         return view
     }
 
+
     private fun setUpTextWatcher() {
 
         whereIamTextWatcher = object : TextWatcher {
@@ -121,7 +125,16 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
                     return
 
                 searchFor = searchText
-                mode = 0
+
+                if (linearWhereIAmGoing.visibility == View.GONE) {
+                    // The logic is on entering this class mode is set from outside,
+                    // but on getting here since the editText for current location is set to previously selected or current user location,
+                    // The mode will change as this activate textWatcher,
+
+                    // So, if user is coming to select destination the linearWhereIAmGoing view should ve visible
+                    // if visible, then the mode shouldn't change
+                    mode = 0
+                }
 
                 launch {
                     delay(300)  //debounce timeOut
@@ -237,7 +250,7 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
     private fun setupViewModel() {
         searchForPlacesViewModel = ViewModelProviders.of(
                 this,
-                ViewModelFactory(ApiHelper(ApiServiceImpl()))
+                ViewModelFactory(ApiHelper(ApiServiceImpl( requireActivity())))
         ).get(SearchForPlacesViewModel::class.java)
     }
 
@@ -259,10 +272,10 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
                 view.setOnClickListener {
                     when (mode) {
                         0 -> {
-                            callback.onSelect(SelectedAddrss(model, null))
+                            callback.onSelect(SelectedAddrss(model, null, mode))
                         }
                         else -> {
-                            callback.onSelect(SelectedAddrss(null, model))
+                            callback.onSelect(SelectedAddrss(null, model, mode))
                         }
                     }
                 }
@@ -294,10 +307,10 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
     override fun onItemClicked(address: Autocomplete) {
         when (mode) {
             0 -> {
-                callback.onSelect(SelectedAddrss(address, null))
+                callback.onSelect(SelectedAddrss(address, null,mode))
             }
             else -> {
-                callback.onSelect(SelectedAddrss(null, address))
+                callback.onSelect(SelectedAddrss(null, address, mode))
             }
         }
     }

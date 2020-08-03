@@ -4,6 +4,7 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.Autocom
 import SelectedAddrss
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
@@ -60,6 +61,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     private var searchRadius: Int? = 1
     private var searchForAvailableTrucks: Boolean = false
     private lateinit var trkData: TruckData
+    private lateinit var shaper: SharedPreferences
     private var overviewW: Overview? = null
 
     override fun onAttachFragment(fragment: Fragment) {
@@ -78,6 +80,11 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.battlefield_landing_activity_main)
+        context = this@BattlefieldLandingActivity
+
+        shaper = this.let {
+            PreferenceManager.getDefaultSharedPreferences(it)
+        }
 
 
         //Initialize views and click listeners
@@ -87,7 +94,6 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
 
         //Pass context
-        context = this@BattlefieldLandingActivity
 
         // Configure som initialization base on app type
 //        configureCollectionReferenceForApp()
@@ -202,7 +208,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     private fun setupViewModel() {
         mapLandingViewModel = ViewModelProviders.of(
                 this,
-                ViewModelFactory(ApiHelper(ApiServiceImpl()))
+                ViewModelFactory(ApiHelper(ApiServiceImpl(this)))
         ).get(MapLandingViewModel::class.java)
     }
 
@@ -323,9 +329,8 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     }
 
     private fun fetchAndSubscribeForLocationOverview() {
-        val shaper = this.let {
-            PreferenceManager.getDefaultSharedPreferences(it)
-        }
+
+
         tvHello.text = "Hello ${shaper.getString(MobileMapCorePlugin.KEY_USER_FIRST_NAME, "")}"
         val userTypeAndId = shaper.getString(MobileMapCorePlugin.KEY_USER_TYPE_AND_ID, "")
 
@@ -726,22 +731,17 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     }
 
     override fun onSelect(selectedAddress: SelectedAddrss) {
-        when (searchMode) {
+        when (selectedAddress.mode) {
             0 -> {
-// TODO Get return mode from fragment response
                 globalSelectedAdd.pickUp = selectedAddress.pickUp
                 etPickUpLocation.text = selectedAddress.pickUp?.description?.toEditable()
                 selectedAddress.pickUp!!.placeId?.let { bootstrapLatLng(it, globalSelectedAdd.pickUp) }
-
             }
             else -> {
-
                 searchRadius = null
                 globalSelectedAdd.destination = selectedAddress.destination
                 editTextToLocation.text = selectedAddress.destination?.description?.toEditable()
                 selectedAddress.destination!!.placeId?.let { bootstrapLatLng(it, globalSelectedAdd.destination) }
-
-
             }
         }
         onBackPressed()
@@ -809,6 +809,31 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         overview?.trucks?.let {
             setupClusterManager(it as List<Trucks>)
         }
+
+
+        overview?.customerLocations?.let {
+            it.forEach { cl ->
+                cl?.location?.let { loc ->
+                    mMap.addMarker(
+                            MarkerOptions()
+                                    .position(NewBaseMapActivity.toLatLngNotNull(loc.coordinates))
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_customerlocation)))
+                }
+            }
+
+
+        }
+
+//        overview?.kobocareStations?.let {
+//            it.forEach { cl ->
+//                cl?.location?.let { loc ->
+//                    mMap.addMarker(
+//                            MarkerOptions()
+//                                    .position(NewBaseMapActivity.toLatLngNotNull(loc.coordinates))
+//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_kobostation)))
+//                }
+//            }
+//        }
         mMap.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(currentLatLng, 14.5F),
                 object : GoogleMap.CancelableCallback {

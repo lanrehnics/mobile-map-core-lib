@@ -2,6 +2,7 @@ package com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips
 
 import WhiteListedStop
 import com.google.gson.annotations.SerializedName
+import com.kobo.mobile_map_core.mobile_map_core.data.models.mqttmessage.KoboBusinessUnitTag
 import java.io.Serializable
 
 data class TripDetail (
@@ -51,4 +52,5 @@ data class TripDetail (
         @SerializedName("currentBestRoute") val currentBestRoute : String ="",
         @SerializedName("waybillNo") val waybillNo : String,
         @SerializedName("salesOrderNo") val salesOrderNo : String
+//        @SerializedName("KoboBusinessUnitTag") val koboBusinessUnitTag : KoboBusinessUnitTag?
 ): Serializable

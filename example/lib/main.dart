@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
-import 'package:mobile_map_core/mobile_map_core.dart';
 import 'package:mobile_map_core_example/LandingPage.dart';
 import 'package:mobile_map_core_example/LoginScreen.dart';
 import 'package:mobile_map_core_example/SessionManager.dart';
@@ -21,13 +17,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-  String stuff = "nvlkxjvl";
-
   @override
   void initState() {
     super.initState();
-    //initPlatformState();
   }
 
   @override

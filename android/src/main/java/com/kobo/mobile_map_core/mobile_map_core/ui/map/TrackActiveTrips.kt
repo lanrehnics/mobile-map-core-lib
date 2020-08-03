@@ -2,6 +2,7 @@ package com.kobo.mobile_map_core.mobile_map_core.ui.map
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -24,6 +25,7 @@ import com.google.android.libraries.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
 import com.kobo.mobile_map_core.mobile_map_core.R
+import com.kobo.mobile_map_core.mobile_map_core.animation.TruckMover
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiHelper
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiServiceImpl
 import com.kobo.mobile_map_core.mobile_map_core.data.models.ClearCommand
@@ -41,6 +43,7 @@ import com.kobo.mobile_map_core.mobile_map_core.ui.fragments.FragmentTripDetails
 import com.kobo.mobile_map_core.mobile_map_core.ui.viewmodel.ActiveTripsViewModel
 import com.xdev.mvvm.utils.Status
 import kotlinx.android.synthetic.main.activity_track_active_trips.*
+import java.util.*
 
 
 class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoClickedListener, FilteredActiveTrips.OnTripInfoCloseButtonClickListener, FragmentTripDetails.OnStartNavigationClickListener, FilteredActiveTrips.SwitchToMapClickListener {
@@ -56,14 +59,19 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
     private lateinit var bottomSheetView: View
     private lateinit var activeTripsData: ActiveTripsData
 
+
     val TRIP_INFO = "trip_info"
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        Pass context
-        context = this@TrackActiveTrips
         setContentView(R.layout.activity_track_active_trips)
+        context = this@TrackActiveTrips
+        shaper = this.let {
+            PreferenceManager.getDefaultSharedPreferences(it)
+        }
+
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         toggle = findViewById(R.id.toggle)
         toggleDetails = findViewById(R.id.toggleDetails)
@@ -134,10 +142,6 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
 
 
     private fun initActiveTrips() {
-        val shaper = this.let {
-            PreferenceManager.getDefaultSharedPreferences(it)
-        }
-
         val userTypeAndId = shaper.getString(MobileMapCorePlugin.KEY_USER_TYPE_AND_ID, "")
         userTypeAndId?.let { getActiveTripsViewModel.fetchActiveTrips(userTypeAndId) }
     }
@@ -170,7 +174,7 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
     private fun setupViewModel() {
         getActiveTripsViewModel = ViewModelProviders.of(
                 this,
-                ViewModelFactory(ApiHelper(ApiServiceImpl()))
+                ViewModelFactory(ApiHelper(ApiServiceImpl(this)))
         ).get(ActiveTripsViewModel::class.java)
     }
 
@@ -288,11 +292,18 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
                     }
                 }
             }
+            truckMover?.stopTruckMovementTimer()
+            truckMover = null
+            keepListening = false
+            try {
+//                unSubscribe(mqttTopic)
+//                mqttAndroidClient?.disconnect()
+            } catch (e: Exception) {
+            }
 
 
         } else {
 
-            val fragment = supportFragmentManager.findFragmentByTag("")
             tripInfoBottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
         }
 
@@ -306,7 +317,7 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
 
     override fun onSelect(selectedTripInfo: Trucks) {
 
-        tripInfo = selectedTripInfo
+        truckInfo = selectedTripInfo
         displayMode = MapDisplayMode.SingleTripTruckFocusMode
         focusFrom = FocusFrom.List
         openMapFragment()
@@ -321,15 +332,15 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
     fun setUpTripInfoViewPager() {
 
 
-        val fragmentTripDetails: FragmentTripDetails = FragmentTripDetails.newInstance(tripInfo)
+        val fragmentTripDetails: FragmentTripDetails = FragmentTripDetails.newInstance(truckInfo)
         fragmentTripDetails.setOnStartNavigationClickListener(this)
-        val fragmentActiveTripEvents: FragmentActiveTripEvents = FragmentActiveTripEvents.newInstance(tripInfo)
+        val fragmentActiveTripEvents: FragmentActiveTripEvents = FragmentActiveTripEvents.newInstance(truckInfo)
 
         val pages: MutableList<Fragment> = arrayListOf()
         pages.add(fragmentTripDetails)
         pages.add(fragmentActiveTripEvents)
 
-        activeTripDetailsAdapterViewPager = ActiveTripsDetailsPagerAdapter(supportFragmentManager,pages)
+        activeTripDetailsAdapterViewPager = ActiveTripsDetailsPagerAdapter(supportFragmentManager, pages)
         vpPagerActiveTripDetails.adapter = activeTripDetailsAdapterViewPager
         vpPagerActiveTripDetails.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {
@@ -355,7 +366,7 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
 
     override fun oyaStart(selectedTripInfo: Trucks?) {
         val intent = Intent(this, NavigationActivity::class.java)
-        val navigationData = NavigationData(regNumber = tripInfo.regNumber, tripId = tripInfo.tripDetail?.tripId, tripReadId = tripInfo.tripDetail?.tripReadId, destination = tripInfo.tripDetail?.deliveryLocation?.coordinates)
+        val navigationData = NavigationData(regNumber = truckInfo.regNumber, tripId = truckInfo.tripDetail?.tripId, tripReadId = truckInfo.tripDetail?.tripReadId, destination = truckInfo.tripDetail?.deliveryLocation?.coordinates)
         intent.putExtra(NavigationActivity.NAVIGATION_DATA, navigationData)
         startActivity(intent)
     }
@@ -364,8 +375,10 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
     override fun multipleTruckClusteringMode() {
         clearMapAndData(ClearCommand.ALL)
         tripMarkerManager = activeTripsData.tripsData.trucks?.map { it?.regNumber!! to it }?.toMap()?.toMutableMap()
-        val convertTripsToTruckList: List<Trucks?>? = activeTripsData.tripsData.trucks
-        convertTripsToTruckList?.let { setupClusterManager(it) }
+//        val convertTripsToTruckList: List<Trucks?>? = activeTripsData.tripsData.trucks
+//        convertTripsToTruckList?.let { setupClusterManager(it) }
+        activeTripsData.tripsData.trucks?.let { setupClusterManager(it) }
+
     }
 
     override fun setUpClusterManagerClickListener() {
@@ -391,27 +404,29 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
 
                             clearMapAndData(ClearCommand.MAP)
 
-                            tripInfo = tripMarkerManager?.get(it.title)!!
+                            truckInfo = tripMarkerManager?.get(it.title)!!
                             setUpTripInfoViewPager()
-                            if (tripInfo.tripDetail?.travelledRoutePolyline?.isNotEmpty()!! && tripInfo.tripDetail?.currentBestRoute?.isNotEmpty()!!) {
-                                drawPolyLine(travelledPolyList = mapService.decodePoly(tripInfo.tripDetail?.travelledRoutePolyline!!),
-                                        currentBestPolyList = mapService.decodePoly(tripInfo.tripDetail?.currentBestRoute!!))
+                            if (truckInfo.tripDetail?.travelledRoutePolyline?.isNotEmpty()!! && truckInfo.tripDetail?.currentBestRoute?.isNotEmpty()!!) {
+                                drawPolyLine(travelledPolyList = mapService.decodePoly(truckInfo.tripDetail?.travelledRoutePolyline!!),
+                                        currentBestPolyList = mapService.decodePoly(truckInfo.tripDetail?.currentBestRoute!!))
                             }
 
-                            val marker = mMap.addMarker(
-                                    tripInfo.lastKnownLocation?.coordinates?.let { it1 -> toLatLng(it1) }?.let { it2 ->
+
+                            selectedMarker = mMap.addMarker(
+                                    truckInfo.lastKnownLocation?.coordinates?.let { it1 -> toLatLng(it1) }?.let { it2 ->
                                         MarkerOptions()
                                                 .position(it2)
                                                 //                                                .title(selectedTruck!!.d.reg_number)
-                                                .rotation(tripInfo.bearing.toFloat())
-                                                .icon(truckFromStatus(tripInfo))
+                                                .rotation(truckInfo.bearing.toFloat())
+                                                .icon(truckFromStatus(truckInfo))
                                     }
                             )
 
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(tripInfo.lastKnownLocation?.coordinates?.let { latLngFromList(it) }, 12f))
 
-
-                            tripInfo.events?.let { events ->
+                            mqttTopic = "client/track/${truckInfo.regNumber}".toLowerCase(Locale.getDefault())
+                            setUpMQTT()
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(truckInfo.lastKnownLocation?.coordinates?.let { latLngFromList(it) }, 17f))
+                            truckInfo.events?.let { events ->
                                 events.forEach { ev ->
 
                                     ev?.let { it ->
@@ -426,6 +441,10 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
 
                                 }
                             }
+//                            truckInfo.locations?.let {
+//                                TruckMover(mMap, context, selectedMarker).showMovingTruck(
+//                                        ArrayList(it)
+//                                )}
 
 
                             // clusterManager has access to display markers

@@ -1,5 +1,7 @@
 package com.kobo.mobile_map_core.mobile_map_core
 
+import android.content.Context
+import androidx.preference.PreferenceManager
 import com.google.android.libraries.maps.model.LatLng
 import java.util.*
 
@@ -7,54 +9,69 @@ abstract class AppConfig {
 
 
     companion object {
-//        private var BASEURL: String = ""
-        private const val BASE_MOCK_GEO: String = "https://086c8d4c-7739-421a-839b-895bf1d5e436.mock.pstmn.io"
-        private const val BASE_STAGE_GEO: String = "https://stagegpsapi.kobo360.com/v2"
-        private const val BASESTAGGINGURL: String = "https://stage.api.kobo360.com"
 
-        fun autoCompleteUrl(searchTerms: String): String {
-            return "${BASE_STAGE_GEO}/location/autocomplete?input=${searchTerms}&source=google";
+
+        private fun getBaseUrl(context: Context): String? {
+            val shaper = this.let {
+                PreferenceManager.getDefaultSharedPreferences(context)
+            }
+            return shaper.getString(MobileMapCorePlugin.KEY_GEO_BASE_URL, "")
         }
 
-        fun activeTripsUrl(userTypeAndId: String, filterBy: String?): String {
+        private fun getKoboBaseUrl(context: Context): String? {
+            val shaper = this.let {
+                PreferenceManager.getDefaultSharedPreferences(context)
+            }
+            return shaper.getString(MobileMapCorePlugin.KEY_KOBO_BASE_URL, "")
+        }
+
+
+        //        private const val getBaseUrl(context): String =getBaseUrl()
+//        private const val BASESTAGGINGURL: String = "https://stage.api.kobo360.com"
+
+        fun autoCompleteUrl(context: Context, searchTerms: String): String {
+            return "${getBaseUrl(context)}location/autocomplete?input=${searchTerms}&source=google";
+        }
+
+        fun activeTripsUrl(context: Context, userTypeAndId: String, filterBy: String?): String {
             return if (filterBy != null)
-                "${BASE_STAGE_GEO}/location/activeTrips?$userTypeAndId&status=$filterBy"
+                "${getBaseUrl(context)}location/activeTrips?$userTypeAndId&status=$filterBy"
             else
-                "${BASE_STAGE_GEO}/location/activeTrips?$userTypeAndId"
+                "${getBaseUrl(context)}location/activeTrips?$userTypeAndId"
         }
 
-        fun dedicatedTruckUrl(userTypeAndId: String): String {
-            return "${BASE_MOCK_GEO}/location/trucks?$userTypeAndId"
+        fun dedicatedTruckUrl(context: Context, userTypeAndId: String): String {
+            return "${getBaseUrl(context)}location/trucks?$userTypeAndId"
         }
 
-        fun groupedAssetClass(): String {
-            return "${BASESTAGGINGURL}/asset/grouped"
+        fun groupedAssetClass(context: Context): String {
+            return "${getKoboBaseUrl(context)}asset/grouped"
         }
 
-        fun reverseGeocode(lat: Double, lng: Double): String {
-            return "${BASE_STAGE_GEO}/location/reverse/geocode?lat=$lat&lng=$lng&source=google"
+        fun reverseGeocode(context: Context, lat: Double, lng: Double): String {
+            return "${getBaseUrl(context)}location/reverse/geocode?lat=$lat&lng=$lng&source=google"
         }
 
-        fun placeId(placesId: String): String {
-            return "${BASE_STAGE_GEO}/location/place?placeId=$placesId"
+        fun placeId(context: Context, placesId: String): String {
+            return "${getBaseUrl(context)}location/place?placeId=$placesId"
         }
 
-        fun availableTrucks(origin: LatLng?, destination: LatLng?, radius: Int?, assetId: String): String {
-            val type = if(radius != null){
+        fun availableTrucks(context: Context, origin: LatLng?, destination: LatLng?, radius: Int?, assetId: String): String {
+            val type = if (radius != null) {
                 "radius=$radius"
-            }else{
+            } else {
                 "destinationLat=${destination?.latitude}&destinationLng=${destination?.longitude}"
             }
 
-            return "${BASE_STAGE_GEO}/location/availableTrucks?" +
+            return "${getBaseUrl(context)}location/availableTrucks?" +
                     "currentLat=${origin?.latitude}" +
                     "&currentLng=${origin?.longitude}" +
-                    "&$type"+
+                    "&$type" +
                     "&assetType=$assetId"
         }
 
-        fun locationOverview(userTypeAndId: String, latLng: LatLng): String {
-            return "${BASE_STAGE_GEO}/location?$userTypeAndId&lat=${latLng.latitude}&lng=${latLng.longitude}"
+        fun locationOverview(context: Context, userTypeAndId: String, latLng: LatLng): String {
+            return "${getBaseUrl(context)}location?$userTypeAndId&lat=${latLng.latitude}&lng=${latLng.longitude}"
         }
     }
 

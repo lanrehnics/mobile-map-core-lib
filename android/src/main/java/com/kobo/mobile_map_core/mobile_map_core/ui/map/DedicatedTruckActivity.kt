@@ -1,6 +1,7 @@
 package com.kobo.mobile_map_core.mobile_map_core.ui.map
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -20,6 +21,7 @@ import com.google.android.libraries.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
 import com.kobo.mobile_map_core.mobile_map_core.R
+import com.kobo.mobile_map_core.mobile_map_core.animation.TruckMover
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiHelper
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiServiceImpl
 import com.kobo.mobile_map_core.mobile_map_core.data.models.ClearCommand
@@ -35,6 +37,7 @@ import com.todkars.shimmer.ShimmerRecyclerView
 import com.xdev.mvvm.utils.Status
 import kotlinx.android.synthetic.main.activity_dedicated_truck.*
 import kotlinx.android.synthetic.main.dedicated_truck_bottom_sheet.*
+import java.util.*
 
 class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickListener {
 
@@ -49,6 +52,11 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dedicated_truck)
+        context = this@DedicatedTruckActivity
+        shaper = this.let {
+            PreferenceManager.getDefaultSharedPreferences(it)
+        }
+
         listShimmerDedicatedTrucks = findViewById(R.id.listShimmerDedicatedTrucks)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -66,9 +74,6 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
 
 
     private fun fetchDedicatedTrucks() {
-        val shaper = this.let {
-            PreferenceManager.getDefaultSharedPreferences(it)
-        }
         val userTypeAndId = shaper.getString(MobileMapCorePlugin.KEY_USER_TYPE_AND_ID, "")
         userTypeAndId?.let { dedicatedTruckViewModel.fetchDedicatedTruck(it) }
     }
@@ -84,7 +89,7 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
     private fun setupViewModel() {
         dedicatedTruckViewModel = ViewModelProviders.of(
                 this,
-                ViewModelFactory(ApiHelper(ApiServiceImpl()))
+                ViewModelFactory(ApiHelper(ApiServiceImpl(this)))
         ).get(DedicatedTruckViewModel::class.java)
     }
 
@@ -110,19 +115,35 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
                             clearMapAndData(ClearCommand.MAP)
                             truckInfo = truckMarkerManager?.get(it.title)!!
 
+                            if (truckInfo.tripDetail?.travelledRoutePolyline?.isNotEmpty()!! && truckInfo.tripDetail?.currentBestRoute?.isNotEmpty()!!) {
+                                drawPolyLine(travelledPolyList = mapService.decodePoly(truckInfo.tripDetail?.travelledRoutePolyline!!),
+                                        currentBestPolyList = mapService.decodePoly(truckInfo.tripDetail?.currentBestRoute!!))
+                            }
                             truckInfo.lastKnownLocation?.let {
-                                val marker = mMap.addMarker(
+                                selectedMarker = mMap.addMarker(
                                         toLatLng(it.coordinates)?.let { it1 ->
                                             MarkerOptions()
                                                     .position(it1)
-                                //                                                .title(selectedTruck!!.d.reg_number)
+                                                    //                                                .title(selectedTruck!!.d.reg_number)
                                                     .rotation(truckInfo.bearing.toFloat())
                                                     .icon(truckFromStatus(truckInfo))
                                         }
+
                                 )
+
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(truckInfo.lastKnownLocation?.coordinates?.let { latLngFromList(it) }, 17f))
                                 bootstrapDedicationBottomSheet()
                                 dedicatedTruckBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
                             }
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(truckInfo.lastKnownLocation?.coordinates?.let { latLngFromList(it) }, 17f))
+                            mqttTopic = "client/track/${truckInfo.regNumber}".toLowerCase(Locale.getDefault())
+                            setUpMQTT()
+
+//                            truckInfo.locations?.let {
+//                                TruckMover(mMap, context, selectedMarker).showMovingTruck(
+//                                        ArrayList(it)
+//                                )}
+
 
                         }
 
@@ -158,32 +179,39 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
 
 
 //
-//            when (focusFrom) {
-//                FocusFrom.Map -> {
-//                    focusFrom = FocusFrom.Default
-//                    dedicatedTruckBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
-//                    multipleTruckClusteringMode()
-//                }
-//                else -> {
-            bottomSheetView.visibility = View.GONE
-            val count = supportFragmentManager.backStackEntryCount
-            if (count == 0) {
-                super.onBackPressed()
-            } else {
-                supportFragmentManager.popBackStack()
-                switchToList.visibility = View.GONE
-                switchToMap.visibility = View.VISIBLE
+            when (focusFrom) {
+                FocusFrom.Map -> {
+                    focusFrom = FocusFrom.Default
+                    dedicatedTruckBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+                    multipleTruckClusteringMode()
+                }
+                else -> {
+                    bottomSheetView.visibility = View.GONE
+                    val count = supportFragmentManager.backStackEntryCount
+                    if (count == 0) {
+                        super.onBackPressed()
+                    } else {
+                        supportFragmentManager.popBackStack()
+                        switchToList.visibility = View.GONE
+                        switchToMap.visibility = View.VISIBLE
+                    }
+
+                }
             }
-//                }
-//            }
+
+            truckMover?.stopTruckMovementTimer()
+            truckMover = null
+            keepListening = false
+            try {
+
+//                unSubscribe(mqttTopic)
+//                mqttAndroidClient?.disconnect()
+            } catch (e: Exception) {
+            }
 
 
         } else {
             dedicatedTruckBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
-            focusFrom = FocusFrom.Default
-            if (focusFrom == FocusFrom.Map) {
-                multipleTruckClusteringMode()
-            }
         }
 
 //        val fragment: Fragment? = supportFragmentManager.findFragmentByTag("filteredActiveTrips")
