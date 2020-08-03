@@ -16,6 +16,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  shared_preferences: ^0.5.7+3
+  http: ^0.12.2
 
   mobile_map_core:
     path: ../
