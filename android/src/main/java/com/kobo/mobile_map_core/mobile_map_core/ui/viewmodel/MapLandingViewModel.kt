@@ -7,6 +7,7 @@ import com.google.android.libraries.maps.model.LatLng
 import com.kobo.mobile_map_core.mobile_map_core.data.models.asset_class_model.AssetClassResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.AvailableTruckResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.OverviewResponse
+import com.kobo.mobile_map_core.mobile_map_core.data.models.orders.AvailableOrdersResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.place_id.PlacesResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.reverse_geocode.ReverseGeocodeResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.repository.MainRepository
@@ -20,6 +21,7 @@ class MapLandingViewModel(private val mainRepository: MainRepository) : ViewMode
     private val groupedAssetClass = MutableLiveData<Resource<AssetClassResponse>>()
     private val reverseGeoCode = MutableLiveData<Resource<ReverseGeocodeResponse>>()
     private val availableTrucks = MutableLiveData<Resource<AvailableTruckResponse>>()
+    private val availableOrders = MutableLiveData<Resource<AvailableOrdersResponse>>()
     private val latLngFromPlacesId = MutableLiveData<Resource<PlacesResponse>>()
     private val locationOverview = MutableLiveData<Resource<OverviewResponse>>()
     private val compositeDisposable = CompositeDisposable()
@@ -72,6 +74,20 @@ class MapLandingViewModel(private val mainRepository: MainRepository) : ViewMode
         )
     }
 
+    private fun searchAvailableOrder(origin: LatLng?, assetType: String) {
+        availableOrders.postValue(Resource.loading(null))
+        compositeDisposable.add(
+                mainRepository.fetchAvailableOrders(origin, assetType)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({ available ->
+                            availableOrders.postValue(Resource.success(available))
+                        }, { throwable ->
+                            availableOrders.postValue(Resource.error("Something Went Wrong", null))
+                        })
+        )
+    }
+
 
     private fun fetchLatLngFromPlaceId(placeId: String) {
         latLngFromPlacesId.postValue(Resource.loading(null))
@@ -120,6 +136,11 @@ class MapLandingViewModel(private val mainRepository: MainRepository) : ViewMode
     fun fetchAvailableTruck(origin: LatLng?, destination: LatLng?, radius: Int?, assetId: String): LiveData<Resource<AvailableTruckResponse>> {
         searchAvailableTruck(origin, destination, radius, assetId)
         return availableTrucks
+    }
+
+    fun fetchAvailableOrder(origin: LatLng?, assetType: String): LiveData<Resource<AvailableOrdersResponse>> {
+        searchAvailableOrder(origin, assetType)
+        return availableOrders
     }
 
     fun fetchLatLngFromPlacesId(placesId: String): LiveData<Resource<PlacesResponse>> {

@@ -7,6 +7,7 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.AutoCom
 import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.AvailableTruckResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.DedicatedTruckResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.OverviewResponse
+import com.kobo.mobile_map_core.mobile_map_core.data.models.orders.AvailableOrdersResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.place_id.PlacesResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.reverse_geocode.ReverseGeocodeResponse
 import io.reactivex.Single
@@ -16,6 +17,7 @@ interface ApiService {
     fun fetchGroupedAssetClass(): Single<AssetClassResponse>
     fun getReverseGeocode(lat:Double,lng:Double): Single<ReverseGeocodeResponse>
     fun fetchAvailableTrucks(origin: LatLng?, destination: LatLng?, radius: Int?, assetId: String): Single<AvailableTruckResponse>
+    fun fetchAvailableOrders(origin: LatLng?, assetType: String): Single<AvailableOrdersResponse>
     fun fetchLatLngFromPlacesId(placesId: String): Single<PlacesResponse>
     fun fetchActiveTrips(userTypeAndId: String, filterBy: String?): Single<ActiveTripsDataResponse>
     fun fetchDedicatedTruck(userTypeAndId: String): Single<DedicatedTruckResponse>

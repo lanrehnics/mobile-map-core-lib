@@ -10,6 +10,7 @@ class ApiHelper(private val apiService: ApiService) {
     fun fetchGroupedAssetClass() = apiService.fetchGroupedAssetClass()
     fun getReverseGeocode(lat: Double, lng: Double) = apiService.getReverseGeocode(lat, lng)
     fun fetchAvailableTrucks(origin: LatLng?, destination: LatLng?, radius: Int?, assetId: String) = apiService.fetchAvailableTrucks(origin, destination, radius, assetId)
+    fun fetchAvailableOrders(origin: LatLng?, assetType: String) = apiService.fetchAvailableOrders(origin, assetType)
     fun placeId(placeId: String) = apiService.fetchLatLngFromPlacesId(placeId)
     fun fetchLocationOverview(userTypeAndId: String, latLng: LatLng) = apiService.fetchLocationOverview(userTypeAndId, latLng)
 

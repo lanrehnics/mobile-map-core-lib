@@ -16,6 +16,11 @@ class LandingPageScreen extends StatefulWidget {
 }
 
 class _LandingPageScreenState extends State<LandingPageScreen> {
+  static const String SQUAD_APP = "squad";
+  static const String CUSTOMER_APP = "customer";
+  static const String TRANSPORTER_APP = "transporter";
+  static const String DRIVER_APP = "driver";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,8 +43,9 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                     "user_name": SessionManager.name,
                     "kobo_base_url": "https://stage.api.kobo360.com/",
                     "gps_base_url": "https://stagegpsapi.kobo360.com/v2/",
+                    "geo_base_url": "https://stagegpsapi.kobo360.com/v2/",
                     "environment": "staging",
-                    "simulate_route_for_driver": true
+                    "simulate": true
                   });
                 },
                 child: Text("Open map"),

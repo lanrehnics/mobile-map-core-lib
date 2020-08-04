@@ -64,11 +64,11 @@ class FragmentTripDetails : Fragment() {
         // Inflate the layout for this fragment
 
         val view = inflater.inflate(R.layout.fragment_trip_details, container, false)
-        val tvStartNavigationForTrip = view.findViewById<TextView>(R.id.tvStartNavigationForTrip)
-        tvStartNavigationForTrip.setOnClickListener(View.OnClickListener {
-
-            callBack?.oyaStart(tripInfo)
-        })
+//        val tvStartNavigationForTrip = view.findViewById<TextView>(R.id.tvStartNavigationForTrip)
+//        tvStartNavigationForTrip.setOnClickListener(View.OnClickListener {
+//
+//            callBack?.oyaStart(tripInfo)
+//        })
 //        view.findViewById<>()
 
         setUpView(view)

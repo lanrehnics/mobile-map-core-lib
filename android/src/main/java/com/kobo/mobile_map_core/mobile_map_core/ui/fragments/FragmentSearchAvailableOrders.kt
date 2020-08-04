@@ -9,17 +9,17 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.kobo.mobile_map_core.mobile_map_core.R
-import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.TruckData
-import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.Trucks
-import com.kobo.mobile_map_core.mobile_map_core.ui.adapter.AvailableTruckListAdapter
-import com.kobo.mobile_map_core.mobile_map_core.ui.adapter.OnAvailableTruckItemClickListener
+import com.kobo.mobile_map_core.mobile_map_core.data.models.orders.AvailableOrdersData
+import com.kobo.mobile_map_core.mobile_map_core.data.models.orders.Orders
+import com.kobo.mobile_map_core.mobile_map_core.ui.adapter.AvailableOrderListAdapter
+import com.kobo.mobile_map_core.mobile_map_core.ui.adapter.OnAvailableOrderItemClickListener
 import com.kobo.mobile_map_core.mobile_map_core.ui.fragments.`interface`.UseFulFragmentsInterface
 import com.todkars.shimmer.ShimmerRecyclerView
 
 private const val ARG_PARAM1 = "param1"
 
 
-class FragmentSearchAvailableTrucks : Fragment(), OnAvailableTruckItemClickListener {
+class FragmentSearchAvailableOrders : Fragment(), OnAvailableOrderItemClickListener {
 
 
     private lateinit var callback: UseFulFragmentsInterface.OnInfoClickedListener
@@ -40,23 +40,23 @@ class FragmentSearchAvailableTrucks : Fragment(), OnAvailableTruckItemClickListe
     }
 
 
-    private var truckData: TruckData? = null
+    private var truckData: AvailableOrdersData? = null
     private lateinit var listShimmerFilteredActiveTrips: ShimmerRecyclerView
     private lateinit var closeFragmentIcon: ImageView
     private lateinit var switchToMap: ImageView
-    private lateinit var adapter: AvailableTruckListAdapter
+    private lateinit var adapter: AvailableOrderListAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            truckData = it.getSerializable(ARG_PARAM1) as TruckData
+            truckData = it.getSerializable(ARG_PARAM1) as AvailableOrdersData
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_search_available_trucks, container, false)
+        val view = inflater.inflate(R.layout.fragment_search_available_orders, container, false)
 
 
 
@@ -79,18 +79,18 @@ class FragmentSearchAvailableTrucks : Fragment(), OnAvailableTruckItemClickListe
     companion object {
 
         @JvmStatic
-        fun newInstance(truckData: TruckData) =
-                FragmentSearchAvailableTrucks().apply {
+        fun newInstance(ordersData: AvailableOrdersData) =
+                FragmentSearchAvailableOrders().apply {
                     arguments = Bundle().apply {
-                        putSerializable(ARG_PARAM1, truckData)
+                        putSerializable(ARG_PARAM1, ordersData)
                     }
                 }
     }
 
     private fun setupUI() {
         listShimmerFilteredActiveTrips.layoutManager = LinearLayoutManager(activity)
-        adapter = truckData?.trucks?.let { ArrayList(it) }?.let {
-            AvailableTruckListAdapter(it
+        adapter = truckData?.orders?.let { ArrayList(it) }?.let {
+            AvailableOrderListAdapter(it
                     , this)
         }!!
         listShimmerFilteredActiveTrips.addItemDecoration(
@@ -104,15 +104,12 @@ class FragmentSearchAvailableTrucks : Fragment(), OnAvailableTruckItemClickListe
     }
 
 
-    private fun renderList(results: List<Trucks>) {
+    private fun renderList(results: List<Orders>) {
         adapter.addData(results)
         adapter.notifyDataSetChanged()
     }
 
-    override fun onItemClicked(truckInfo: Trucks) {
-        callback.onSelect(truckInfo)
+    override fun onItemClicked(orders: Orders) {
+        callback.onSelect(orders)
     }
-
-
-
 }

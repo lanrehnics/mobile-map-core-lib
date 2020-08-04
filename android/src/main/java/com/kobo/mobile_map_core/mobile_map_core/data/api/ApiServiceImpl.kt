@@ -11,6 +11,7 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.AutoCom
 import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.AvailableTruckResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.DedicatedTruckResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.OverviewResponse
+import com.kobo.mobile_map_core.mobile_map_core.data.models.orders.AvailableOrdersResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.place_id.PlacesResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.reverse_geocode.ReverseGeocodeResponse
 import com.rx2androidnetworking.Rx2AndroidNetworking
@@ -70,6 +71,14 @@ class ApiServiceImpl(private val context: Context) : ApiService {
                 .addHeaders("Authorization", getToken())
                 .build()
                 .getObjectSingle(AvailableTruckResponse::class.java)
+    }
+
+    override fun fetchAvailableOrders(origin: LatLng?, assetType: String): Single<AvailableOrdersResponse> {
+        return Rx2AndroidNetworking.get(
+                AppConfig.availableOrders(context, origin, assetType))
+                .addHeaders("Authorization", getToken())
+                .build()
+                .getObjectSingle(AvailableOrdersResponse::class.java)
     }
 
     override fun fetchLatLngFromPlacesId(placesId: String): Single<PlacesResponse> {

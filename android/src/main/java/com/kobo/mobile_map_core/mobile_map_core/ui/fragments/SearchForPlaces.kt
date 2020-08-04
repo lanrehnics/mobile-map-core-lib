@@ -1,7 +1,7 @@
 package com.kobo.mobile_map_core.mobile_map_core.ui.fragments
 
 import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.Autocomplete
-import SelectedAddrss
+import com.kobo.mobile_map_core.mobile_map_core.data.models.SelectedAddrss
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,17 +12,13 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
 import com.kobo.mobile_map_core.mobile_map_core.R
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiHelper
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiServiceImpl
-import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.CustomerLocations
 import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.Overview
-import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.OverviewData
 import com.kobo.mobile_map_core.mobile_map_core.ui.base.ViewModelFactory
 import com.kobo.mobile_map_core.mobile_map_core.ui.adapter.AutoCompleteAdapter
 import com.kobo.mobile_map_core.mobile_map_core.ui.adapter.OnAutoCompleteItemClickListener

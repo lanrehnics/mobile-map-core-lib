@@ -70,6 +70,11 @@ abstract class AppConfig {
                     "&assetType=$assetId"
         }
 
+
+        fun availableOrders(context: Context, origin: LatLng?, assetType: String): String {
+            return "${getBaseUrl(context)}location/availableOrder?lat=${origin?.latitude}&lng=${origin?.longitude}&assetType=$assetType"
+        }
+
         fun locationOverview(context: Context, userTypeAndId: String, latLng: LatLng): String {
             return "${getBaseUrl(context)}location?$userTypeAndId&lat=${latLng.latitude}&lng=${latLng.longitude}"
         }

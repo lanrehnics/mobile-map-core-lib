@@ -1,6 +1,6 @@
 package com.kobo.mobile_map_core.mobile_map_core.ui.map
 
-import SelectedAddrss
+import com.kobo.mobile_map_core.mobile_map_core.data.models.SelectedAddrss
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -24,12 +24,12 @@ import com.kobo.mobile_map_core.mobile_map_core.enums.KoboLocationType
 import com.kobo.mobile_map_core.mobile_map_core.data.models.*
 import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.Autocomplete
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.Trucks
+import com.kobo.mobile_map_core.mobile_map_core.data.models.orders.Orders
 import com.kobo360.map.MarkerClusterRenderer
 import com.kobo.mobile_map_core.mobile_map_core.data.services.MapService
+import com.kobo360.map.OrderMarkerClusterRenderer
 import kotlinx.android.synthetic.main.dedicated_truck_bottom_sheet.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.android.synthetic.main.order_details.*
 import java.lang.Exception
 import java.util.*
 
@@ -47,25 +47,21 @@ abstract class BaseMapActivity : AppCompatActivity() {
 
     //Protected variables ...
     protected lateinit var context: Context
-    protected var isMappedFiltered = false
-    protected var isMappedFilteredByCustomer = false
-    protected var isMappedFilteredByStations = false
-    private var customersLocations: KoboLocations? = null
-    protected var customerLocationList: MutableList<Locations?>? = arrayListOf()
-    private var koboStationLocations: KoboLocations? = null
-    protected var koboStationLocationsList: MutableList<Locations?>? = arrayListOf()
     protected lateinit var fusedLocationClient: FusedLocationProviderClient
     protected lateinit var mapService: MapService
     protected lateinit var mMap: GoogleMap
     protected lateinit var mMapView: View
     protected lateinit var overviewBottomSheet: BottomSheetBehavior<View>
     protected lateinit var searchBottomSheet: BottomSheetBehavior<View>
+    protected lateinit var searchBottomSheetOrder: BottomSheetBehavior<View>
     protected lateinit var truckDetailsBottomSheet: BottomSheetBehavior<View>
+    protected lateinit var availableOrderBottomSheet: BottomSheetBehavior<View>
 
     //    protected lateinit var fabMyLocation: View
 //    protected lateinit var fabTripFilter: View
     //    protected lateinit var fabOpenSearch: View
     protected lateinit var btnSearchButton: CircularProgressButton
+    protected lateinit var btnSearchButtonOrder: CircularProgressButton
 
     //    protected lateinit var backArrowButton: ImageButton
     protected lateinit var toolbar: Toolbar
@@ -83,6 +79,7 @@ abstract class BaseMapActivity : AppCompatActivity() {
 //    protected lateinit var tvEtt: TextView
     protected var isSearchOn = false
     protected lateinit var clusterManager: ClusterManager<TruckClusterItem>
+    protected lateinit var ordersClusterManager: ClusterManager<OrderClusterItem>
     protected var markerManager: MutableMap<String, Marker> = mutableMapOf()
 
 
@@ -90,9 +87,9 @@ abstract class BaseMapActivity : AppCompatActivity() {
 
     private var parserCounter = 0
 
-    protected var truckMarkerManager: MutableMap<String, Trucks> = mutableMapOf()
+    protected var itemMarkerManager: MutableMap<String, Any> = mutableMapOf()
     var pickUpStations: MutableMap<Marker, Locations> = mutableMapOf()
-    var selectedTruck: Trucks? = null
+    var selectedItem: Any? = null
 
     //    protected val listTruckModel: MutableList<TruckModelDataParser?> = ArrayList()
     protected val listFilterTerms: MutableList<String?> = ArrayList()
@@ -105,74 +102,28 @@ abstract class BaseMapActivity : AppCompatActivity() {
     }
 
 
-//    private fun focusOnTruck(truckId: String) {
-//        backArrowButton.visibility = View.INVISIBLE
-//        btnCloseTruckInfo.visibility = View.VISIBLE
-//
-//        val docRef = db.collection("com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.Trucks").document(truckId)
-//        fireStoreSearchEventListener = docRef.addSnapshotListener { snapshot, e ->
-//            if (e != null) {
-//                Log.w(MapsActivity.TAG, "Listen failed.", e)
-//                return@addSnapshotListener
-//            }
-//            if (snapshot != null && snapshot.exists()) {
-//
-//                fireStoreSearchEventListener?.remove()
-//                Log.d(MapsActivity.TAG, "Current data: ${snapshot.data}")
-//                val searchResult = snapshot.toObject(TruckModelDataParser::class.java)
-//
-//                if (searchResult != null) {
-//                    isSearchOn = true
-//                    mMap.uiSettings.isRotateGesturesEnabled = true
-//                    mMap.addMarker(
-//                            MarkerOptions()
-//                                    .position(toLatLng(searchResult.l))
-//                                    .title(searchResult.d.reg_number)
-//                                    .rotation(searchResult.d.bearing.toFloat())
-//                                    .icon(truckFromStatus(searchResult))
-//                    )
-//                    mMap.animateCamera(
-//                            CameraUpdateFactory.newCameraPosition(
-//                                    CameraPosition.Builder().target(
-//                                            LatLng(searchResult.l.latitude, searchResult.l.longitude)
-//                                    )
-//                                            .zoom(16.5f).build()
-//                            )
-//                    )
-//                }
-//            } else {
-//                Log.d(MapsActivity.TAG, "Current data: null")
-//            }
-//        }
-//
-//    }
-
-
     protected fun clearMapAndData(command: ClearCommand) {
-
+        ordersClusterManager?.clearItems()
         clusterManager.clearItems()
-        customerLocationList?.clear()
-        koboStationLocationsList?.clear()
-
         when (command) {
             ClearCommand.MAP -> {
                 mMap.clear()
 //                listTripStatusFilter.clear()
             }
             ClearCommand.DATA -> {
-                truckMarkerManager.clear()
+                itemMarkerManager.clear()
                 markerManager.clear()
                 listFilterTerms.clear()
             }
             ClearCommand.WITHOUT_VIEW -> {
                 mMap.clear()
-                truckMarkerManager.clear()
+                itemMarkerManager.clear()
                 markerManager.clear()
             }
             else -> {
                 mMap.clear()
                 markerManager.clear()
-                truckMarkerManager.clear()
+                itemMarkerManager.clear()
 //                backArrowButton.visibility = View.VISIBLE
 //                btnCloseTruckInfo.visibility = View.INVISIBLE
                 listFilterTerms.clear()
@@ -180,23 +131,27 @@ abstract class BaseMapActivity : AppCompatActivity() {
         }
     }
 
-    protected fun resetView() {
-        try {
-            selectedTruck = null
-            currentDisplayMode = DisplayMode.ALL
-//            btnCloseTruckInfo.visibility = View.INVISIBLE
-            clearMapAndData(ClearCommand.ALL)
-
-            bootStrapPickupStationsAndTrucks()
-        } catch (e: Exception) {
-        }
-    }
-
     protected fun addTrucks(model: Trucks?) {
         try {
             model?.lastKnownLocation?.let {
                 if (it.coordinates[0] != 0.0) {
-                    truckMarkerManager[model.regNumber] = model
+                    itemMarkerManager[model.regNumber] = model
+                }
+            }
+//            if (truckMarkerManager.size <= 50) {
+
+//            }
+        } catch (error: Exception) {
+            error.message?.let { Log.d("partner", it) }
+        }
+
+    }
+
+    protected fun addOrders(order: Orders?) {
+        try {
+            order?.pickupLocation?.let {
+                if (it.coordinates[0] != 0.0) {
+                    itemMarkerManager[order.id] = order
                 }
             }
 //            if (truckMarkerManager.size <= 50) {
@@ -237,29 +192,46 @@ abstract class BaseMapActivity : AppCompatActivity() {
         }
     }
 
-    protected fun setTruckDetails() {
-        tvTruckRegNo.text = selectedTruck?.regNumber
-        tvAssetInfo.text = "${selectedTruck?.assetClass?.type} ${selectedTruck?.assetClass?.size}${selectedTruck?.assetClass?.unit}"
-        tvCurrentNavigation.text = selectedTruck?.lastKnownLocation?.address
-        tvDriverName.text = selectedTruck?.driver?.firstName
-        tvDriverRating.text = selectedTruck?.driver?.rating.toString()
-        ratingBarDriverRating.rating = selectedTruck?.driver?.rating?.toFloat()!!
+    protected fun setItemDetails(displayFor: String) {
 
-        this.let {
-            Glide.with(it)
-                    .load(selectedTruck?.driver?.image)
-                    .placeholder(ColorDrawable(Color.BLACK))
-                    .into(profile_image)
-        };
-//        tvTripStatus.text = selectedTruck?.d?.status
-//        tvCustName.text = selectedTruck?.d?.customerName
-//        tvPickUp.text = selectedTruck?.d?.pickUpStation?.address
-//        tvDestination.text = selectedTruck?.d?.deliveryStation?.address
-//        tvDriverName.text = selectedTruck?.d?.driverName
-//        tvDriverMobile.text = selectedTruck?.d?.driverMobile
-//        tvRegNumber.text = selectedTruck?.d?.reg_number
-//        tvEtt.text = "O Hour(s)"
+        when (displayFor) {
+
+            "order" -> {
+
+                val selectedOrder: Orders? = selectedItem as Orders?
+                tvCustomerName.text = selectedOrder?.customerName
+                tvDeliveryAddress.text = selectedOrder?.deliveryLocation?.address
+                tvPickUpAddress.text = selectedOrder?.pickupLocation?.address
+                tvEta.text = selectedOrder?.expectedETA?.text
+
+                availableOrderBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
+
+            }
+            else -> {
+
+                val selectedTruck: Trucks? = selectedItem as Trucks?
+                tvTruckRegNo.text = selectedTruck?.regNumber
+                tvAssetInfo.text = "${selectedTruck?.assetClass?.type} ${selectedTruck?.assetClass?.size}${selectedTruck?.assetClass?.unit}"
+                tvCurrentNavigation.text = selectedTruck?.lastKnownLocation?.address
+                tvDriverName.text = selectedTruck?.driver?.firstName
+                tvDriverRating.text = selectedTruck?.driver?.rating.toString()
+                ratingBarDriverRating.rating = selectedTruck?.driver?.rating?.toFloat()!!
+
+                this.let {
+                    Glide.with(it)
+                            .load(selectedTruck?.driver?.image)
+                            .placeholder(ColorDrawable(Color.BLACK))
+                            .into(profile_image)
+                }
+
+                truckDetailsBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
+
+            }
+        }
+
+
     }
+
 
     protected fun drawPolyLine(
             polyLineList: List<LatLng>
@@ -282,42 +254,6 @@ abstract class BaseMapActivity : AppCompatActivity() {
         blackPolyline = mMap.addPolyline(blackPolylineOptions)
     }
 
-    protected fun bootStrapPickupStationsAndTrucks() {
-        clearMapAndData(ClearCommand.ALL)
-        GlobalScope.launch(Dispatchers.Main) {
-            try {
-//                customersLocations = mapService.fetchCustomersLocations(toGeoHash(currentLatLng))
-                customerLocationList = customersLocations?.data?.locations?.toMutableList()
-//                koboStationLocations = mapService.fetchKoboStations(toGeoHash(currentLatLng))
-                koboStationLocationsList = koboStationLocations?.data?.locations?.toMutableList()
-
-//                customerLocationList?.forEach { model -> addTrucks(model?.let { TruckModelDataParser(it, "customer") }) }
-//                koboStationLocationsList?.forEach { model -> addTrucks(model?.let { TruckModelDataParser(it, "station") }) }
-
-//                runGeoQuery(verifyCurrentLocation(toGeoPoint(currentLatLng)))
-            } catch (e: Exception) {
-                Log.e(BattlefieldLandingActivity.TAG, "Error fetching customers locations ${e.message}")
-            }
-        }
-    }
-
-
-    protected fun refreshCustomers() {
-        customerLocationList = customersLocations?.data?.locations?.toMutableList()
-        customerLocationList?.forEach { pickUpStation ->
-            addStations(pickUpStation, KoboLocationType.CUSTOMER)
-        }
-    }
-
-    protected fun refreshStations() {
-        koboStationLocationsList = koboStationLocations?.data?.locations?.toMutableList()
-        koboStationLocationsList?.forEach { koboStation ->
-            addStations(koboStation, KoboLocationType.STATION)
-        }
-    }
-
-
-
     protected fun setupClusterManager(listTrucks: List<Trucks>) {
         clusterManager.renderer = MarkerClusterRenderer(this, mMap, clusterManager)
         addTruckClusters(listTrucks)
@@ -327,13 +263,15 @@ abstract class BaseMapActivity : AppCompatActivity() {
 
         try {
             val boundsBuilder = LatLngBounds.Builder()
-            truckMarkerManager.values.toList().map { model ->
+            itemMarkerManager.values.toList().map { model ->
                 boundsBuilder.include(
-                        model.lastKnownLocation?.coordinates?.get(1)?.let {
-                            LatLng(
-                                    it,
-                                    model.lastKnownLocation.coordinates[0]
-                            )
+                        (model as Trucks?)?.lastKnownLocation?.coordinates?.get(1)?.let {
+                            model.lastKnownLocation?.coordinates?.get(0)?.let { it1 ->
+                                LatLng(
+                                        it,
+                                        it1
+                                )
+                            }
                         }
                 )
             }
@@ -343,22 +281,51 @@ abstract class BaseMapActivity : AppCompatActivity() {
             if (currentDisplayMode == DisplayMode.ALL) {
                 mMap.uiSettings.isRotateGesturesEnabled = false
             }
-//            mMap.animateCamera(cu)
-//                    setupClusterManager()
-//                    moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.center, 10.0F))
         } catch (e: Exception) {
         }
     }
 
-//    protected fun addClusters(listTrucks: List<TruckModelDataParser>) {
-//        if (listTrucks.isNotEmpty()) {
-//            listTrucks.forEach { e -> clusterManager.addItem(MarkerClusterItem(e)) }
-//        }
-//    }
+    protected fun setupOrderClusterManager(listOrders: List<Orders>) {
+        ordersClusterManager.renderer = OrderMarkerClusterRenderer(this, mMap, ordersClusterManager)
+        addOrderClusters(listOrders)
+        mMap.setOnCameraIdleListener(ordersClusterManager)
+        mMap.setOnMarkerClickListener(ordersClusterManager)
+        ordersClusterManager.cluster()
+
+        try {
+            val boundsBuilder = LatLngBounds.Builder()
+            itemMarkerManager.values.toList().map { model ->
+                boundsBuilder.include(
+                        (model as Trucks?)?.lastKnownLocation?.coordinates?.get(1)?.let {
+                            model.lastKnownLocation?.coordinates?.get(0)?.let { it1 ->
+                                LatLng(
+                                        it,
+                                        it1
+                                )
+                            }
+                        }
+                )
+            }
+
+            val bounds = boundsBuilder.build()
+            val cu: CameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 50)
+            if (currentDisplayMode == DisplayMode.ALL) {
+                mMap.uiSettings.isRotateGesturesEnabled = false
+            }
+        } catch (e: Exception) {
+        }
+    }
+
 
     protected fun addTruckClusters(listTrucks: List<Trucks>) {
         if (listTrucks.isNotEmpty()) {
             listTrucks.forEach { e -> e.lastKnownLocation?.let { clusterManager.addItem(TruckClusterItem(e)) } }
+        }
+    }
+
+    protected fun addOrderClusters(listTrucks: List<Orders>) {
+        if (listTrucks.isNotEmpty()) {
+            listTrucks.forEach { e -> e.pickupLocation?.let { ordersClusterManager.addItem(OrderClusterItem(e)) } }
         }
     }
 

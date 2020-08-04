@@ -189,7 +189,7 @@
                             android:layout_marginTop="15dp"
                             android:fontFamily="@font/avenir_regular"
                             android:gravity="center"
-                            android:text="Track Dedicated Trucks"
+                            android:text="Track Trucks"
                             android:textColor="@color/colorPrimaryText"
                             android:textFontWeight="800"
                             android:textSize="12sp" />

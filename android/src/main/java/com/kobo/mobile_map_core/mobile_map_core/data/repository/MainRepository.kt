@@ -8,6 +8,7 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.AutoCom
 import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.AvailableTruckResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.DedicatedTruckResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.OverviewResponse
+import com.kobo.mobile_map_core.mobile_map_core.data.models.orders.AvailableOrdersResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.place_id.PlacesResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.reverse_geocode.ReverseGeocodeResponse
 import io.reactivex.Single
@@ -36,6 +37,10 @@ class MainRepository(private val apiHelper: ApiHelper) {
 
     fun fetchAvailableTrucks(origin: LatLng?, destination: LatLng?, radius: Int?, assetId: String): Single<AvailableTruckResponse> {
         return apiHelper.fetchAvailableTrucks(origin, destination, radius, assetId)
+    }
+
+    fun fetchAvailableOrders(origin: LatLng?, assetType: String): Single<AvailableOrdersResponse> {
+        return apiHelper.fetchAvailableOrders(origin, assetType)
     }
 
 
