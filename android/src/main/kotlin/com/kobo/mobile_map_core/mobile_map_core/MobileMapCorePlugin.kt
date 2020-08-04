@@ -22,6 +22,13 @@ class MobileMapCorePlugin : MethodCallHandler {
         const val STAGING = "staging"
         const val PRODUCTION = "production"
 
+        const val APP_TYPE_CUSTOMER = "customer"
+        const val APP_TYPE_SQUAD = "squad"
+        const val APP_TYPE_TRANSPORTER = "transporter"
+        const val APP_TYPE_PARTNER = "partner"
+        const val APP_TYPE_DRIVER = "driver"
+
+
 
         const val NAVIGATION_DATA = "NAVIGATION_DATA"
 
@@ -38,7 +45,7 @@ class MobileMapCorePlugin : MethodCallHandler {
         const val KEY_GEO_BASE_URL = "geo_base_url"
         const val KEY_KOBO_BASE_URL = "kobo_base_url"
         const val KEY_ENVIRONMENT = "environment"
-        const val KEY_SIMULATE_ROUTE_FOR_DRIVER = "simulate_route_for_driver"
+        const val KEY_SIMULATE_ROUTE_FOR_DRIVER = "simulate"
 
         lateinit var CLOUDMQTT_HOST: String
         lateinit var CLOUDMQTT_USER: String

@@ -15,7 +15,7 @@ data class KobocareStations (
         @SerializedName("stateCode") val stateCode : Int?,
         @SerializedName("state") val state : String?,
         @SerializedName("country") val country : String? =null,
-//        @SerializedName("location") val location : Location?=null,
+        @SerializedName("location") val location : Location?=null,
         @SerializedName("contactName") val contactName : String?,
         @SerializedName("contactPhone") val contactPhone : String?,
         @SerializedName("geofenceRadius") val geofenceRadius : Int?,

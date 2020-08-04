@@ -1,0 +1,119 @@
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/availableOrderBottomSheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:fillViewport="true"
+    app:behavior_hideable="true"
+    app:behavior_peekHeight="200dp"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="20dp">
+
+        <RelativeLayout
+            android:id="@+id/bottomSheetHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="17dp"
+            android:paddingBottom="24dp">
+
+            <View
+                android:layout_width="50dp"
+                android:layout_height="4dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/anchor_bg_grey" />
+
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tvCustomerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/avenir_heavy"
+            android:textColor="@color/colorPrimaryTextLight"
+            android:textSize="16sp"
+            tools:text="Dangote Cement LTD" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/ic_droppinstarttrip" />
+
+            <TextView
+                android:id="@+id/tvPickUpAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/avenir_regular"
+                android:textColor="@color/green"
+                android:textSize="12sp"
+                tools:text="Jibowu Loading Station" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/ic_droppinendtrip" />
+
+            <TextView
+                android:id="@+id/tvDeliveryAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/avenir_regular"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                tools:text="No 22 Ikorodu road, Jibowu Bus stop, Lagos" />
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/tvEta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:fontFamily="@font/avenir_regular"
+            android:textColor="@color/tcolorRed"
+            android:textSize="12sp"
+            tools:text="Arrive in 10 min" />
+
+        <!--        <Button-->
+        <!--            android:id="@+id/btnTotalOrderAvailable"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="39dp"-->
+        <!--            android:layout_marginTop="24dp"-->
+        <!--            android:background="@color/green"-->
+        <!--            android:fontFamily="@font/avenir_regular"-->
+        <!--            android:textColor="@android:color/white"-->
+        <!--            android:textSize="14sp"-->
+        <!--            tools:text="21 ORDERS AVAILABLE " />-->
+
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

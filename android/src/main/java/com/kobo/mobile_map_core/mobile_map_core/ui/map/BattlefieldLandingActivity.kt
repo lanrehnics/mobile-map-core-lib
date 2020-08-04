@@ -1,15 +1,13 @@
 package com.kobo.mobile_map_core.mobile_map_core.ui.map
 
 import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.Autocomplete
-import SelectedAddrss
-import android.annotation.SuppressLint
+import com.kobo.mobile_map_core.mobile_map_core.data.models.SelectedAddrss
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
-import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.core.app.ActivityCompat
@@ -30,29 +28,36 @@ import com.kobo.mobile_map_core.mobile_map_core.R
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiHelper
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiServiceImpl
 import com.kobo.mobile_map_core.mobile_map_core.data.models.ClearCommand
+import com.kobo.mobile_map_core.mobile_map_core.data.models.PrepareFragmentModel
 import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.Location
 import com.kobo.mobile_map_core.mobile_map_core.data.models.asset_class_model.AssetClasses
-import com.kobo.mobile_map_core.mobile_map_core.data.models.asset_class_model.Size
 import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.TruckData
 import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.TruckDataConst
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.Trucks
 import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.Overview
+import com.kobo.mobile_map_core.mobile_map_core.data.models.orders.AvailableOrdersData
 import com.kobo.mobile_map_core.mobile_map_core.data.services.MapService
 import com.kobo.mobile_map_core.mobile_map_core.ui.base.ViewModelFactory
+import com.kobo.mobile_map_core.mobile_map_core.ui.fragments.FragmentSearchAvailableOrders
 import com.kobo.mobile_map_core.mobile_map_core.ui.fragments.FragmentSearchAvailableTrucks
 import com.kobo.mobile_map_core.mobile_map_core.ui.fragments.SearchForPlaces
+import com.kobo.mobile_map_core.mobile_map_core.ui.fragments.`interface`.UseFulFragmentsInterface
+import com.kobo.mobile_map_core.mobile_map_core.ui.user_actions.CustomerActionsImpl
+import com.kobo.mobile_map_core.mobile_map_core.ui.user_actions.PartnerActionImpl
+import com.kobo.mobile_map_core.mobile_map_core.ui.user_actions.UserTypeAction
 import com.kobo.mobile_map_core.mobile_map_core.ui.viewmodel.MapLandingViewModel
 import com.xdev.mvvm.utils.Status
 import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.android.synthetic.main.battlefield_landing_activity_main.*
 import kotlinx.android.synthetic.main.fragment_user_options.*
 import kotlinx.android.synthetic.main.search_available_truck.*
+import kotlinx.android.synthetic.main.search_available_order.*
 import timber.log.Timber
 import java.lang.Exception
 
 
 class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
-        GoogleMap.OnMarkerClickListener, View.OnClickListener, SearchForPlaces.OnAddressSelectedListener, FragmentSearchAvailableTrucks.SwitchToMapClickListener, FragmentSearchAvailableTrucks.OnTruckInfoClickedListener, FragmentSearchAvailableTrucks.OnAvailableTruckCloseButtonClickListener {
+        GoogleMap.OnMarkerClickListener, View.OnClickListener, SearchForPlaces.OnAddressSelectedListener, UseFulFragmentsInterface.SwitchToMapClickListener, UseFulFragmentsInterface.OnInfoClickedListener, UseFulFragmentsInterface.OnCloseButtonClickListener {
 
     private lateinit var mapLandingViewModel: MapLandingViewModel
     private lateinit var assetClasses: AssetClasses
@@ -60,9 +65,10 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     //    private lateinit var selectedSize: Size
     private var searchRadius: Int? = 1
     private var searchForAvailableTrucks: Boolean = false
-    private lateinit var trkData: TruckData
+    private lateinit var data: Any
     private lateinit var shaper: SharedPreferences
     private var overviewW: Overview? = null
+    private lateinit var userTypeAction: UserTypeAction
 
     override fun onAttachFragment(fragment: Fragment) {
         if (fragment is SearchForPlaces) {
@@ -93,12 +99,6 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         setupFetchGroupedAssetObserver()
 
 
-        //Pass context
-
-        // Configure som initialization base on app type
-//        configureCollectionReferenceForApp()
-
-
         // Initialize map, services, bottom sheet and drawer
         mapService = MapService(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -108,85 +108,20 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
         overviewBottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
         searchBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+        searchBottomSheetOrder.state = BottomSheetBehavior.STATE_HIDDEN
         truckDetailsBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
-
-        overviewBottomSheet.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-            }
-
-            @SuppressLint("SwitchIntDef")
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when (newState) {
-                    BottomSheetBehavior.STATE_COLLAPSED -> {
-
-                    }
-                    BottomSheetBehavior.STATE_HIDDEN -> {
-//                        resetView()
-//                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    }
-                    BottomSheetBehavior.STATE_EXPANDED -> {
-//                        btnCloseTruckInfo.visibility = View.VISIBLE
-                    }
-                    BottomSheetBehavior.STATE_DRAGGING -> {
-
-                    }
-                    BottomSheetBehavior.STATE_SETTLING -> {
-
-                    }
-                }
-            }
-        })
-
-        searchBottomSheet.setBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-            }
-
-            @SuppressLint("SwitchIntDef")
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when (newState) {
-                    BottomSheetBehavior.STATE_COLLAPSED -> {
-
-                        if (!searchForAvailableTrucks) {
-                            overviewBottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
-                            searchBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
-                        }
-
-                    }
-                    BottomSheetBehavior.STATE_HIDDEN -> {
-                        if (!searchForAvailableTrucks)
-                            overviewBottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
-                    }
-                    BottomSheetBehavior.STATE_EXPANDED -> {
-
-                    }
-                    BottomSheetBehavior.STATE_DRAGGING -> {
-
-                    }
-                    BottomSheetBehavior.STATE_SETTLING -> {
-
-                    }
-                }
-            }
-        })
-
+        availableOrderBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
 
     }
 
     private fun setUpSpinner(list: List<AssetClasses>) {
-
-        val spinnerAdapter: ArrayAdapter<AssetClasses> = ArrayAdapter(this, R.layout.item_spinner, list)
-
-        spinner.adapter = spinnerAdapter
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                assetClasses = parent.selectedItem as AssetClasses
-//                setUpSpinner2(assetClasses.size)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        userTypeAction.setUpSpinner(this, list) { result ->
+            setAssetClasses(result)
         }
+    }
 
-
+    private fun setAssetClasses(result: AssetClasses) {
+        assetClasses = result
     }
 
 //    private fun setUpSpinner2(list: List<Size>) {
@@ -254,8 +189,9 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
     private fun setMyCurrentLocations(address: String) {
         globalSelectedAdd.pickUp?.description = address
-        etPickUpLocation.text = address.toEditable()
         tvMyCurrentLocation.text = address
+
+        userTypeAction.setEtPickUp(address.toEditable())
     }
 
 
@@ -266,6 +202,10 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
             fetchAndSubscribeForLocationOverview()
         }
         clusterManager = ClusterManager(this, googleMap)
+        ordersClusterManager = ClusterManager(this, googleMap)
+
+
+        userTypeAction.setMap(mMap, clusterManager, ordersClusterManager)
         setClusterManagerClickListener()
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
         //mMap.isTrafficEnabled = true
@@ -363,98 +303,6 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
     override fun onClick(v: View?) {
         when (v!!.id) {
-//            R.id.fabTripFilter -> {
-//                tripFilterLinearLayout.visibility = View.VISIBLE
-////                drawerLayout.openDrawer(GravityCompat.END)
-//                if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
-//                    drawerLayout.closeDrawer(GravityCompat.END)
-//                }
-//            }
-
-//            R.id.fabSearch -> {
-//                val searchIntent = Intent(this, SearchActivity::class.java)
-//                startActivity(searchIntent)
-//            }
-//            R.id.fabMyLocation -> {
-//                try {
-//                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
-//                } catch (e: Exception) {
-//
-//                }
-//            }
-
-//            R.id.btn_apply -> {
-//                if (!isMappedFiltered) {
-//                    if (listFilterTerms.isNotEmpty()) {
-//                        val filteredTruckList = truckMarkerManager.values.toList().filter { truckModel ->
-//                            val activeTrip: String = if (truckModel.d.active == 1) TripStatus.STATUS_ACTIVE_TRIPS else ""
-//                            val flaggedTrip: String = if (truckModel.d.flagged) TripStatus.STATUS_FLAGGED_TRIP else ""
-//
-//                            listFilterTerms.contains(truckModel.d.status.toLowerCase(Locale.getDefault()))
-//                                    || listFilterTerms.contains(activeTrip.toLowerCase(Locale.getDefault()))
-//                                    || listFilterTerms.contains(flaggedTrip.toLowerCase(Locale.getDefault()))
-//                                    || listFilterTerms.contains(truckModel.d.resourceType)
-//                        }
-//
-//                        if (filteredTruckList.isNotEmpty()) {
-//                            clearMapAndData(ClearCommand.MAP)
-////                            addClusters(filteredTruckList)
-//                            val boundsBuilder = LatLngBounds.Builder()
-//
-//                            filteredTruckList.map { model ->
-//                                boundsBuilder.include(
-//                                        LatLng(
-//                                                model.l.latitude,
-//                                                model.l.longitude
-//                                        )
-//                                )
-//                            }
-//                            val bounds = boundsBuilder.build()
-//                            clusterManager.cluster()
-//                            val cu: CameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 100)
-//
-//                            mMap.animateCamera(cu)
-//
-//                        } else {
-//                            showMessage(this, "No truck found")
-//                        }
-//                    }
-//                    btnApply.text = "Clear Filter"
-//
-//                    isMappedFiltered = true
-//
-//                } else {
-//
-//                    isMappedFilteredByCustomer = false
-//                    isMappedFilteredByStations = false
-//
-//                    bootStrapPickupStationsAndTrucks()
-//
-//                    btnApply.text = "Apply Filter"
-//
-//                    statusPositioned.isChecked = false
-//                    statusInpremise.isChecked = false
-//                    statusLoaded.isChecked = false
-//                    statusTransporting.isChecked = false
-//                    statusAtDestination.isChecked = false
-//                    statusAvailable.isChecked = false
-//                    flaggedTrips.isChecked = false
-//                    activeTrips.isChecked = false
-//                    customers.isChecked = false
-//                    stations.isChecked = false
-//
-//
-////                    customersLocations?.let {
-////                        it.data.locations.forEach { pickUpStation ->
-////                            addStations(pickUpStation, KoboLocationType.CUSTOMER)
-////                        }
-////                    }
-//
-//
-//                }
-//                drawerLayout.closeDrawer(GravityCompat.END)
-//            }
-
             R.id.bottomSheetHeader -> {
                 if (overviewBottomSheet.state == BottomSheetBehavior.STATE_COLLAPSED) {
                     overviewBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
@@ -468,12 +316,23 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
                 fetchAvailableTruck(globalSelectedAdd.pickUp?.latLng, globalSelectedAdd.destination?.latLng, searchRadius, assetClasses.type)
             }
 
+            R.id.btnSearchButtonOrder -> {
+                fetchAvailableOrder(globalSelectedAdd.pickUp?.latLng, assetClasses.type)
+            }
+
             R.id.btnCloseTruckInfo -> {
                 searchForAvailableTrucks = false
+                userTypeAction.setSearchForAvailableTrucks(searchForAvailableTrucks)
                 btnCloseTruckInfo.visibility = View.INVISIBLE
-                searchBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
-                if (truckDetailsBottomSheet.state == BottomSheetBehavior.STATE_EXPANDED) {
+                userTypeAction.expandSearchBottomSheet()
+                if (
+                        truckDetailsBottomSheet.state == BottomSheetBehavior.STATE_EXPANDED ||
+                        availableOrderBottomSheet.state == BottomSheetBehavior.STATE_EXPANDED
+
+
+                ) {
                     truckDetailsBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+                    availableOrderBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
 //                    overviewBottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
                 fetchAndSubscribeForLocationOverview()
@@ -487,17 +346,13 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     override fun onRequestPermissionsResult(
             requestCode: Int, permissions: Array<String>,
             grantResults: IntArray) {
-        Log.i(TAG, "onRequestPermissionResult")
+        Timber.i("onRequestPermissionResult")
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             when {
-                grantResults.isEmpty() -> Log.i(TAG, "User interaction was cancelled.")
+                grantResults.isEmpty() -> Timber.i("User interaction was cancelled.")
                 grantResults[0] == PackageManager.PERMISSION_GRANTED -> {
-//                    mMap.isMyLocationEnabled = true
                     fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
-                        // Got last known location. In some rare situations this can be null.
-                        // 3
                         if (location != null) {
-//                lastLocation = location
                             val currentLatLng = LatLng(location.latitude, location.longitude)
                             mMap.animateCamera(
                                     CameraUpdateFactory.newLatLngZoom(
@@ -505,7 +360,8 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
                                             12f
                                     )
                             )
-                            bootStrapPickupStationsAndTrucks()
+
+                            //Load location overview here...
                         }
                     }
                 }
@@ -515,99 +371,22 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     }
 
     private fun setClusterManagerClickListener() {
-        clusterManager.setOnClusterClickListener {
+        userTypeAction.setClusterManagerClickListener { result -> clusterClickListener(result) }
+    }
 
-            if (it != null) {
-                truckDetailsBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
-                val items = it.items
-                val builder = LatLngBounds.Builder()
-                for (item in items) {
-                    builder.include(item.position)
-                }
-                val bounds = builder.build()
-                val mCameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 100)
-                mMap.animateCamera(mCameraUpdate)
+    private fun clusterClickListener(result: String?) {
+        result?.let {
+            val resultList = it.split(",")
+            try {
+
+                selectedItem = itemMarkerManager[resultList[0]]!!
+                setItemDetails(resultList[1])
+
+            } catch (e: Exception) {
+                Timber.i(e.message.toString())
             }
-            true
         }
-        clusterManager.setOnClusterItemClickListener {
-            mMap.animateCamera(
-                    CameraUpdateFactory.newLatLng(it.position),
-                    object : GoogleMap.CancelableCallback {
-                        override fun onFinish() {
 
-                            try {
-                                selectedTruck = truckMarkerManager[it.title]!!
-                                truckDetailsBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
-
-                                setTruckDetails()
-                            } catch (e: Exception) {
-                                Timber.i(e.message.toString())
-                            }
-
-                        }
-                        // clusterManager has access to display markers
-                        // try extract the selected marker from the marker manager in clusterManager
-//                            selectedMarker = getMarkerFromClusterCollections(it)
-
-
-//                            if (selectedTruck?.d?.resourceType == "truck") {
-//                                // Clear all geopoints and clustered markers
-//                                clearMapAndData(ClearCommand.MAP)
-////                                backArrowButton.visibility = View.INVISIBLE
-////                                btnCloseTruckInfo.visibility = View.VISIBLE
-////                                btnCloseTruckInfo.visibility = View.VISIBLE
-//                                currentDisplayMode = DisplayMode.SINGLE
-//                                setTruckDetails()
-//                                if (overviewBottomSheet.state == BottomSheetBehavior.STATE_HIDDEN) {
-//                                    overviewBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
-//                                }
-//                                val destinationLatitude: Double =
-//                                        selectedTruck!!.d.deliveryStation.location.coordinates[0]
-//                                val destinationLongitude: Double =
-//                                        selectedTruck!!.d.deliveryStation.location.coordinates[1]
-//
-//
-//                                val origin = toGeoPoint(selectedMarker.position)
-//
-//                                val marker = mMap.addMarker(
-//                                        MarkerOptions()
-//                                                .position(toLatLng(origin))
-//                                                .title(selectedTruck!!.d.reg_number)
-//                                                .rotation(selectedTruck!!.d.bearing.toFloat())
-//                                                .icon(truckFromStatus(selectedTruck!!))
-//                                )
-//
-//                                // Reset marker after adding new marker
-//                                selectedMarker = marker
-//                                markerManager[selectedTruck!!.d.reg_number] = marker
-//
-//                                val destination = GeoPoint(destinationLatitude, destinationLongitude)
-//
-//                                if (destinationLatitude > 0 && destinationLongitude > 0)
-//                                    GlobalScope.launch(Dispatchers.Main) {
-//                                        try {
-//                                            val polyLineList =
-//                                                    mapService.getPolyline(origin, destination)
-//                                            if (polyLineList.isNotEmpty()) {
-//                                                drawPolyLine(polyLineList)
-//                                            }
-//                                        } catch (e: Exception) {
-//                                            Log.e(
-//                                                    TAG,
-//                                                    "Error fetching customers locations ${e.message}"
-//                                            )
-//                                        }
-//                                    }
-//
-//                            } else {
-//                                selectedMarker.showInfoWindow()
-//                            }
-
-                        override fun onCancel() {}
-                    })
-            true
-        }
     }
 
     private fun initializeViews() {
@@ -627,31 +406,68 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
             }
         })
 
-
-
         toolbar = findViewById(R.id.toolbar)
 
         bottomSheetHeader = findViewById(R.id.bottomSheetHeader)
         btnSearchButton = findViewById(R.id.btnSearchButton)
+        btnSearchButtonOrder = findViewById(R.id.btnSearchButtonOrder)
 
 
         overviewBottomSheet = BottomSheetBehavior.from(findViewById(R.id.layout_bottom_sheet))
         searchBottomSheet = BottomSheetBehavior.from(findViewById(R.id.searchAvailableTruckId))
+        searchBottomSheetOrder = BottomSheetBehavior.from(findViewById(R.id.searchAvailableOrderId))
         truckDetailsBottomSheet = BottomSheetBehavior.from(findViewById(R.id.dedicatedTruckBottomSheet))
+        availableOrderBottomSheet = BottomSheetBehavior.from(findViewById(R.id.availableOrderBottomSheet))
 
         bottomSheetHeader.setOnClickListener(this)
         btnSearchButton.setOnClickListener(this)
+        btnSearchButtonOrder.setOnClickListener(this)
         btnCloseTruckInfo.setOnClickListener(this)
+
+        when (shaper.getString(MobileMapCorePlugin.KEY_APP_TYPE, "")) {
+            MobileMapCorePlugin.APP_TYPE_CUSTOMER -> {
+                userTypeAction = CustomerActionsImpl(
+                        overviewBottomSheet,
+                        searchBottomSheet,
+                        truckDetailsBottomSheet,
+                        spinner,
+                        etPickUpLocation)
+            }
+
+            MobileMapCorePlugin.APP_TYPE_TRANSPORTER -> {
+                userTypeAction = PartnerActionImpl(
+                        overviewBottomSheet,
+                        searchBottomSheetOrder,
+                        availableOrderBottomSheet,
+                        spinnerOrder,
+                        etPickUpLocationOrder)
+            }
+
+            MobileMapCorePlugin.APP_TYPE_PARTNER -> {
+                userTypeAction = PartnerActionImpl(
+                        overviewBottomSheet,
+                        searchBottomSheetOrder,
+                        availableOrderBottomSheet,
+                        spinnerOrder,
+                        etPickUpLocationOrder)
+            }
+
+            MobileMapCorePlugin.APP_TYPE_SQUAD -> {
+
+            }
+
+            MobileMapCorePlugin.APP_TYPE_DRIVER -> {
+
+            }
+        }
     }
 
     fun openSearchAvailableTrucks(view: View) {
-        overviewBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
-        searchBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
+        userTypeAction.openSearchAvailableTrucks()
     }
 
     fun closeSearchBottomSheet(view: View) {
-        overviewBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
-        searchBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+        userTypeAction.closeSearchBottomSheet()
     }
 
 
@@ -661,10 +477,6 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
     fun openDedicatedTruck(view: View) {
         startActivity(Intent(this, DedicatedTruckActivity::class.java))
-    }
-
-    fun openTruckNavigation(view: View) {
-        startActivity(Intent(this, NavigationActivity::class.java))
     }
 
     fun setToLocation(view: View) {
@@ -701,19 +513,48 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
         switchToList.visibility = View.INVISIBLE
 
-        val fragmentSearchAvailableTrucks = FragmentSearchAvailableTrucks.newInstance(trkData)
-        fragmentSearchAvailableTrucks.setSwitchToMapClickListener(this)
-        fragmentSearchAvailableTrucks.setOnTruckInfoClickedListener(this)
-        fragmentSearchAvailableTrucks.setOnAvailableTruckCloseButtonClickListener(this)
-        val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.add(R.id.mainMapHome, fragmentSearchAvailableTrucks, "fragmentSearchAvailableTrucks").addToBackStack("fragmentSearchAvailableTrucks").commit()
+        userTypeAction.switchToListFromMap(data) { prepareFragment -> prepareListFragment(prepareFragment) }
+
+
+    }
+
+    private fun prepareListFragment(prepareFragment: PrepareFragmentModel) {
+
+        when (prepareFragment.displayFor) {
+            "order" -> {
+
+                val fragment: FragmentSearchAvailableOrders = prepareFragment.fragment as FragmentSearchAvailableOrders
+
+                fragment.setSwitchToMapClickListener(this)
+                fragment.setOnTruckInfoClickedListener(this)
+                fragment.setOnAvailableTruckCloseButtonClickListener(this)
+                val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+                fragmentTransaction.add(R.id.mainMapHome, fragment, "fragmentSearchAvailableOrders").addToBackStack("fragmentSearchAvailableTrucks").commit()
+            }
+
+            else -> {
+
+
+                val fragment: FragmentSearchAvailableTrucks = prepareFragment.fragment as FragmentSearchAvailableTrucks
+
+                fragment.setSwitchToMapClickListener(this)
+                fragment.setOnTruckInfoClickedListener(this)
+                fragment.setOnAvailableTruckCloseButtonClickListener(this)
+                val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+                fragmentTransaction.add(R.id.mainMapHome, fragment, "fragmentSearchAvailableTrucks").addToBackStack("fragmentSearchAvailableTrucks").commit()
+
+            }
+        }
     }
 
 
     override fun onBackPressed() {
-
-        if (truckDetailsBottomSheet.state == BottomSheetBehavior.STATE_EXPANDED) {
+        if (
+                truckDetailsBottomSheet.state == BottomSheetBehavior.STATE_EXPANDED ||
+                availableOrderBottomSheet.state == BottomSheetBehavior.STATE_EXPANDED
+        ) {
             truckDetailsBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+            availableOrderBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
         } else if (searchForAvailableTrucks) {
 
             val count = supportFragmentManager.backStackEntryCount
@@ -722,8 +563,9 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
             } else {
                 fetchAndSubscribeForLocationOverview()
                 searchForAvailableTrucks = false
+                userTypeAction.setSearchForAvailableTrucks(searchForAvailableTrucks)
                 btnCloseTruckInfo.visibility = View.INVISIBLE
-                searchBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
+                userTypeAction.expandSearchBottomSheet()
             }
         } else {
             super.onBackPressed()
@@ -734,7 +576,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         when (selectedAddress.mode) {
             0 -> {
                 globalSelectedAdd.pickUp = selectedAddress.pickUp
-                etPickUpLocation.text = selectedAddress.pickUp?.description?.toEditable()
+                userTypeAction.setEtPickUp(selectedAddress.pickUp?.description?.toEditable())
                 selectedAddress.pickUp!!.placeId?.let { bootstrapLatLng(it, globalSelectedAdd.pickUp) }
             }
             else -> {
@@ -801,6 +643,33 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
     }
 
+
+    private fun fetchAvailableOrder(origin: LatLng?, assetType: String) {
+        mapLandingViewModel.fetchAvailableOrder(origin, assetType).observe(this, androidx.lifecycle.Observer {
+            when (it.status) {
+
+                Status.SUCCESS -> {
+                    switchToList.visibility = View.VISIBLE
+                    it.data?.let { response -> bootstrapAvailableOrdersOnMap(response.data) }!!
+                }
+
+                Status.LOADING -> {
+                    btnSearchButtonOrder.startAnimation()
+//                    progressBar.visibility = View.VISIBLE
+//                    recyclerView.visibility = View.GONE
+                }
+                Status.ERROR -> {
+                    btnSearchButtonOrder.revertAnimation()
+                    println("Error")
+                    //Handle Error
+//                    progressBar.visibility = View.GONE
+//                    Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+                }
+            }
+        })
+
+    }
+
     private fun bootstrapLocationOverview(overview: Overview?) {
         overviewW = overview
         tvTruckOverviewAvailableTrucks.text = overview?.totalAvailableTrucks.toString()
@@ -824,16 +693,16 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
         }
 
-//        overview?.kobocareStations?.let {
-//            it.forEach { cl ->
-//                cl?.location?.let { loc ->
-//                    mMap.addMarker(
-//                            MarkerOptions()
-//                                    .position(NewBaseMapActivity.toLatLngNotNull(loc.coordinates))
-//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_kobostation)))
-//                }
-//            }
-//        }
+        overview?.kobocareStations?.let {
+            it.forEach { cl ->
+                cl?.location?.let { loc ->
+                    mMap.addMarker(
+                            MarkerOptions()
+                                    .position(NewBaseMapActivity.toLatLngNotNull(loc.coordinates))
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_kobostation)))
+                }
+            }
+        }
         mMap.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(currentLatLng, 14.5F),
                 object : GoogleMap.CancelableCallback {
@@ -861,12 +730,13 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
     private fun bootstrapAvailableTrucksOnMap(truckData: TruckData) {
 
-        trkData = truckData
+        data = truckData
 
         clearMapAndData(ClearCommand.ALL)
         btnSearchButton.revertAnimation()
         btnCloseTruckInfo.visibility = View.VISIBLE
         searchForAvailableTrucks = true
+        userTypeAction.setSearchForAvailableTrucks(searchForAvailableTrucks)
         searchBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
         overviewBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
 
@@ -897,44 +767,37 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
     }
 
-    fun String.toEditable(): Editable = Editable.Factory.getInstance().newEditable(this)
+    private fun bootstrapAvailableOrdersOnMap(availableOrdersData: AvailableOrdersData) {
+
+        data = availableOrdersData
+
+        clearMapAndData(ClearCommand.ALL)
+        btnSearchButtonOrder.revertAnimation()
+        btnCloseTruckInfo.visibility = View.VISIBLE
+        searchForAvailableTrucks = true
+        userTypeAction.setSearchForAvailableTrucks(searchForAvailableTrucks)
+        searchBottomSheetOrder.state = BottomSheetBehavior.STATE_HIDDEN
+        overviewBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(globalSelectedAdd.pickUp?.latLng, 14.5f))
+        availableOrdersData.orders?.forEach { model -> addOrders(model) }
+        availableOrdersData.orders?.let { setupOrderClusterManager(it) }
+
+    }
 
     override fun onSwitchToMapClickListener() {
         switchToList.visibility = View.VISIBLE
-        val fragment: Fragment? = supportFragmentManager.findFragmentByTag("fragmentSearchAvailableTrucks")
-        if (fragment != null)
-            supportFragmentManager.beginTransaction().remove(fragment).commit()
+        userTypeAction.onSwitchToMapClickListener(supportFragmentManager)
     }
 
-    override fun onSelect(selectedTruckInfo: Trucks) {
+    override fun onSelect(selectedInfo: Any) {
 
         try {
-            clearMapAndData(ClearCommand.MAP)
-            selectedTruck = selectedTruckInfo
-            selectedTruck?.lastKnownLocation?.let {
-                val marker = mMap.addMarker(
-                        selectedTruck?.bearing?.toFloat()?.let { it1 ->
-                            NewBaseMapActivity.toLatLng(it.coordinates)?.let { it2 ->
-                                MarkerOptions()
-                                        .position(it2)
-                                        //                                                .title(selectedTruck!!.d.reg_number)
-                                        .rotation(it1)
-                                        .icon(NewBaseMapActivity.truckFromStatus(selectedTruck!!))
-                            }
-                        }
-                )
-
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(NewBaseMapActivity.toLatLng(it.coordinates), 14.5f))
-            }
-
-            truckDetailsBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
-
+            selectedItem = selectedInfo
             switchToList.visibility = View.VISIBLE
-            val fragment: Fragment? = supportFragmentManager.findFragmentByTag("fragmentSearchAvailableTrucks")
-            if (fragment != null)
-                supportFragmentManager.beginTransaction().remove(fragment).commit()
-            setTruckDetails()
-            truckDetailsBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
+            clearMapAndData(ClearCommand.MAP)
+            userTypeAction.onSelectFromList(selectedInfo, supportFragmentManager) { displayFor -> setItemDetails(displayFor) }
 
         } catch (e: Exception) {
             Timber.i(e.message.toString())
@@ -943,8 +806,8 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
     override fun onTripInfoCloseButtonClick() {
         switchToList.visibility = View.VISIBLE
-        val fragment: Fragment? = supportFragmentManager.findFragmentByTag("fragmentSearchAvailableTrucks")
-        if (fragment != null)
-            supportFragmentManager.beginTransaction().remove(fragment).commit()
+        userTypeAction.onTripInfoCloseButtonClick(supportFragmentManager)
     }
+
+    private fun String?.toEditable(): Editable = Editable.Factory.getInstance().newEditable(this)
 }

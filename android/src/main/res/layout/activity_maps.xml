@@ -35,6 +35,10 @@
 
     <include layout="@layout/search_available_truck" />
 
+    <include layout="@layout/search_available_order" />
+
     <include layout="@layout/dedicated_truck_bottom_sheet" />
+
+    <include layout="@layout/order_details" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

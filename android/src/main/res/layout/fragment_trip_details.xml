@@ -35,17 +35,17 @@
             android:src="@drawable/ic_green_circle" />
 
 
-        <TextView
-            android:id="@+id/tvStartNavigationForTrip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:drawableLeft="@drawable/ic_navigation"
-            android:drawablePadding="10dp"
-            android:fontFamily="@font/avenir_medium"
-            android:text="Start Navigation"
-            android:textColor="@color/colorPrimaryText"
-            android:textSize="16sp" />
+<!--        <TextView-->
+<!--            android:id="@+id/tvStartNavigationForTrip"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_alignParentRight="true"-->
+<!--            android:drawableLeft="@drawable/ic_navigation"-->
+<!--            android:drawablePadding="10dp"-->
+<!--            android:fontFamily="@font/avenir_medium"-->
+<!--            android:text="Start Navigation"-->
+<!--            android:textColor="@color/colorPrimaryText"-->
+<!--            android:textSize="16sp" />-->
 
 
     </RelativeLayout>
