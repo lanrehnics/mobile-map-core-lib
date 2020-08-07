@@ -430,7 +430,7 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 BitmapDescriptorFactory.fromResource(R.drawable.ic_available_truck)
             } else {
                 println(null.toString())
-                when (tp.tripDetail?.overviewStatus?.toString()?.toLowerCase(Locale.getDefault())) {
+                when (tp.tripDetail?.overviewStatus?.toLowerCase(Locale.getDefault())) {
                     "toPickup".toLowerCase(Locale.getDefault()) -> BitmapDescriptorFactory.fromResource(R.drawable.ic_enroute_truck)
                     "toDelivery".toLowerCase(Locale.getDefault()) -> BitmapDescriptorFactory.fromResource(R.drawable.ic_truck_to_delivery)
                     "atDestination".toLowerCase(Locale.getDefault()) -> BitmapDescriptorFactory.fromResource(R.drawable.ic_active_trip_truck)
