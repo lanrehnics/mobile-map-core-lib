@@ -1,7 +1,5 @@
 package com.kobo.mobile_map_core.mobile_map_core.ui.map
 
-import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.Autocomplete
-import com.kobo.mobile_map_core.mobile_map_core.data.models.SelectedAddrss
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -9,7 +7,9 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.view.View
-import android.widget.*
+import android.widget.RelativeLayout
+import android.widget.SeekBar
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -29,8 +29,10 @@ import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiHelper
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiServiceImpl
 import com.kobo.mobile_map_core.mobile_map_core.data.models.ClearCommand
 import com.kobo.mobile_map_core.mobile_map_core.data.models.PrepareFragmentModel
+import com.kobo.mobile_map_core.mobile_map_core.data.models.SelectedAddrss
 import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.Location
 import com.kobo.mobile_map_core.mobile_map_core.data.models.asset_class_model.AssetClasses
+import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.Autocomplete
 import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.TruckData
 import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.TruckDataConst
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.Trucks
@@ -50,14 +52,13 @@ import com.xdev.mvvm.utils.Status
 import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.android.synthetic.main.battlefield_landing_activity_main.*
 import kotlinx.android.synthetic.main.fragment_user_options.*
-import kotlinx.android.synthetic.main.search_available_truck.*
 import kotlinx.android.synthetic.main.search_available_order.*
+import kotlinx.android.synthetic.main.search_available_truck.*
 import timber.log.Timber
-import java.lang.Exception
 
 
 class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
-        GoogleMap.OnMarkerClickListener, View.OnClickListener, SearchForPlaces.OnAddressSelectedListener, UseFulFragmentsInterface.SwitchToMapClickListener, UseFulFragmentsInterface.OnInfoClickedListener, UseFulFragmentsInterface.OnCloseButtonClickListener {
+        GoogleMap.OnMarkerClickListener, View.OnClickListener, SearchForPlaces.OnAddressSelectedListener, UseFulFragmentsInterface.SwitchToMapClickListener, UseFulFragmentsInterface.OnInfoClickedListener, UseFulFragmentsInterface.OnCloseButtonClickListener, GoogleMap.OnMyLocationButtonClickListener {
 
     private lateinit var mapLandingViewModel: MapLandingViewModel
     private lateinit var assetClasses: AssetClasses
@@ -208,9 +209,11 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         userTypeAction.setMap(mMap, clusterManager, ordersClusterManager)
         setClusterManagerClickListener()
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
-        //mMap.isTrafficEnabled = true
+//        mMap.isTrafficEnabled = true
         mMap.isIndoorEnabled = false
         mMap.isBuildingsEnabled = true
+        mMap.isMyLocationEnabled = true
+        mMap.setOnMyLocationButtonClickListener(this)
 //        mMap.uiSettings.isCompassEnabled = true
 //        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style))
 
@@ -234,7 +237,9 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
     private fun setUpLocationPermission() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), BattlefieldLandingActivity.LOCATION_PERMISSION_REQUEST_CODE)
+
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+
             return
         } else {
 //            mMap.isMyLocationEnabled = true
@@ -250,21 +255,16 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
                     subscribeForReverseGeocode()
                     fetchAndSubscribeForLocationOverview()
-
-                    //TODO implement map overview here ...
-//                    bootStrapPickupStationsAndTrucks()
                 }
             }
 
             val locationButton = (mMapView.findViewById<View>(Integer.parseInt("1")).parent as View).findViewById<View>(Integer.parseInt("2"))
-
-            locationButton.visibility = View.INVISIBLE
 //
-//            val rlp=locationButton.layoutParams as (RelativeLayout.LayoutParams)
-//            // position on right bottom
-//            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP,0)
-//            rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE)
-//            rlp.setMargins(0,0,60,30)
+            val rlp=locationButton.layoutParams as (RelativeLayout.LayoutParams)
+            // position on right bottom
+            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP,0)
+            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP,RelativeLayout.TRUE)
+            rlp.setMargins(0,30,60,30)
         }
     }
 
@@ -704,7 +704,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
             }
         }
         mMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(currentLatLng, 14.5F),
+                CameraUpdateFactory.newLatLngZoom(currentLatLng, 13.0F),
                 object : GoogleMap.CancelableCallback {
                     override fun onFinish() {
                         overviewBottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -713,7 +713,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
                     override fun onCancel() {}
                 })
         var circleOptions = CircleOptions()
-                .center(currentLatLng).radius(1000.0)
+                .center(currentLatLng).radius(3000.0)
                 .fillColor(Color.parseColor("#5029489b"))
                 .strokeColor(Color.parseColor("#29489b"))
                 .strokeWidth(1F)
@@ -742,7 +742,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
         if ((truckData.radiusInKM != null) && truckData.type == TruckDataConst.TYPE_RADIUS) {
             val circleOptions = CircleOptions()
-                    .center(globalSelectedAdd.pickUp?.latLng).radius(1000.0)
+                    .center(globalSelectedAdd.pickUp?.latLng).radius((truckData.radiusInKM * 1000.0))
                     .fillColor(Color.parseColor("#5029489b"))
                     .strokeColor(Color.parseColor("#29489b"))
                     .strokeWidth(1F)
@@ -810,4 +810,8 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     }
 
     private fun String?.toEditable(): Editable = Editable.Factory.getInstance().newEditable(this)
+    override fun onMyLocationButtonClick(): Boolean {
+        setUpLocationPermission()
+        return true
+    }
 }

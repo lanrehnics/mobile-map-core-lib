@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat.startActivity
 import androidx.preference.PreferenceManager.getDefaultSharedPreferences
-import com.androidnetworking.AndroidNetworking
 import com.kobo.mobile_map_core.mobile_map_core.data.models.NavigationData
 import com.kobo.mobile_map_core.mobile_map_core.ui.map.BattlefieldLandingActivity
 import com.kobo.mobile_map_core.mobile_map_core.ui.map.NavigationActivity
