@@ -42,6 +42,7 @@ class MobileMapCorePlugin : MethodCallHandler {
         const val KEY_TRIP_ID = "trip_id"
         const val KEY_READABLE_TRIP_ID = "trip_read_id"
         const val KEY_GEO_BASE_URL = "geo_base_url"
+        const val KEY_GPS_BASE_URL = "gps_base_url"
         const val KEY_KOBO_BASE_URL = "kobo_base_url"
         const val KEY_ENVIRONMENT = "environment"
         const val KEY_SIMULATE_ROUTE_FOR_DRIVER = "simulate"
@@ -89,7 +90,11 @@ class MobileMapCorePlugin : MethodCallHandler {
                 val appType = args?.get(KEY_APP_TYPE) as String?
                 val userTypeAndId = args?.get(KEY_USER_TYPE_AND_ID) as String?
                 val authToken = args?.get(KEY_AUTH_TOKEN) as String?
-                val geoBaseUrl = args?.get(KEY_GEO_BASE_URL) as String?
+                val geoBaseUrl = if(args?.get(KEY_GEO_BASE_URL) != null ){
+                    args?.get(KEY_GEO_BASE_URL) as String?
+                } else {
+                    args?.get(KEY_GPS_BASE_URL) as String?
+                }
                 val koboBaseUrl = args?.get(KEY_KOBO_BASE_URL) as String?
                 val id = args?.get(KEY_ID) as Int
                 val userFirstName = args[KEY_USER_FIRST_NAME] as String?

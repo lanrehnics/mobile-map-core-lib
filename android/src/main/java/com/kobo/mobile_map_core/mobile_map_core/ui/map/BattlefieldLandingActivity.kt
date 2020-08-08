@@ -529,7 +529,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
                 fragment.setOnTruckInfoClickedListener(this)
                 fragment.setOnAvailableTruckCloseButtonClickListener(this)
                 val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
-                fragmentTransaction.add(R.id.mainMapHome, fragment, "fragmentSearchAvailableOrders").addToBackStack("fragmentSearchAvailableTrucks").commit()
+                fragmentTransaction.add(R.id.mainMapHome, fragment, "fragmentSearchAvailableOrders").addToBackStack("fragmentSearchAvailableOrders").commit()
             }
 
             else -> {
