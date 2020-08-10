@@ -39,13 +39,22 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                         "${SessionManager.userType.toLowerCase()}Id=${SessionManager.userId}",
                     "token": SessionManager.token,
                     "id": SessionManager.userId,
-                    "user_first_name": "Olanrewaju",
                     "user_name": SessionManager.name,
                     "kobo_base_url": "https://stage.api.kobo360.com/",
                     "gps_base_url": "https://stagegpsapi.kobo360.com/v2/",
-                    "geo_base_url": "https://stagegpsapi.kobo360.com/v2/",
+//                    "geo_base_url": "https://stagegpsapi.kobo360.com/v2/",
                     "environment": "staging",
-                    "simulate": true
+                    "simulate": true,
+
+//                    "app_type": AppConfig.KOBO_CUSTOMER_APP,
+//                    "token": SessionManager.authToken,
+//                    "id": SessionManager.userTypeId,
+//                    "user_type_and_id":
+//                        "${SessionManager.userType}Id=${SessionManager.userTypeId}",
+//                    "user_name": SessionManager.firstName,
+//                    "geo_base_url": SessionManager.geoBaseUrl,
+//                    "kobo_base_url": SessionManager.baseUrl,
+//                    "environment": SessionManager.environment
                   });
                 },
                 child: Text("Open map"),

@@ -1,10 +1,14 @@
 package com.kobo.mobile_map_core.mobile_map_core.ui.map
 
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.location.GpsStatus
+import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings
 import android.text.Editable
 import android.view.View
 import android.widget.RelativeLayout
@@ -48,6 +52,7 @@ import com.kobo.mobile_map_core.mobile_map_core.ui.user_actions.CustomerActionsI
 import com.kobo.mobile_map_core.mobile_map_core.ui.user_actions.PartnerActionImpl
 import com.kobo.mobile_map_core.mobile_map_core.ui.user_actions.UserTypeAction
 import com.kobo.mobile_map_core.mobile_map_core.ui.viewmodel.MapLandingViewModel
+import com.kobo.mobile_map_core.mobile_map_core.utils.GpsUtils
 import com.xdev.mvvm.utils.Status
 import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.android.synthetic.main.battlefield_landing_activity_main.*
@@ -112,6 +117,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         searchBottomSheetOrder.state = BottomSheetBehavior.STATE_HIDDEN
         truckDetailsBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
         availableOrderBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+
 
     }
 
@@ -197,6 +203,8 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
 
     override fun onMapReady(googleMap: GoogleMap) {
+
+
         mMap = googleMap
         mMap.setOnMapLongClickListener {
             currentLatLng = it
@@ -209,16 +217,9 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         userTypeAction.setMap(mMap, clusterManager, ordersClusterManager)
         setClusterManagerClickListener()
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
-//        mMap.isTrafficEnabled = true
         mMap.isIndoorEnabled = false
         mMap.isBuildingsEnabled = true
-        mMap.isMyLocationEnabled = true
-        mMap.setOnMyLocationButtonClickListener(this)
-//        mMap.uiSettings.isCompassEnabled = true
-//        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style))
-
         mMap.uiSettings.setAllGesturesEnabled(true)
-
         mMap.moveCamera(
                 CameraUpdateFactory.newCameraPosition(
                         CameraPosition.Builder()
@@ -230,7 +231,12 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
                 )
         )
         mMap.setOnMarkerClickListener(this)
-        setUpLocationPermission()
+
+        GpsUtils(this).turnGPSOn {
+            if (it) {
+                setUpLocationPermission()
+            }
+        }
 
 
     }
@@ -242,11 +248,13 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
             return
         } else {
-//            mMap.isMyLocationEnabled = true
             fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
                 // Got last known location. In some rare situations this can be null.
                 // 3
                 if (location != null) {
+
+                    mMap.isMyLocationEnabled = true
+                    mMap.setOnMyLocationButtonClickListener(this)
 //                lastLocation = location
                     currentLatLng = LatLng(location.latitude, location.longitude)
 
@@ -260,11 +268,11 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
             val locationButton = (mMapView.findViewById<View>(Integer.parseInt("1")).parent as View).findViewById<View>(Integer.parseInt("2"))
 //
-            val rlp=locationButton.layoutParams as (RelativeLayout.LayoutParams)
+            val rlp = locationButton.layoutParams as (RelativeLayout.LayoutParams)
             // position on right bottom
-            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP,0)
-            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP,RelativeLayout.TRUE)
-            rlp.setMargins(0,30,60,30)
+            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
+            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
+            rlp.setMargins(0, 30, 60, 30)
         }
     }
 
@@ -361,7 +369,8 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
                                     )
                             )
 
-                            //Load location overview here...
+                            onMapReady(mMap)
+
                         }
                     }
                 }
@@ -811,7 +820,24 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
     private fun String?.toEditable(): Editable = Editable.Factory.getInstance().newEditable(this)
     override fun onMyLocationButtonClick(): Boolean {
-        setUpLocationPermission()
+        GpsUtils(this).turnGPSOn {
+            if (it) {
+                setUpLocationPermission()
+            }
+        }
         return true
+    }
+
+    private fun checkGpsStatus() {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+
+        locationManager?.let {
+            val status = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+            if (!status) {
+                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+        }
+
     }
 }
