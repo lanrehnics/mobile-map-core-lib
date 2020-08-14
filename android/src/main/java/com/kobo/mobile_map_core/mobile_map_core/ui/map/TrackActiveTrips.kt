@@ -11,17 +11,17 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
 import com.google.android.libraries.maps.CameraUpdateFactory
 import com.google.android.libraries.maps.GoogleMap
 import com.google.android.libraries.maps.model.LatLngBounds
 import com.google.android.libraries.maps.model.MarkerOptions
-//import com.google.android.gms.maps.CameraUpdateFactory
-//import com.google.android.gms.maps.GoogleMap
-//import com.google.android.gms.maps.model.LatLngBounds
-//import com.google.android.gms.maps.model.MarkerOptions
+//import com.google.android.libraries.maps.CameraUpdateFactory
+//import com.google.android.libraries.maps.GoogleMap
+//import com.google.android.libraries.maps.model.LatLngBounds
+//import com.google.android.libraries.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
 import com.kobo.mobile_map_core.mobile_map_core.R
@@ -172,7 +172,7 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
     }
 
     private fun setupViewModel() {
-        getActiveTripsViewModel = ViewModelProviders.of(
+        getActiveTripsViewModel = ViewModelProvider(
                 this,
                 ViewModelFactory(ApiHelper(ApiServiceImpl(this)))
         ).get(ActiveTripsViewModel::class.java)
@@ -414,11 +414,13 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
 
                             selectedMarker = mMap.addMarker(
                                     truckInfo.lastKnownLocation?.coordinates?.let { it1 -> toLatLng(it1) }?.let { it2 ->
-                                        MarkerOptions()
-                                                .position(it2)
-                                                //                                                .title(selectedTruck!!.d.reg_number)
-                                                .rotation(truckInfo.bearing.toFloat())
-                                                .icon(truckFromStatus(truckInfo))
+                                        truckInfo.bearing?.toFloat()?.let { it1 ->
+                                            MarkerOptions()
+                                                    .position(it2)
+                                                    //                                                .title(selectedTruck!!.d.reg_number)
+                                                    .rotation(it1)
+                                                    .icon(truckFromStatus(truckInfo))
+                                        }
                                     }
                             )
 

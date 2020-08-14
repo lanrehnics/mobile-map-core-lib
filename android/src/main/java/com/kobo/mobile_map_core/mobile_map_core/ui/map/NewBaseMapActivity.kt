@@ -71,7 +71,7 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
     protected lateinit var currentLatLng: LatLng
     protected lateinit var fusedLocationClient: FusedLocationProviderClient
     protected lateinit var clusterManager: ClusterManager<TruckClusterItem>
-    protected var truckMarkerManager: MutableMap<String, Trucks>? = mutableMapOf()
+    protected var truckMarkerManager: MutableMap<String?, Trucks>? = mutableMapOf()
     protected var tripMarkerManager: MutableMap<String, Trucks>? = mutableMapOf()
     protected var markerManager: MutableMap<String, Marker> = mutableMapOf()
 
@@ -280,11 +280,13 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         selectedMarker = mMap.addMarker(
                 truckInfo.lastKnownLocation?.coordinates?.let { it1 -> toLatLng(it1) }?.let { it2 ->
-                    MarkerOptions()
-                            .position(it2)
-                            //                                                .title(selectedTruck!!.d.reg_number)
-                            .rotation(truckInfo.bearing.toFloat())
-                            .icon(truckFromStatus(truckInfo))
+                    truckInfo.bearing?.toFloat()?.let {
+                        MarkerOptions()
+                                .position(it2)
+                                //                                                .title(selectedTruck!!.d.reg_number)
+                                .rotation(it)
+                                .icon(truckFromStatus(truckInfo))
+                    }
                 }
         )
 
@@ -328,10 +330,12 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         truckInfo.lastKnownLocation?.let { lkl ->
             val marker = mMap.addMarker(
-                    MarkerOptions()
-                            .position(toLatLngNotNull(lkl.coordinates))
-                            .rotation(truckInfo.bearing.toFloat())
-                            .icon(truckFromStatus(truckInfo))
+                    truckInfo.bearing?.toFloat()?.let {
+                        MarkerOptions()
+                                .position(toLatLngNotNull(lkl.coordinates))
+                                .rotation(it)
+                                .icon(truckFromStatus(truckInfo))
+                    }
             )
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(toLatLngNotNull(lkl.coordinates), 17f))
 
@@ -363,6 +367,8 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val supportMapFragment = SupportMapFragment.newInstance(GoogleMapOptions()
                 .mapId(resources.getString(R.string.map_id)))
+
+//        val supportMapFragment = SupportMapFragment.newInstance()
         supportFragmentManager.beginTransaction().add(R.id.mainActiveTripsHome, supportMapFragment).addToBackStack("mapFragment").commit()
         supportMapFragment.getMapAsync(this)
     }
@@ -407,7 +413,7 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
         fun truckFromStatus(tp: Trucks): BitmapDescriptor? {
 
 
-            return if (!tp.onTrip) {
+            return if (!tp.onTrip!!) {
                 BitmapDescriptorFactory.fromResource(R.drawable.ic_available_truck)
             } else {
                 when (tp.tripDetail?.overviewStatus.toString().toLowerCase(Locale.getDefault())) {

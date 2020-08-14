@@ -5,19 +5,21 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.SelectedAddrss
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kobo.mobile_map_core.mobile_map_core.R
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiHelper
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiServiceImpl
+import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.AutoCompleteResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.Overview
 import com.kobo.mobile_map_core.mobile_map_core.ui.base.ViewModelFactory
 import com.kobo.mobile_map_core.mobile_map_core.ui.adapter.AutoCompleteAdapter
@@ -29,12 +31,11 @@ import iammert.com.expandablelib.ExpandCollapseListener.CollapseListener
 import iammert.com.expandablelib.ExpandCollapseListener.ExpandListener
 import iammert.com.expandablelib.ExpandableLayout
 import iammert.com.expandablelib.Section
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
 import kotlin.coroutines.CoroutineContext
-
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -60,8 +61,6 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
     private lateinit var expandableLayout: ExpandableLayout
     private lateinit var linearWhereIAmGoing: LinearLayout
     private lateinit var imageViewCircle: ImageView
-    private lateinit var chevrondown: ImageView
-    private lateinit var chevronside: ImageView
     private lateinit var whereGoingToEditText: EditText
     private lateinit var whereIam: EditText
     private lateinit var whereIamTextWatcher: TextWatcher
@@ -84,6 +83,8 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+
+        setupViewModel()
         val view: View = inflater.inflate(R.layout.fragment_search_for_places, container, false)
         suggestedPlacesRecyclerView = view.findViewById(R.id.suggestedPlacesRecyclerView)
         imageViewCircle = view.findViewById(R.id.imageViewCircle)
@@ -100,12 +101,10 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
         whereGoingToEditText.addTextChangedListener(whereGoingToEditTextWatcher)
 
 
-
         configureViewMode()
 
         setUpExpandableView(view)
         setupUI()
-        setupViewModel()
         return view
     }
 
@@ -131,7 +130,6 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
                     // if visible, then the mode shouldn't change
                     mode = 0
                 }
-
                 launch {
                     delay(300)  //debounce timeOut
                     if (searchText != searchFor)
@@ -188,12 +186,14 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
         searchForPlacesViewModel.getPlaces(searchTerm).observe(viewLifecycleOwner, Observer {
             when (it.status) {
                 Status.SUCCESS -> {
+
                     if (mode == 0) {
                         progressWhereIAm.visibility = View.GONE
                     } else {
                         progressWhereGoing.visibility = View.GONE
                     }
-                    it.data?.let { autoComplete -> renderList(autoComplete.data.autocomplete) }
+
+                    it.data?.let { autoComplete -> renderList(autoComplete) }
                 }
                 Status.LOADING -> {
                     if (mode == 0) {
@@ -238,15 +238,15 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
     }
 
 
-    private fun renderList(results: List<Autocomplete>?) {
-        adapter.addData(results)
+    private fun renderList(results: AutoCompleteResponse) {
+        adapter.addData(results.data.autocomplete)
         adapter.notifyDataSetChanged()
     }
 
     private fun setupViewModel() {
-        searchForPlacesViewModel = ViewModelProviders.of(
+        searchForPlacesViewModel = ViewModelProvider(
                 this,
-                ViewModelFactory(ApiHelper(ApiServiceImpl( requireActivity())))
+                ViewModelFactory(ApiHelper(ApiServiceImpl(requireActivity())))
         ).get(SearchForPlacesViewModel::class.java)
     }
 
@@ -303,7 +303,7 @@ class SearchForPlaces : Fragment(), OnAutoCompleteItemClickListener, CoroutineSc
     override fun onItemClicked(address: Autocomplete) {
         when (mode) {
             0 -> {
-                callback.onSelect(SelectedAddrss(address, null,mode))
+                callback.onSelect(SelectedAddrss(address, null, mode))
             }
             else -> {
                 callback.onSelect(SelectedAddrss(null, address, mode))

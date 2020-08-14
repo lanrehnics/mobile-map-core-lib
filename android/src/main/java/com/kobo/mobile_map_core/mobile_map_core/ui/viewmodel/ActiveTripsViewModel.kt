@@ -22,7 +22,6 @@ class ActiveTripsViewModel(private val mainRepository: MainRepository) : ViewMod
 
 
     fun fetchActiveTrips(userTypeAndId: String, filterBy: String? = null) {
-        println("")
         listOfActiveTrips.postValue(Resource.loading(null))
         compositeDisposable.add(
                 mainRepository.fetchActiveTrips(userTypeAndId,filterBy)

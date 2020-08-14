@@ -56,6 +56,14 @@ class LiteHttp private constructor() {
         return execute(builder)
     }
 
+    suspend fun getWithHeader(serviceUrl: String, headers: ArrayMap<String, String>?): String? {
+        val builder = Request.Builder()
+        if (headers != null)
+            addHeaders(builder, headers)
+        builder.url(generateUrlParams(serviceUrl, null))
+        return execute(builder)
+    }
+
     suspend fun post(serviceUrl: String, params: ArrayMap<String, Any>): String? {
         return post(serviceUrl, null, params)
     }

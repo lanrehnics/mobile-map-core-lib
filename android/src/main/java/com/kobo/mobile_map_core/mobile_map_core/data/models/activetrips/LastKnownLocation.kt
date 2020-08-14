@@ -5,9 +5,9 @@ import java.io.Serializable
 
 data class LastKnownLocation(
 
-        @SerializedName("type") val type: String,
+        @SerializedName("type") val type: String?,
         @SerializedName("coordinates") val coordinates: List<Double>,
-        @SerializedName("address") val address: String,
-        @SerializedName("_id") val _id: String,
-        @SerializedName("geohash") val geohash: String
+        @SerializedName("address") val address: String?,
+        @SerializedName("_id") val _id: String?,
+        @SerializedName("geohash") val geohash: String?
 ) : Serializable

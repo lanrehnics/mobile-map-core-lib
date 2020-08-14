@@ -8,10 +8,10 @@ import java.io.Serializable
 
 data class Overview(
         @SerializedName("location") val location: Location?,
-        @SerializedName("lastKnownLocation") val lastKnownLocation: LastKnownLocation,
+        @SerializedName("lastKnownLocation") val lastKnownLocation: LastKnownLocation?,
         @SerializedName("totalAvailableTrucks") val totalAvailableTrucks: Int?,
         @SerializedName("totalActiveTrucks") val totalActiveTrucks: Int?,
-        @SerializedName("trucks") val trucks: List<Trucks?>,
+        @SerializedName("trucks") val trucks: List<Trucks?>?,
         @SerializedName("customerLocations") val customerLocations: List<CustomerLocations?>?,
         @SerializedName("kobocareStations") val kobocareStations: List<KobocareStations?>?
 ) : Serializable

@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -79,7 +79,7 @@ class ActiveTripsFragmentList : Fragment() {
     }
 
     private fun setupViewModel() {
-        getActiveTripsViewModel = ViewModelProviders.of(
+        getActiveTripsViewModel = ViewModelProvider(
                 this,
                 ViewModelFactory(ApiHelper(ApiServiceImpl(requireActivity())))
         ).get(ActiveTripsViewModel::class.java)

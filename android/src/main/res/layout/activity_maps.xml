@@ -17,6 +17,15 @@
             map:mapId="@string/map_id"
             tools:context=".MapsActivity" />
 
+
+        <!--        <fragment-->
+        <!--            android:id="@+id/map"-->
+        <!--            class="com.google.android.gms.maps.SupportMapFragment"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="match_parent"-->
+        <!--            tools:context=".MapsActivity" />-->
+
+
         <ImageView
             android:id="@+id/switchToList"
             android:layout_width="72dp"

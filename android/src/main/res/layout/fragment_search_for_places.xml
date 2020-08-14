@@ -1,152 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    android:orientation="vertical"
     tools:context=".ui.fragments.SearchForPlaces">
 
-    <ImageView
-        android:id="@+id/backButton"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:src="@drawable/ic_arrowback" />
-
     <LinearLayout
-        android:id="@+id/linearWhereIam"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingLeft="20dp">
-
-        <ImageView
-            android:id="@+id/imageViewPolygon"
-            android:layout_width="13dp"
-            android:layout_height="13dp"
-            android:src="@drawable/ic_polygon" />
-
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical">
-
-            <EditText
-                android:id="@+id/whereIam"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="39dp"
-                android:layout_marginEnd="20dp"
-                android:background="@drawable/holo_bg"
-                android:hint="Pickup location"
-                android:paddingLeft="10dp"
-                android:textColor="@color/colorPrimaryText"
-                android:textColorHint="@color/colorDividerGrey" />
-
-            <ProgressBar
-                android:layout_marginRight="30dp"
-                android:indeterminateDrawable="@drawable/progress"
-                android:layout_alignParentRight="true"
-                android:layout_centerInParent="true"
-                android:visibility="invisible"
-                android:id="@+id/progressWhereIAm"
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_width="35dp"
-                android:layout_height="35dp">
-            </ProgressBar>
-
-        </RelativeLayout>
-
-
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:id="@+id/linearWhereIAmGoing"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingLeft="20dp">
-
-        <ImageView
-            android:id="@+id/imageViewCircle"
-            android:layout_width="13dp"
-            android:layout_height="13dp"
-            android:layout_marginEnd="0dp"
-            android:src="@drawable/ic_ellipse" />
-
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:gravity="center_vertical"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/whereGoingToEditText"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="39dp"
-                android:layout_marginEnd="20dp"
-                android:background="@drawable/holo_bg"
-                android:hint="Where to?"
-                android:paddingLeft="10dp"
-                android:textColor="@color/colorPrimaryText"
-                android:textColorHint="@color/colorDividerGrey" />
-
-            <ProgressBar
-                android:layout_marginRight="30dp"
-                android:indeterminateDrawable="@drawable/progress"
-                android:layout_alignParentRight="true"
-                android:layout_centerInParent="true"
-                android:visibility="invisible"
-                android:id="@+id/progressWhereGoing"
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_width="30dp"
-                android:layout_height="30dp">
-            </ProgressBar>
-
-        </RelativeLayout>
-
-    </LinearLayout>
-
-
-    <View
-        android:id="@+id/view2"
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/trans_grad" />
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="5dp"
         android:orientation="vertical">
 
-        <iammert.com.expandablelib.ExpandableLayout
-            android:id="@+id/el"
+        <ImageView
+            android:id="@+id/backButton"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/ic_arrowback" />
+
+        <LinearLayout
+            android:id="@+id/linearWhereIam"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:childLayout="@layout/item_saved_places"
-            app:parentLayout="@layout/item_saved_parent" />
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="20dp">
+
+            <ImageView
+                android:id="@+id/imageViewPolygon"
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:src="@drawable/ic_polygon" />
 
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/suggestedPlacesRecyclerView"
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+
+                <EditText
+                    android:id="@+id/whereIam"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="39dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/holo_bg"
+                    android:hint="Pickup location"
+                    android:paddingLeft="10dp"
+                    android:textColor="@color/colorPrimaryText"
+                    android:textColorHint="@color/colorDividerGrey" />
+
+                <ProgressBar
+                    android:id="@+id/progressWhereIAm"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerInParent="true"
+                    android:layout_marginRight="30dp"
+                    android:indeterminateDrawable="@drawable/progress"
+                    android:visibility="invisible"></ProgressBar>
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/linearWhereIAmGoing"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="20dp">
+
+            <ImageView
+                android:id="@+id/imageViewCircle"
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:layout_marginEnd="0dp"
+                android:src="@drawable/ic_ellipse" />
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+
+                <EditText
+                    android:id="@+id/whereGoingToEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="39dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/holo_bg"
+                    android:hint="Where to?"
+                    android:paddingLeft="10dp"
+                    android:textColor="@color/colorPrimaryText"
+                    android:textColorHint="@color/colorDividerGrey" />
+
+                <ProgressBar
+                    android:id="@+id/progressWhereGoing"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerInParent="true"
+                    android:layout_marginRight="30dp"
+                    android:indeterminateDrawable="@drawable/progress"
+                    android:visibility="invisible"></ProgressBar>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+
+        <View
+            android:id="@+id/view2"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/trans_grad" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:orientation="vertical">
+
+            <iammert.com.expandablelib.ExpandableLayout
+                android:id="@+id/el"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:childLayout="@layout/item_saved_places"
+                app:parentLayout="@layout/item_saved_parent" />
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/suggestedPlacesRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+
+        </LinearLayout>
 
 
     </LinearLayout>
-
-
-</LinearLayout>
+</ScrollView>

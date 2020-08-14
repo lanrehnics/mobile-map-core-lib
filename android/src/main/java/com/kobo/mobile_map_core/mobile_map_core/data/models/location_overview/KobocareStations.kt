@@ -9,7 +9,7 @@ data class KobocareStations (
         @SerializedName("products") val products : List<Products?>,
         @SerializedName("vendorId") val vendorId : Int?,
         @SerializedName("vendorName") val vendorName : String?,
-        @SerializedName("stationId") val stationId : Int,
+        @SerializedName("stationId") val stationId : Int?,
         @SerializedName("stationName") val stationName : String?,
         @SerializedName("address") val address : String?,
         @SerializedName("stateCode") val stateCode : Int?,

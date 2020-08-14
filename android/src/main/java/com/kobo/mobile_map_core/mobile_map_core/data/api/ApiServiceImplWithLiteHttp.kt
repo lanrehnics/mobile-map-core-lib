@@ -1,8 +1,10 @@
 package com.kobo.mobile_map_core.mobile_map_core.data.api
 
 import android.content.Context
+import android.util.ArrayMap
 import androidx.preference.PreferenceManager
 import com.google.android.libraries.maps.model.LatLng
+import com.google.gson.Gson
 import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.ActiveTripsDataResponse
 import com.kobo.mobile_map_core.mobile_map_core.AppConfig
 import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
@@ -14,10 +16,16 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.Ov
 import com.kobo.mobile_map_core.mobile_map_core.data.models.orders.AvailableOrdersResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.place_id.PlacesResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.reverse_geocode.ReverseGeocodeResponse
+import com.kobo.mobile_map_core.mobile_map_core.utils.client.LiteHttp
+import com.kobo360.models.polyline.PolylineJsonDecoder
 import com.rx2androidnetworking.Rx2AndroidNetworking
 import io.reactivex.Single
+import io.reactivex.internal.operators.observable.ObservableSingleSingle
+import kotlinx.coroutines.GlobalScope
+//import kotlinx.coroutines.rx2.rxSingle
+import java.lang.Exception
 
-class ApiServiceImpl(val context: Context) : ApiService {
+class ApiServiceImplWithLiteHttp(val context: Context) : ApiService {
 
 
     private fun getToken(): String? {
@@ -62,6 +70,24 @@ class ApiServiceImpl(val context: Context) : ApiService {
                 .build()
                 .getObjectSingle(ReverseGeocodeResponse::class.java)
     }
+
+
+//    override fun getReverseGeocode(lat: Double, lng: Double): Single<ReverseGeocodeResponse> {
+//        return rxSingle {
+//            try {
+//
+//                val headers: ArrayMap<String, String> = ArrayMap()
+//                headers["Authorization"] = getToken()
+//
+//                val res = LiteHttp.instance?.getWithHeader(AppConfig.reverseGeocode(context, lat, lng), headers)
+//                print(res.toString())
+//                val result = Gson().fromJson(res.toString(), ReverseGeocodeResponse::class.java)
+//                result
+//            } catch (e: Exception) {
+//                throw  e
+//            }
+//        }
+//    }
 
 
     override fun fetchAvailableTrucks(origin: LatLng?, destination: LatLng?, radius: Int?, assetId: String): Single<AvailableTruckResponse> {

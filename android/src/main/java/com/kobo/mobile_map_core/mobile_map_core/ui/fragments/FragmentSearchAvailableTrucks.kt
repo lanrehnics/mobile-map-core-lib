@@ -15,6 +15,7 @@ import com.kobo.mobile_map_core.mobile_map_core.ui.adapter.AvailableTruckListAda
 import com.kobo.mobile_map_core.mobile_map_core.ui.adapter.OnAvailableTruckItemClickListener
 import com.kobo.mobile_map_core.mobile_map_core.ui.fragments.`interface`.UseFulFragmentsInterface
 import com.todkars.shimmer.ShimmerRecyclerView
+import java.util.*
 
 private const val ARG_PARAM1 = "param1"
 

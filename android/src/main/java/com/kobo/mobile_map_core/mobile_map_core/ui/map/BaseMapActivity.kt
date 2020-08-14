@@ -87,7 +87,7 @@ abstract class BaseMapActivity : AppCompatActivity() {
 
     private var parserCounter = 0
 
-    protected var itemMarkerManager: MutableMap<String, Any> = mutableMapOf()
+    protected var itemMarkerManager: MutableMap<String?, Any> = mutableMapOf()
     var pickUpStations: MutableMap<Marker, Locations> = mutableMapOf()
     var selectedItem: Any? = null
 

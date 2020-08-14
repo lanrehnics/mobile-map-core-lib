@@ -1,6 +1,7 @@
 package com.kobo.mobile_map_core.mobile_map_core
 
 import android.content.Context
+import android.util.Log
 import androidx.preference.PreferenceManager
 import com.google.android.libraries.maps.model.LatLng
 import java.util.*
@@ -30,6 +31,8 @@ abstract class AppConfig {
 //        private const val BASESTAGGINGURL: String = "https://stage.api.kobo360.com"
 
         fun autoCompleteUrl(context: Context, searchTerms: String): String {
+
+            Log.d(">>>>>>>>>>>>>>>>>", "${getBaseUrl(context)}location/autocomplete?input=${searchTerms}&source=google")
             return "${getBaseUrl(context)}location/autocomplete?input=${searchTerms}&source=google";
         }
 
