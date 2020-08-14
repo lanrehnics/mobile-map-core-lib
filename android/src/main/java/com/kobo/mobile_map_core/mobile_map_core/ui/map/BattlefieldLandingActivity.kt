@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.location.GpsStatus
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
@@ -17,7 +16,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import com.google.android.gms.location.LocationServices
 import com.google.android.libraries.maps.CameraUpdateFactory
@@ -35,6 +34,7 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.ClearCommand
 import com.kobo.mobile_map_core.mobile_map_core.data.models.PrepareFragmentModel
 import com.kobo.mobile_map_core.mobile_map_core.data.models.SelectedAddrss
 import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.Location
+import com.kobo.mobile_map_core.mobile_map_core.data.models.asset_class_model.AssetClassResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.asset_class_model.AssetClasses
 import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.Autocomplete
 import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.TruckData
@@ -42,6 +42,7 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.Tru
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.Trucks
 import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.Overview
 import com.kobo.mobile_map_core.mobile_map_core.data.models.orders.AvailableOrdersData
+import com.kobo.mobile_map_core.mobile_map_core.data.models.reverse_geocode.ReverseGeocodeResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.services.MapService
 import com.kobo.mobile_map_core.mobile_map_core.ui.base.ViewModelFactory
 import com.kobo.mobile_map_core.mobile_map_core.ui.fragments.FragmentSearchAvailableOrders
@@ -121,8 +122,8 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
     }
 
-    private fun setUpSpinner(list: List<AssetClasses>) {
-        userTypeAction.setUpSpinner(this, list) { result ->
+    private fun setUpSpinner(res: AssetClassResponse) {
+        userTypeAction.setUpSpinner(this, res.data.assetClasses) { result ->
             setAssetClasses(result)
         }
     }
@@ -148,7 +149,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 //    }
 
     private fun setupViewModel() {
-        mapLandingViewModel = ViewModelProviders.of(
+        mapLandingViewModel = ViewModelProvider(
                 this,
                 ViewModelFactory(ApiHelper(ApiServiceImpl(this)))
         ).get(MapLandingViewModel::class.java)
@@ -159,7 +160,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         mapLandingViewModel.getGroupedAssetClass().observe(this, androidx.lifecycle.Observer {
             when (it.status) {
                 Status.SUCCESS -> {
-                    it.data?.let { response -> setUpSpinner(response.data.assetClasses) }!!
+                    it.data?.let { response -> setUpSpinner(response) }
                 }
                 Status.LOADING -> {
 //                    progressBar.visibility = View.VISIBLE
@@ -179,7 +180,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
             when (it.status) {
                 Status.SUCCESS -> {
 
-                    it.data?.let { response -> setMyCurrentLocations(response.data.geocoded.location.address) }!!
+                    it.data?.let { response -> setMyCurrentLocations(response) }
                 }
                 Status.LOADING -> {
 //                    progressBar.visibility = View.VISIBLE
@@ -194,7 +195,9 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         })
     }
 
-    private fun setMyCurrentLocations(address: String) {
+    private fun setMyCurrentLocations(res: ReverseGeocodeResponse) {
+//        Log.i(BattlefieldLandingActivity::class.java.name, ">>>>> ${res.data.geocoded.location.address}")
+        val address = res.data.geocoded.location.address
         globalSelectedAdd.pickUp?.description = address
         tvMyCurrentLocation.text = address
 
@@ -287,7 +290,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
                 Status.SUCCESS -> {
                     pBar.visibility = View.INVISIBLE
                     switchToList.visibility = View.INVISIBLE
-                    it.data?.let { response -> bootstrapLocationOverview(response.data?.overview) }!!
+                    it.data?.let { response -> bootstrapLocationOverview(response.data?.overview) }
                 }
                 Status.LOADING -> {
                     pBar.visibility = View.VISIBLE
@@ -603,7 +606,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         mapLandingViewModel.fetchLatLngFromPlacesId(placesId).observe(this, androidx.lifecycle.Observer {
             when (it.status) {
                 Status.SUCCESS -> {
-                    it.data?.let { response -> setLatLngInfo(response.data.place.geometry.location, add) }!!
+                    it.data?.let { response -> setLatLngInfo(response.data.place.geometry.location, add) }
                 }
                 Status.LOADING -> {
 //                    progressBar.visibility = View.VISIBLE
@@ -632,7 +635,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
                 Status.SUCCESS -> {
                     switchToList.visibility = View.VISIBLE
-                    it.data?.let { response -> bootstrapAvailableTrucksOnMap(response.data.truckData) }!!
+                    it.data?.let { response -> bootstrapAvailableTrucksOnMap(response.data.truckData) }
                 }
 
                 Status.LOADING -> {
@@ -659,7 +662,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
                 Status.SUCCESS -> {
                     switchToList.visibility = View.VISIBLE
-                    it.data?.let { response -> bootstrapAvailableOrdersOnMap(response.data) }!!
+                    it.data?.let { response -> bootstrapAvailableOrdersOnMap(response.data) }
                 }
 
                 Status.LOADING -> {

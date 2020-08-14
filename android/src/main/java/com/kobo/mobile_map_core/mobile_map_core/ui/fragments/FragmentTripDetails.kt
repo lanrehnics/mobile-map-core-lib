@@ -129,12 +129,12 @@ class FragmentTripDetails : Fragment() {
         tvCargoDescription.text = trips.tripDetail?.goodType
         tvCargoSize.text = "N/A"
         tvCurrentNavigation.text = trips.lastKnownLocation?.address
-        tvDriverName.text = trips.driver.firstName
-        tvDriverRating.text = trips.driver.rating.toString()
-        ratingBarDriverRating.rating = trips.driver.rating.toFloat()
+        tvDriverName.text = trips.driver?.firstName
+        tvDriverRating.text = trips.driver?.rating.toString()
+        trips.driver?.rating?.toFloat()?.let {  ratingBarDriverRating.rating = it  }
         activity?.let {
             Glide.with(it)
-                    .load(trips.driver.image)
+                    .load(trips.driver?.image)
                     .placeholder(ColorDrawable(Color.BLACK))
                     .into(profile_image)
         };

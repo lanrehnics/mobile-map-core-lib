@@ -9,7 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.lifecycle.Observer
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -87,7 +87,7 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
     }
 
     private fun setupViewModel() {
-        dedicatedTruckViewModel = ViewModelProviders.of(
+        dedicatedTruckViewModel = ViewModelProvider(
                 this,
                 ViewModelFactory(ApiHelper(ApiServiceImpl(this)))
         ).get(DedicatedTruckViewModel::class.java)
@@ -122,11 +122,12 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
                             truckInfo.lastKnownLocation?.let {
                                 selectedMarker = mMap.addMarker(
                                         toLatLng(it.coordinates)?.let { it1 ->
-                                            MarkerOptions()
-                                                    .position(it1)
-                                                    //                                                .title(selectedTruck!!.d.reg_number)
-                                                    .rotation(truckInfo.bearing.toFloat())
-                                                    .icon(truckFromStatus(truckInfo))
+                                            truckInfo.bearing?.toFloat()?.let { it2 ->
+                                                MarkerOptions()
+                                                        .position(it1)
+                                                        .rotation(it2)
+                                                        .icon(truckFromStatus(truckInfo))
+                                            }
                                         }
 
                                 )
@@ -298,13 +299,13 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
 //        tvRating.text = "N/A"
 //        rbTruckRate.rating = 0f
         tvCurrentNavigation.text = truckInfo.lastKnownLocation?.address
-        tvDriverName.text = truckInfo.driver.firstName
+        tvDriverName.text = truckInfo.driver?.firstName
 //        tvDriverRating.text = selectedTripInfo.driver.rating.toString()
 //        tvMemberSince.text = "Member since: N/A"
 
         this.let {
             Glide.with(it)
-                    .load(truckInfo.driver.image)
+                    .load(truckInfo.driver?.image)
                     .placeholder(ColorDrawable(Color.BLACK))
                     .into(profile_image)
         }
