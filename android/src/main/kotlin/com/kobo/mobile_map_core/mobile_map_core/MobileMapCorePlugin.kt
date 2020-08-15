@@ -156,15 +156,12 @@ class MobileMapCorePlugin : MethodCallHandler {
             "navigate_driver" -> {
 
                 val args = call.arguments() as? Map<String, Any?>?
-                val appType = args?.get(KEY_APP_TYPE) as String?
                 val truckRegNumber = args?.get(KEY_TRUCK_REG_NUMBER) as String?
                 val tripReadId = args?.get(KEY_READABLE_TRIP_ID) as String?
                 val tripId = args?.get(KEY_TRIP_ID) as String?
                 val destination = args?.get(KEY_DESTINATION) as List<Double>?
-                val userTypeAndId = args?.get(KEY_USER_TYPE_AND_ID) as String?
                 val authToken = args?.get(KEY_AUTH_TOKEN) as String?
                 val id = args?.get(KEY_ID) as Int
-                val userFirstName = args[KEY_USER_FIRST_NAME] as String?
 
                 val simulateRouteForDriver = if (args[KEY_SIMULATE_ROUTE_FOR_DRIVER] != null) {
                     args[KEY_SIMULATE_ROUTE_FOR_DRIVER] as Boolean
@@ -193,9 +190,6 @@ class MobileMapCorePlugin : MethodCallHandler {
                 getActiveContext()?.let {
                     getDefaultSharedPreferences(it)
                             .edit()
-                            .putString(KEY_USER_TYPE_AND_ID, userTypeAndId)
-                            .putString(KEY_USER_FIRST_NAME, userFirstName)
-                            .putString(KEY_APP_TYPE, appType)
                             .putString(KEY_AUTH_TOKEN, "Bearer $authToken")
                             .putString(KEY_CLOUDMQTT_HOST, CLOUDMQTT_HOST)
                             .putString(KEY_CLOUDMQTT_USER, CLOUDMQTT_USER)
