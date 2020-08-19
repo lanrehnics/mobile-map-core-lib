@@ -28,7 +28,6 @@ class MobileMapCorePlugin : MethodCallHandler {
         const val APP_TYPE_DRIVER = "driver"
 
 
-
         const val NAVIGATION_DATA = "NAVIGATION_DATA"
 
 
@@ -50,6 +49,7 @@ class MobileMapCorePlugin : MethodCallHandler {
         lateinit var CLOUDMQTT_HOST: String
         lateinit var CLOUDMQTT_USER: String
         lateinit var CLOUDMQTT_PASS: String
+        var simulateRouteForDriver: Boolean = false
 
         private val DEV_CLOUDMQTT_HOST = "tcp://smart-journalist.cloudmqtt.com:1883"
         private val DEV_CLOUDMQTT_USER = "mobileand"
@@ -90,7 +90,7 @@ class MobileMapCorePlugin : MethodCallHandler {
                 val appType = args?.get(KEY_APP_TYPE) as String?
                 val userTypeAndId = args?.get(KEY_USER_TYPE_AND_ID) as String?
                 val authToken = args?.get(KEY_AUTH_TOKEN) as String?
-                val geoBaseUrl = if(args?.get(KEY_GEO_BASE_URL) != null ){
+                val geoBaseUrl = if (args?.get(KEY_GEO_BASE_URL) != null) {
                     args?.get(KEY_GEO_BASE_URL) as String?
                 } else {
                     args?.get(KEY_GPS_BASE_URL) as String?
@@ -105,11 +105,6 @@ class MobileMapCorePlugin : MethodCallHandler {
                     STAGING
                 }
 
-                val simulateRouteForDriver = if (args[KEY_SIMULATE_ROUTE_FOR_DRIVER] != null) {
-                    args[KEY_SIMULATE_ROUTE_FOR_DRIVER] as Boolean
-                } else {
-                    false
-                }
 
 
                 when (environment?.toLowerCase(Locale.getDefault())) {
@@ -122,6 +117,8 @@ class MobileMapCorePlugin : MethodCallHandler {
                         CLOUDMQTT_HOST = DEV_CLOUDMQTT_HOST
                         CLOUDMQTT_USER = DEV_CLOUDMQTT_USER
                         CLOUDMQTT_PASS = DEV_CLOUDMQTT_PASS
+                        simulateRouteForDriver = true
+
                     }
                 }
 
@@ -163,12 +160,6 @@ class MobileMapCorePlugin : MethodCallHandler {
                 val authToken = args?.get(KEY_AUTH_TOKEN) as String?
                 val id = args?.get(KEY_ID) as Int
 
-                val simulateRouteForDriver = if (args[KEY_SIMULATE_ROUTE_FOR_DRIVER] != null) {
-                    args[KEY_SIMULATE_ROUTE_FOR_DRIVER] as Boolean
-                } else {
-                    false
-                }
-
 
                 val environment = args[KEY_ENVIRONMENT] as String?
 
@@ -182,6 +173,7 @@ class MobileMapCorePlugin : MethodCallHandler {
                         CLOUDMQTT_HOST = DEV_CLOUDMQTT_HOST
                         CLOUDMQTT_USER = DEV_CLOUDMQTT_USER
                         CLOUDMQTT_PASS = DEV_CLOUDMQTT_PASS
+                        simulateRouteForDriver = true
                     }
                 }
 
