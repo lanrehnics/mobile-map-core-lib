@@ -4,10 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiHelper
 import com.kobo.mobile_map_core.mobile_map_core.data.repository.MainRepository
-import com.kobo.mobile_map_core.mobile_map_core.ui.viewmodel.ActiveTripsViewModel
-import com.kobo.mobile_map_core.mobile_map_core.ui.viewmodel.DedicatedTruckViewModel
-import com.kobo.mobile_map_core.mobile_map_core.ui.viewmodel.MapLandingViewModel
-import com.kobo.mobile_map_core.mobile_map_core.ui.viewmodel.SearchForPlacesViewModel
+import com.kobo.mobile_map_core.mobile_map_core.ui.viewmodel.*
 
 class ViewModelFactory(private val apiHelper: ApiHelper) : ViewModelProvider.Factory {
 
@@ -25,6 +22,10 @@ class ViewModelFactory(private val apiHelper: ApiHelper) : ViewModelProvider.Fac
 
             modelClass.isAssignableFrom(MapLandingViewModel::class.java) -> {
                 MapLandingViewModel(MainRepository(apiHelper)) as T
+            }
+
+            modelClass.isAssignableFrom(GeneralSearchViewModel::class.java) -> {
+                GeneralSearchViewModel(MainRepository(apiHelper)) as T
             }
             else -> throw IllegalArgumentException("Unknown class name")
         }

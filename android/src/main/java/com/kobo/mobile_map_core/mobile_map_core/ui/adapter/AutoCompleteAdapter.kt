@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.kobo.mobile_map_core.mobile_map_core.R
 import kotlinx.android.synthetic.main.item_auto_complete.view.*
+import java.util.*
 
 class AutoCompleteAdapter(
         private val suggestedPlaces: ArrayList<Autocomplete>, val itemClickListener: OnAutoCompleteItemClickListener

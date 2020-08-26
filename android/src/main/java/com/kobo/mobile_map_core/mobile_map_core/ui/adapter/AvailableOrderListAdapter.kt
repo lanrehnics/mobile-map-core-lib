@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import com.kobo.mobile_map_core.mobile_map_core.R
 import com.kobo.mobile_map_core.mobile_map_core.data.models.orders.Orders
 import kotlinx.android.synthetic.main.item_available_order.view.*
+import java.util.*
 
 class AvailableOrderListAdapter(private val availableOrderList: ArrayList<Orders?>, val itemClickListener: OnAvailableOrderItemClickListener) : RecyclerView.Adapter<AvailableOrderListAdapterHolder>() {
 

@@ -10,6 +10,7 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.asset_class_model.As
 import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.AutoCompleteResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.AvailableTruckResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.DedicatedTruckResponse
+import com.kobo.mobile_map_core.mobile_map_core.data.models.gsearch.GeneralSearchResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.OverviewResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.orders.AvailableOrdersResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.place_id.PlacesResponse
@@ -27,6 +28,17 @@ class ApiServiceImpl(val context: Context) : ApiService {
         return shaper.getString(MobileMapCorePlugin.KEY_AUTH_TOKEN, "")
     }
 
+
+    override fun searchForData(query: MutableMap<String, String?>): Single<GeneralSearchResponse> {
+        query["limit"] = "10"
+        return Rx2AndroidNetworking.get(AppConfig.searchForData(context))
+                .addHeaders("Authorization", getToken())
+                .addQueryParameter(query)
+                .build()
+                .getObjectSingle(GeneralSearchResponse::class.java)
+
+//                .addQueryParameter("searchTerm",query["searchTerm"])
+    }
 
     override fun fetchPlacesByAutoComplete(searchTerms: String): Single<AutoCompleteResponse> {
         return Rx2AndroidNetworking.get(AppConfig.autoCompleteUrl(context, searchTerms))
@@ -66,8 +78,7 @@ class ApiServiceImpl(val context: Context) : ApiService {
 
     override fun fetchAvailableTrucks(origin: LatLng?, destination: LatLng?, radius: Int?, assetId: String): Single<AvailableTruckResponse> {
         return Rx2AndroidNetworking.get(
-                AppConfig.availableTrucks(context, origin
-                        , destination, radius, assetId))
+                AppConfig.availableTrucks(context, origin, destination, radius, assetId))
                 .addHeaders("Authorization", getToken())
                 .build()
                 .getObjectSingle(AvailableTruckResponse::class.java)

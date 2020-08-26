@@ -5,6 +5,7 @@ import com.google.android.libraries.maps.model.LatLng
 
 class ApiHelper(private val apiService: ApiService) {
     fun fetchPlacesByAutoComplete(searchTerms: String) = apiService.fetchPlacesByAutoComplete(searchTerms)
+    fun searchForData(query: MutableMap<String, String?>) = apiService.searchForData(query)
     fun fetchActiveTrips(userTypeAndId: String, filterBy: String?) = apiService.fetchActiveTrips(userTypeAndId, filterBy)
     fun fetchDedicatedTruck(userTypeAndId: String) = apiService.fetchDedicatedTruck(userTypeAndId)
     fun fetchGroupedAssetClass() = apiService.fetchGroupedAssetClass()

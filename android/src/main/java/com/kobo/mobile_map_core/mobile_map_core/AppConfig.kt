@@ -31,9 +31,11 @@ abstract class AppConfig {
 //        private const val BASESTAGGINGURL: String = "https://stage.api.kobo360.com"
 
         fun autoCompleteUrl(context: Context, searchTerms: String): String {
-
-            Log.d(">>>>>>>>>>>>>>>>>", "${getBaseUrl(context)}location/autocomplete?input=${searchTerms}&source=google")
             return "${getBaseUrl(context)}location/autocomplete?input=${searchTerms}&source=google";
+        }
+
+        fun searchForData(context: Context): String {
+            return "${getBaseUrl(context)}location/search";
         }
 
         fun activeTripsUrl(context: Context, userTypeAndId: String, filterBy: String?): String {

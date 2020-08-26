@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
         <fragment
             android:id="@+id/map"
             class="com.google.android.libraries.maps.SupportMapFragment"
@@ -16,6 +17,42 @@
             android:layout_height="match_parent"
             map:mapId="@string/map_id"
             tools:context=".MapsActivity" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:id="@+id/clearSearch"
+            android:layout_marginTop="15dp"
+            android:src="@drawable/ic_clear" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/searchCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="60dp"
+            android:elevation="10dp">
+
+            <EditText
+                android:id="@+id/etTruckSearch"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:background="@drawable/search_bg_two"
+                android:clickable="true"
+                android:drawableRight="@drawable/ic_search"
+                android:focusable="false"
+                android:fontFamily="@font/avenir_regular"
+                android:hint="Search"
+                android:onClick="openSearchFragment"
+                android:paddingLeft="13dp"
+                android:paddingRight="18dp"
+                android:textColor="@color/colorPrimaryText"
+                android:textColorHint="@color/transparentColorPrimaryText"
+                android:textSize="16sp" />
+
+        </androidx.cardview.widget.CardView>
 
 
         <!--        <fragment-->

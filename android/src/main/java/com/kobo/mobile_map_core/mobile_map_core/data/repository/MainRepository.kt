@@ -7,6 +7,7 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.asset_class_model.As
 import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.AutoCompleteResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.AvailableTruckResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.DedicatedTruckResponse
+import com.kobo.mobile_map_core.mobile_map_core.data.models.gsearch.GeneralSearchResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.OverviewResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.orders.AvailableOrdersResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.place_id.PlacesResponse
@@ -17,6 +18,10 @@ class MainRepository(private val apiHelper: ApiHelper) {
 
     fun fetchPlacesByAutoComplete(searchTerms: String): Single<AutoCompleteResponse> {
         return apiHelper.fetchPlacesByAutoComplete(searchTerms)
+    }
+
+    fun searchForData(query: MutableMap<String, String?>): Single<GeneralSearchResponse> {
+        return apiHelper.searchForData(query)
     }
 
     fun fetchActiveTrips(userTypeAndId: String, filterBy: String?): Single<ActiveTripsDataResponse> {

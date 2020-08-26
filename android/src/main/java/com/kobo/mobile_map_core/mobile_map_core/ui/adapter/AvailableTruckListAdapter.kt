@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import com.kobo.mobile_map_core.mobile_map_core.R
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.Trucks
 import kotlinx.android.synthetic.main.item_available_truck.view.*
+import java.util.*
 
 class AvailableTruckListAdapter(private val availableTruckList: ArrayList<Trucks?>, val itemClickListener: OnAvailableTruckItemClickListener) : RecyclerView.Adapter<AvailableTruckListAdapterAdapterHolder>() {
 

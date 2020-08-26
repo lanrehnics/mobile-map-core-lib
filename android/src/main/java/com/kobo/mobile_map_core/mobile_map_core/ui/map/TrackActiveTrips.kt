@@ -443,69 +443,6 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
 
                                 }
                             }
-//                            truckInfo.locations?.let {
-//                                TruckMover(mMap, context, selectedMarker).showMovingTruck(
-//                                        ArrayList(it)
-//                                )}
-
-
-                            // clusterManager has access to display markers
-                            // try extract the selected marker from the marker manager in clusterManager
-//                            selectedMarker = getMarkerFromClusterCollections(it)
-
-
-//                            if (selectedTruck?.d?.resourceType == "truck") {
-//                                // Clear all geopoints and clustered markers
-//                                clearMapAndData(ClearCommand.MAP)
-////                                backArrowButton.visibility = View.INVISIBLE
-////                                btnCloseTruckInfo.visibility = View.VISIBLE
-////                                btnCloseTruckInfo.visibility = View.VISIBLE
-//                                currentDisplayMode = DisplayMode.SINGLE
-//                                setTruckDetails()
-//                                if (overviewBottomSheet.state == BottomSheetBehavior.STATE_HIDDEN) {
-//                                    overviewBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
-//                                }
-//                                val destinationLatitude: Double =
-//                                        selectedTruck!!.d.deliveryStation.location.coordinates[0]
-//                                val destinationLongitude: Double =
-//                                        selectedTruck!!.d.deliveryStation.location.coordinates[1]
-//
-//
-//                                val origin = toGeoPoint(selectedMarker.position)
-//
-//                                val marker = mMap.addMarker(
-//                                        MarkerOptions()
-//                                                .position(toLatLng(origin))
-//                                                .title(selectedTruck!!.d.reg_number)
-//                                                .rotation(selectedTruck!!.d.bearing.toFloat())
-//                                                .icon(truckFromStatus(selectedTruck!!))
-//                                )
-//
-//                                // Reset marker after adding new marker
-//                                selectedMarker = marker
-//                                markerManager[selectedTruck!!.d.reg_number] = marker
-//
-//                                val destination = GeoPoint(destinationLatitude, destinationLongitude)
-//
-//                                if (destinationLatitude > 0 && destinationLongitude > 0)
-//                                    GlobalScope.launch(Dispatchers.Main) {
-//                                        try {
-//                                            val polyLineList =
-//                                                    mapService.getPolyline(origin, destination)
-//                                            if (polyLineList.isNotEmpty()) {
-//                                                drawPolyLine(polyLineList)
-//                                            }
-//                                        } catch (e: Exception) {
-//                                            Log.e(
-//                                                    TAG,
-//                                                    "Error fetching customers locations ${e.message}"
-//                                            )
-//                                        }
-//                                    }
-//
-//                            } else {
-//                                selectedMarker.showInfoWindow()
-//                            }
                         }
 
                         override fun onCancel() {}

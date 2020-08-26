@@ -10,7 +10,6 @@ import android.widget.TextView
 import com.kobo.mobile_map_core.mobile_map_core.R
 import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.Events
 import java.util.*
-import kotlin.collections.ArrayList
 
 class ActiveTripEventsListAdapter(
         private val values: ArrayList<Events?>)
