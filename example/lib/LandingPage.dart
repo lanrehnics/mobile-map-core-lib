@@ -41,8 +41,8 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                     "id": SessionManager.userId,
                     "user_name": SessionManager.name,
                     "kobo_base_url": "https://stage.api.kobo360.com/",
-                    "gps_base_url": "https://stagegpsapi.kobo360.com/v2/",
-//                    "geo_base_url": "https://stagegpsapi.kobo360.com/v2/",
+//                    "gps_base_url": "https://stagegpsapi.kobo360.com/v2/",
+                    "geo_base_url": "https://stagegpsapi.kobo360.com/v2/",
                     "environment": "staging",
                     "simulate": true,
 
