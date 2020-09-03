@@ -17,7 +17,7 @@ data class TruckData(
         @SerializedName("type") val type: String? = "",
         @SerializedName("total") val total: Int,
         @SerializedName("congestion") val congestion: List<String>,
-        @SerializedName("trucks") val trucks: List<Trucks>
+        @SerializedName("trucks") val trucks: List<Trucks>?
 ):Serializable
 
 class TruckDataConst {

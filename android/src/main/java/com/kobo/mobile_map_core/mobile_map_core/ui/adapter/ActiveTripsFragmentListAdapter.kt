@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.kobo.mobile_map_core.mobile_map_core.R
+import java.util.*
 
 class ActiveTripsFragmentListAdapter(
         private val values: ArrayList<Any?>,

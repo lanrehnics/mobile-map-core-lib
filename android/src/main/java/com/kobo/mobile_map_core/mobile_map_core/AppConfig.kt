@@ -31,20 +31,23 @@ abstract class AppConfig {
 //        private const val BASESTAGGINGURL: String = "https://stage.api.kobo360.com"
 
         fun autoCompleteUrl(context: Context, searchTerms: String): String {
-
-            Log.d(">>>>>>>>>>>>>>>>>", "${getBaseUrl(context)}location/autocomplete?input=${searchTerms}&source=google")
             return "${getBaseUrl(context)}location/autocomplete?input=${searchTerms}&source=google";
         }
 
-        fun activeTripsUrl(context: Context, userTypeAndId: String, filterBy: String?): String {
-            return if (filterBy != null)
-                "${getBaseUrl(context)}location/activeTrips?$userTypeAndId&status=$filterBy"
-            else
-                "${getBaseUrl(context)}location/activeTrips?$userTypeAndId"
+        fun searchForData(context: Context): String {
+            return "${getBaseUrl(context)}location/search";
         }
 
-        fun dedicatedTruckUrl(context: Context, userTypeAndId: String): String {
-            return "${getBaseUrl(context)}location/trucks?$userTypeAndId"
+        fun activeTripsUrl(context: Context): String {
+            return "${getBaseUrl(context)}location/activeTrips"
+        }
+
+        fun dedicatedTruckUrl(context: Context): String {
+            return "${getBaseUrl(context)}location/trucks"
+        }
+
+        fun bookTruck(context: Context, truckRegistrationNumber: String): String {
+            return "${getBaseUrl(context)}bookTruck/$truckRegistrationNumber"
         }
 
         fun groupedAssetClass(context: Context): String {

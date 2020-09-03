@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.kobo.mobile_map_core.mobile_map_core.R
-import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.Trips
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.Trucks
 import kotlinx.android.synthetic.main.item_dedicated_trucks.view.*
+import java.util.*
 
 class DedicatedTruckListAdapter(private val values: ArrayList<Trucks?>, val itemClickListener: OnDedicatedTruckItemClickListener) : RecyclerView.Adapter<DedicatedTruckListAdapterHolder>() {
 

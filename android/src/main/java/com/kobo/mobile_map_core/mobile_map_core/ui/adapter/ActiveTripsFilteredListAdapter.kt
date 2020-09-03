@@ -8,6 +8,7 @@ import com.kobo.mobile_map_core.mobile_map_core.R
 import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.Trips
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.Trucks
 import kotlinx.android.synthetic.main.item_filtered_avtive_trip.view.*
+import java.util.*
 
 class ActiveTripsFilteredListAdapter(private val values: ArrayList<Trucks?>, val itemClickListener: OnActiveTripItemClickListener) : RecyclerView.Adapter<ActiveTripsViewHolder>() {
 

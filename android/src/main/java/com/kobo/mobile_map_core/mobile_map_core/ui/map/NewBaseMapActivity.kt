@@ -5,16 +5,16 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.provider.Settings
-import android.provider.Settings.Secure
-import android.provider.Settings.System
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.libraries.maps.*
 import com.google.android.libraries.maps.model.*
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.maps.android.clustering.ClusterManager
 import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
@@ -29,7 +29,6 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.Location
 import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.Trips
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.Trucks
 import com.kobo.mobile_map_core.mobile_map_core.data.models.mqttmessage.LiveLocationData
-import com.kobo.mobile_map_core.mobile_map_core.data.models.mqttmessage.TruckLiveLocationResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.services.MapService
 import com.kobo.mobile_map_core.mobile_map_core.enums.FocusFrom
 import com.kobo.mobile_map_core.mobile_map_core.enums.MapDisplayMode
@@ -185,7 +184,7 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
-    protected fun setUpLocationPermission() {
+    protected open fun setUpLocationPermission() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), BattlefieldLandingActivity.LOCATION_PERMISSION_REQUEST_CODE)
             return
@@ -392,6 +391,10 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
             return list?.let { Point.fromLngLat(it[0], it[1]) }!!
         }
 
+        fun toReversePoint(list: List<Double>?): Point {
+            return list?.let { Point.fromLngLat(it[1], it[0]) }!!
+        }
+
         fun toPoint(latLng: LatLng): Point {
             return Point.fromLngLat(latLng.longitude, latLng.latitude)
         }
@@ -435,7 +438,7 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
             return if (!tp.onTrip) {
                 BitmapDescriptorFactory.fromResource(R.drawable.ic_available_truck)
             } else {
-                println(null.toString())
+//                println(null.toString())
                 when (tp.tripDetail?.overviewStatus?.toLowerCase(Locale.getDefault())) {
                     "toPickup".toLowerCase(Locale.getDefault()) -> BitmapDescriptorFactory.fromResource(R.drawable.ic_enroute_truck)
                     "toDelivery".toLowerCase(Locale.getDefault()) -> BitmapDescriptorFactory.fromResource(R.drawable.ic_truck_to_delivery)
@@ -524,7 +527,7 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
 //                    setupClusterManager()
 //                    moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.center, 10.0F))
         } catch (e: java.lang.Exception) {
-            println("" + e.message)
+//            println("" + e.message)
         }
     }
 
@@ -590,15 +593,13 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
             mqttAndroidClient?.setCallback(object : MqttCallback {
                 override fun connectionLost(cause: Throwable) {
-                    //connectionStatus = false
-                    // Give your callback on failure here
                     Log.i(NewBaseMapActivity::class.java.name, "connection lost")
 
                 }
 
                 override fun messageArrived(topic: String, message: MqttMessage) {
                     try {
-                        val data = String(message.payload, charset("UTF-8"))
+                        val data = String(message.payload, Charsets.UTF_8)
 
 
                         if (keepListening) {
@@ -628,33 +629,13 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
         } catch (e: MqttException) {
             e.printStackTrace()
         }
-
-
-//        mqttAndroidClient.setCallback(object : MqttCallback {
-//            override fun connectionLost(cause: Throwable) {
-//                Log.i(NewBaseMapActivity::class.java.name, "connection lost")
-//            }
-//
-////            @Throws(Exception::class)
-//            override fun messageArrived(topic: String, message: MqttMessage) {
-//                Log.i(NewBaseMapActivity::class.java.name, "topic: " + topic + ", msg: " + String(message.payload))
-//            }
-//
-//            override fun deliveryComplete(token: IMqttDeliveryToken) {
-//                Log.i(NewBaseMapActivity::class.java.name, "msg delivered")
-//            }
-//        })
-
-
     }
 
     private fun moveTruck(locationList: List<Location>) {
-        println("")
         GlobalScope.launch(Dispatchers.Main) {
             try {
                 locationList.asFlow() // a flow of requests
                         .map { location ->
-                            println(location.toString())
                             MarkerAnimation.animateMarkerToGB(selectedMarker, toLatLngNotNull(location.coordinates), location.bearing.toString(),
                                     LatLngInterpolator.Spherical())
                             mMap.uiSettings.isRotateGesturesEnabled = true
@@ -707,12 +688,10 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 unsubToken?.let { it2 ->
                     it2.actionCallback = object : IMqttActionListener {
                         override fun onSuccess(asyncActionToken: IMqttToken) {
-                            println("Topic Unsub")
                             // Give your callback on unsubscribing here
                         }
 
                         override fun onFailure(asyncActionToken: IMqttToken, exception: Throwable) {
-                            println("Error Unsub")
                             // Give your callback on failure here
                         }
                     }
@@ -722,6 +701,34 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 // Give your callback on failure here
             }
         }
+
+    }
+
+    fun showErrorMessage(baseXml: View, message: String) {
+
+        val snackBar = Snackbar.make(baseXml, message,
+                Snackbar.LENGTH_LONG
+        ).setAction("Action", null)
+        snackBar.setActionTextColor(Color.RED)
+        val snackBarView = snackBar.view
+        snackBarView.setBackgroundColor(Color.RED)
+        val textView = snackBarView.findViewById(com.google.android.material.R.id.snackbar_text) as TextView
+        textView.setTextColor(Color.WHITE)
+        snackBar.show()
+
+    }
+
+    fun showSuccessMessage(baseXml: View, message: String) {
+
+        val snackBar = Snackbar.make(baseXml, message,
+                Snackbar.LENGTH_LONG
+        ).setAction("Action", null)
+        snackBar.setActionTextColor(context.resources.getColor(R.color.colorGreen))
+        val snackBarView = snackBar.view
+        snackBarView.setBackgroundColor(Color.GREEN)
+        val textView = snackBarView.findViewById(com.google.android.material.R.id.snackbar_text) as TextView
+        textView.setTextColor(Color.WHITE)
+        snackBar.show()
 
     }
 
