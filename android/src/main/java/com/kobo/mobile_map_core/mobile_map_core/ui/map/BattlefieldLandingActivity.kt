@@ -1,5 +1,6 @@
 package com.kobo.mobile_map_core.mobile_map_core.ui.map
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -7,6 +8,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -58,7 +60,6 @@ import kotlinx.android.synthetic.main.fragment_user_options.*
 import kotlinx.android.synthetic.main.search_available_order.*
 import kotlinx.android.synthetic.main.search_available_truck.*
 import timber.log.Timber
-import java.sql.DriverManager.println
 import java.util.*
 
 
@@ -94,7 +95,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.battlefield_landing_activity_main)
         context = this@BattlefieldLandingActivity
-
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         shaper = this.let {
             PreferenceManager.getDefaultSharedPreferences(it)
         }
@@ -310,6 +311,37 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
     }
 
+    private fun bookTruck() {
+
+        val truck: Trucks = selectedItem as Trucks;
+
+        mapLandingViewModel.bookTruck(truck.regNumber).observe(this, androidx.lifecycle.Observer {
+            when (it.status) {
+                Status.SUCCESS -> {
+                    btnBookTruck.stopAnimation()
+                    btnBookTruck.revertAnimation {
+//                        progressButton.text = "Some new text"
+                    }
+                    it.data?.let { data -> showSuccessMessage(findViewById(R.id.mainMapHome), "Truck Booked") }
+
+                }
+                Status.LOADING -> {
+                    btnBookTruck.startAnimation()
+                }
+                Status.ERROR -> {
+                    btnBookTruck.stopAnimation()
+                    btnBookTruck.revertAnimation {
+//                        progressButton.text = "Some new text"
+                    }
+                    it.message?.let { errorMessage ->
+                        showErrorMessage(findViewById(R.id.mainMapHome), errorMessage)
+                    }
+                }
+            }
+        })
+
+    }
+
     override fun onMarkerClick(marker: Marker): Boolean {
 
 //        backArrowButton.visibility = View.INVISIBLE
@@ -336,10 +368,33 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
                 fetchAvailableOrder(globalSelectedAdd.pickUp?.latLng, assetClasses.type)
             }
 
+            R.id.btnBookTruck -> {
+
+                val dialogBuilder = AlertDialog.Builder(this)
+
+                dialogBuilder.setMessage("Do you want to continue?")
+                        .setCancelable(false)
+                        .setPositiveButton("Proceed", DialogInterface.OnClickListener { dialog, id ->
+                            dialog.dismiss()
+                            bookTruck()
+                        })
+                        .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, id ->
+                            dialog.cancel()
+                        })
+
+                // create dialog box
+                val alert = dialogBuilder.create()
+                // set title for alert dialog box
+                alert.setTitle("Book truck")
+                // show alert dialog
+                alert.show()
+            }
+
             R.id.btnCloseTruckInfo -> {
                 searchForAvailableTrucks = false
                 userTypeAction.setSearchForAvailableTrucks(searchForAvailableTrucks)
                 btnCloseTruckInfo.visibility = View.INVISIBLE
+                searchCard.visibility = View.VISIBLE
                 userTypeAction.expandSearchBottomSheet()
                 if (
                         truckDetailsBottomSheet.state == BottomSheetBehavior.STATE_EXPANDED ||
@@ -436,6 +491,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         searchCard.visibility = View.GONE
         clearSearch.visibility = View.GONE
         btnSearchButton = findViewById(R.id.btnSearchButton)
+        btnBookTruck = findViewById(R.id.btnBookTruck)
         btnSearchButtonOrder = findViewById(R.id.btnSearchButtonOrder)
 
 
@@ -447,6 +503,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
         bottomSheetHeader.setOnClickListener(this)
         btnSearchButton.setOnClickListener(this)
+        btnBookTruck.setOnClickListener(this)
         btnSearchButtonOrder.setOnClickListener(this)
         btnCloseTruckInfo.setOnClickListener(this)
 
@@ -605,23 +662,6 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         }
     }
 
-    override fun onSelect(selectedAddress: SelectedAddrss) {
-        when (selectedAddress.mode) {
-            0 -> {
-                globalSelectedAdd.pickUp = selectedAddress.pickUp
-                userTypeAction.setEtPickUp(selectedAddress.pickUp?.description?.toEditable())
-                selectedAddress.pickUp!!.placeId?.let { bootstrapLatLng(it, globalSelectedAdd.pickUp) }
-            }
-            else -> {
-                searchRadius = null
-                globalSelectedAdd.destination = selectedAddress.destination
-                editTextToLocation.text = selectedAddress.destination?.description?.toEditable()
-                selectedAddress.destination!!.placeId?.let { bootstrapLatLng(it, globalSelectedAdd.destination) }
-            }
-        }
-        onBackPressed()
-    }
-
 
     private fun bootstrapLatLng(placesId: String, add: Autocomplete?) {
         mapLandingViewModel.fetchLatLngFromPlacesId(placesId).observe(this, androidx.lifecycle.Observer {
@@ -683,6 +723,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
                 Status.SUCCESS -> {
                     switchToList.visibility = View.VISIBLE
+                    searchCard.visibility = View.GONE
                     it.data?.let { response -> bootstrapAvailableOrdersOnMap(response.data) }
                 }
 
@@ -762,7 +803,6 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
 
     private fun bootstrapAvailableTrucksOnMap(truckData: TruckData) {
-
         data = truckData
 
         clearMapAndData(ClearCommand.ALL)
@@ -795,8 +835,10 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
 
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(globalSelectedAdd.pickUp?.latLng, 14.5f))
-        truckData.trucks.forEach { model -> addTrucks(model) }
-        setupClusterManager(truckData.trucks)
+        truckData.trucks?.forEach { model -> addTrucks(model) }
+        truckData.trucks?.let { setupClusterManager(it) }
+        searchCard.visibility = View.GONE
+
 
     }
 
@@ -806,6 +848,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
         clearMapAndData(ClearCommand.ALL)
         btnSearchButtonOrder.revertAnimation()
+        searchCard.visibility = View.GONE
         btnCloseTruckInfo.visibility = View.VISIBLE
         searchForAvailableTrucks = true
         userTypeAction.setSearchForAvailableTrucks(searchForAvailableTrucks)
@@ -819,13 +862,29 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
     }
 
+    override fun onSelect(selectedAddress: SelectedAddrss) {
+        when (selectedAddress.mode) {
+            0 -> {
+                globalSelectedAdd.pickUp = selectedAddress.pickUp
+                userTypeAction.setEtPickUp(selectedAddress.pickUp?.description?.toEditable())
+                selectedAddress.pickUp!!.placeId?.let { bootstrapLatLng(it, globalSelectedAdd.pickUp) }
+            }
+            else -> {
+                searchRadius = null
+                globalSelectedAdd.destination = selectedAddress.destination
+                editTextToLocation.text = selectedAddress.destination?.description?.toEditable()
+                selectedAddress.destination!!.placeId?.let { bootstrapLatLng(it, globalSelectedAdd.destination) }
+            }
+        }
+        onBackPressed()
+    }
+
     override fun onSwitchToMapClickListener() {
         switchToList.visibility = View.VISIBLE
         userTypeAction.onSwitchToMapClickListener(supportFragmentManager)
     }
 
     override fun onSelect(selectedInfo: Any) {
-
         try {
             selectedItem = selectedInfo
             switchToList.visibility = View.VISIBLE
@@ -864,17 +923,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
                         override fun onFinish() {
 
                             if (truck.bearing == null) {
-
-                                val snackBar = Snackbar.make(
-                                        findViewById(R.id.mainMapHome), "No bearing for truck",
-                                        Snackbar.LENGTH_LONG
-                                ).setAction("Action", null)
-                                snackBar.setActionTextColor(Color.RED)
-                                val snackBarView = snackBar.view
-                                snackBarView.setBackgroundColor(Color.RED)
-                                val textView = snackBarView.findViewById(com.google.android.material.R.id.snackbar_text) as TextView
-                                textView.setTextColor(Color.WHITE)
-                                snackBar.show()
+                                showErrorMessage(findViewById(R.id.mainMapHome), "No bearing for truck")
                             } else {
                                 clearMapAndData(ClearCommand.MAP)
 

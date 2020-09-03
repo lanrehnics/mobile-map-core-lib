@@ -22,7 +22,7 @@ class MapService constructor(private val mContext: Context) {
     suspend fun getPolyline(origin: LatLng, destination: LatLng): List<LatLng> {
         var polyLineList: List<LatLng> = ArrayList()
         val res = LiteHttp.instance?.get(getMapRouteUrlByTrip(origin, destination))
-        print(res.toString())
+//        print(res.toString())
         val result = Gson().fromJson(res.toString(), PolylineJsonDecoder::class.java)
         if (result.routes.isNotEmpty()) {
             polyLineList = decodePoly(result.routes[0].overview_polyline.points)

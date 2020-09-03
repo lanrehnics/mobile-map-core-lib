@@ -19,7 +19,7 @@ class DedicatedTruckViewModel(private val mainRepository: MainRepository) : View
     fun fetchDedicatedTruck(userTypeAndId: String, filterBy: String? = null) {
         dedicatedTruckResponse.postValue(Resource.loading(null))
         compositeDisposable.add(
-                mainRepository.fetchDedicatedTruck(userTypeAndId)
+                mainRepository.fetchDedicatedTruck()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({ dedicatedTrucks ->

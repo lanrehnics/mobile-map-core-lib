@@ -539,7 +539,7 @@ class NavigationActivity(
 
     private fun prepareNavigationParams(navigationData: NavigationData?) {
 //        ORIGIN = NewBaseMapActivity.toPoint(tripInfo?.tripDetail?.pickupLocation?.coordinates)
-        DESTINATION = NewBaseMapActivity.toPoint(navigationData?.destination)
+        DESTINATION = NewBaseMapActivity.toReversePoint(navigationData?.destination)
         mqttTopic = "server/track/${navigationData?.regNumber?.toLowerCase(Locale.getDefault())}"
 //        DESTINATION = Point.fromLngLat(3.350918, 6.555414)
     }

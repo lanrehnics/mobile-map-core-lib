@@ -223,8 +223,24 @@
 <!--                app:layout_constraintTop_toBottomOf="@+id/tvDriverRating"-->
 <!--             />-->
 
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
+            android:id="@+id/btnBookTruck"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="40dp"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/button_bg"
+            android:fontFamily="@font/avenir_medium"
+            android:gravity="center"
+            android:text="BOOK TRUCK"
+            android:textColor="@color/colorSwitchNotSelected"
+            android:textSize="16sp"
+            app:spinning_bar_color="@color/colorPrimaryTextLight" />
 
     </LinearLayout>
 

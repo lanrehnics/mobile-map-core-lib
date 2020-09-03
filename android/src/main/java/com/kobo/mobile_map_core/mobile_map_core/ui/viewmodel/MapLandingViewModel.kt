@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.libraries.maps.model.LatLng
+import com.kobo.mobile_map_core.mobile_map_core.data.models.BookTruckResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.asset_class_model.AssetClassResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.AvailableTruckResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.OverviewResponse
@@ -24,6 +25,7 @@ class MapLandingViewModel(private val mainRepository: MainRepository) : ViewMode
     private val availableOrders = MutableLiveData<Resource<AvailableOrdersResponse>>()
     private val latLngFromPlacesId = MutableLiveData<Resource<PlacesResponse>>()
     private val locationOverview = MutableLiveData<Resource<OverviewResponse>>()
+    private val bookTruckResponse = MutableLiveData<Resource<BookTruckResponse>>()
     private val compositeDisposable = CompositeDisposable()
 
     init {
@@ -118,6 +120,21 @@ class MapLandingViewModel(private val mainRepository: MainRepository) : ViewMode
         )
     }
 
+    private fun prepareTruckBooking(truckReg: String?) {
+        bookTruckResponse.postValue(Resource.loading(null))
+        compositeDisposable.add(
+                mainRepository.bookTruck(truckReg)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({ truckBooking ->
+                            bookTruckResponse.postValue(Resource.success(truckBooking))
+                        }, { throwable ->
+                            bookTruckResponse.postValue(Resource.error(throwable.message
+                                    ?: "Something Went Wrong", null))
+                        })
+        )
+    }
+
     override fun onCleared() {
         super.onCleared()
         compositeDisposable.dispose()
@@ -151,6 +168,11 @@ class MapLandingViewModel(private val mainRepository: MainRepository) : ViewMode
     fun getLocationOverview(placesId: String, latLng: LatLng): LiveData<Resource<OverviewResponse>> {
         fetchLocationOverview(placesId, latLng)
         return locationOverview
+    }
+
+    fun bookTruck(truckReg: String?): LiveData<Resource<BookTruckResponse>> {
+        prepareTruckBooking(truckReg)
+        return bookTruckResponse
     }
 
 

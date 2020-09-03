@@ -34,10 +34,14 @@ class LiteHttp private constructor() {
         this.executor = executor
     }
 
-    private fun addHeaders(builder: Request.Builder, headers: ArrayMap<String, String>) {
-        for (key in headers.keys) {
-            builder.addHeader(key, headers[key]!!)
+    private fun addHeaders(builder: Request.Builder, headers: ArrayMap<String, String>?) {
+
+        headers?.let {
+            for (key in it.keys) {
+                builder.addHeader(key, it[key]!!)
+            }
         }
+
     }
 
     suspend fun get(serviceUrl: String): String? {
@@ -56,7 +60,7 @@ class LiteHttp private constructor() {
         return execute(builder)
     }
 
-    suspend fun getWithHeader(serviceUrl: String, headers: ArrayMap<String, String>?): String? {
+    suspend fun getWithHeader(serviceUrl: String, headers: ArrayMap<String, String>): String? {
         val builder = Request.Builder()
         if (headers != null)
             addHeaders(builder, headers)
@@ -85,7 +89,7 @@ class LiteHttp private constructor() {
         return put(serviceUrl, null, params)
     }
 
-    suspend fun put(serviceUrl: String, headers: ArrayMap<String, String>?, params: ArrayMap<String, Any>): String? {
+    suspend fun put(serviceUrl: String, headers: ArrayMap<String, String>?, params: ArrayMap<String, Any>?): String? {
         val builder = Request.Builder()
         if (headers != null)
             addHeaders(builder, headers)
@@ -143,7 +147,12 @@ class LiteHttp private constructor() {
         return GlobalScope.async(Dispatchers.IO) {
             System.setProperty("http.keepAlive", "false")
             val result: Response = client.newCall(builder.build()).execute()
-            result.body!!.string()
+
+            if(result.code == 200 || result.code == 201) {
+                result.body!!.string()
+            }else{
+                throw  Throwable(message = result.message)
+            }
         }.await()
     }
 

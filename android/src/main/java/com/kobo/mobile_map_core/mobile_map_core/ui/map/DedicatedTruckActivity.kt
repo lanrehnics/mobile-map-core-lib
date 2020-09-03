@@ -37,6 +37,7 @@ import com.todkars.shimmer.ShimmerRecyclerView
 import com.xdev.mvvm.utils.Status
 import kotlinx.android.synthetic.main.activity_dedicated_truck.*
 import kotlinx.android.synthetic.main.dedicated_truck_bottom_sheet.*
+import java.lang.reflect.Array
 import java.util.*
 
 class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickListener {
@@ -157,8 +158,8 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
 
     override fun multipleTruckClusteringMode() {
         clearMapAndData(ClearCommand.ALL)
-        truckMarkerManager = dedicatedTruckData.truckData.trucks.map { it.regNumber to it }.toMap().toMutableMap()
-        setupClusterManager(dedicatedTruckData.truckData.trucks)
+        truckMarkerManager = dedicatedTruckData.truckData.trucks?.map { it.regNumber to it }?.toMap()?.toMutableMap()
+        dedicatedTruckData.truckData.trucks?.let { setupClusterManager(it) }
     }
 
 
@@ -314,7 +315,8 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
 
     private fun renderList(results: DedicatedTruckData) {
         dedicatedTruckData = results
-        adapter.addData(results.truckData.trucks)
+        val trucks: List<Trucks> = results.truckData.trucks ?: ArrayList()
+        adapter.addData(trucks)
         adapter.notifyDataSetChanged()
     }
 

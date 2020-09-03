@@ -63,6 +63,7 @@ abstract class BaseMapActivity : NewBaseMapActivity() {
     protected lateinit var truckDetailsBottomSheet: BottomSheetBehavior<View>
     protected lateinit var availableOrderBottomSheet: BottomSheetBehavior<View>
     protected lateinit var btnSearchButton: CircularProgressButton
+    protected lateinit var btnBookTruck: CircularProgressButton
     protected lateinit var btnSearchButtonOrder: CircularProgressButton
 
     protected lateinit var toolbar: Toolbar

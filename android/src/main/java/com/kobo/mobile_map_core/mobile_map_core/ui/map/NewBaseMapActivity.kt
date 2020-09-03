@@ -7,12 +7,14 @@ import android.graphics.Color
 import android.provider.Settings
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.libraries.maps.*
 import com.google.android.libraries.maps.model.*
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.maps.android.clustering.ClusterManager
 import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
@@ -389,6 +391,10 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
             return list?.let { Point.fromLngLat(it[0], it[1]) }!!
         }
 
+        fun toReversePoint(list: List<Double>?): Point {
+            return list?.let { Point.fromLngLat(it[1], it[0]) }!!
+        }
+
         fun toPoint(latLng: LatLng): Point {
             return Point.fromLngLat(latLng.longitude, latLng.latitude)
         }
@@ -695,6 +701,34 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 // Give your callback on failure here
             }
         }
+
+    }
+
+    fun showErrorMessage(baseXml: View, message: String) {
+
+        val snackBar = Snackbar.make(baseXml, message,
+                Snackbar.LENGTH_LONG
+        ).setAction("Action", null)
+        snackBar.setActionTextColor(Color.RED)
+        val snackBarView = snackBar.view
+        snackBarView.setBackgroundColor(Color.RED)
+        val textView = snackBarView.findViewById(com.google.android.material.R.id.snackbar_text) as TextView
+        textView.setTextColor(Color.WHITE)
+        snackBar.show()
+
+    }
+
+    fun showSuccessMessage(baseXml: View, message: String) {
+
+        val snackBar = Snackbar.make(baseXml, message,
+                Snackbar.LENGTH_LONG
+        ).setAction("Action", null)
+        snackBar.setActionTextColor(context.resources.getColor(R.color.colorGreen))
+        val snackBarView = snackBar.view
+        snackBarView.setBackgroundColor(Color.GREEN)
+        val textView = snackBarView.findViewById(com.google.android.material.R.id.snackbar_text) as TextView
+        textView.setTextColor(Color.WHITE)
+        snackBar.show()
 
     }
 

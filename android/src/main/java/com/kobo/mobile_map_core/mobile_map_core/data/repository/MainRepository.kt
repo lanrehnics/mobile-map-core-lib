@@ -3,6 +3,7 @@ package com.kobo.mobile_map_core.mobile_map_core.data.repository
 import com.google.android.libraries.maps.model.LatLng
 import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.ActiveTripsDataResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiHelper
+import com.kobo.mobile_map_core.mobile_map_core.data.models.BookTruckResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.asset_class_model.AssetClassResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.AutoCompleteResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.AvailableTruckResponse
@@ -28,8 +29,8 @@ class MainRepository(private val apiHelper: ApiHelper) {
         return apiHelper.fetchActiveTrips(userTypeAndId, filterBy)
     }
 
-    fun fetchDedicatedTruck(userTypeAndId: String): Single<DedicatedTruckResponse> {
-        return apiHelper.fetchDedicatedTruck(userTypeAndId)
+    fun fetchDedicatedTruck(): Single<DedicatedTruckResponse> {
+        return apiHelper.fetchDedicatedTruck()
     }
 
     fun fetchGroupedAssetClass(): Single<AssetClassResponse> {
@@ -55,6 +56,11 @@ class MainRepository(private val apiHelper: ApiHelper) {
 
     fun fetchLocationOverview(userTypeAndId: String, latLng: LatLng): Single<OverviewResponse> {
         return apiHelper.fetchLocationOverview(userTypeAndId, latLng)
+    }
+
+
+    fun bookTruck(truckReg: String?): Single<BookTruckResponse> {
+        return apiHelper.bookTruck(truckReg)
     }
 
 }

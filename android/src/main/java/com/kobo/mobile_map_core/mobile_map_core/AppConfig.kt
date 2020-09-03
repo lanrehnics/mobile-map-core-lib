@@ -38,15 +38,16 @@ abstract class AppConfig {
             return "${getBaseUrl(context)}location/search";
         }
 
-        fun activeTripsUrl(context: Context, userTypeAndId: String, filterBy: String?): String {
-            return if (filterBy != null)
-                "${getBaseUrl(context)}location/activeTrips?$userTypeAndId&status=$filterBy"
-            else
-                "${getBaseUrl(context)}location/activeTrips?$userTypeAndId"
+        fun activeTripsUrl(context: Context): String {
+            return "${getBaseUrl(context)}location/activeTrips"
         }
 
-        fun dedicatedTruckUrl(context: Context, userTypeAndId: String): String {
-            return "${getBaseUrl(context)}location/trucks?$userTypeAndId"
+        fun dedicatedTruckUrl(context: Context): String {
+            return "${getBaseUrl(context)}location/trucks"
+        }
+
+        fun bookTruck(context: Context, truckRegistrationNumber: String): String {
+            return "${getBaseUrl(context)}bookTruck/$truckRegistrationNumber"
         }
 
         fun groupedAssetClass(context: Context): String {
