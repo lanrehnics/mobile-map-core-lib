@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.provider.Settings
 import android.util.Log
 import android.view.View
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -28,12 +29,17 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.Events
 import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.Location
 import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.Trips
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.Trucks
+import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.Overview
 import com.kobo.mobile_map_core.mobile_map_core.data.models.mqttmessage.LiveLocationData
 import com.kobo.mobile_map_core.mobile_map_core.data.services.MapService
 import com.kobo.mobile_map_core.mobile_map_core.enums.FocusFrom
 import com.kobo.mobile_map_core.mobile_map_core.enums.MapDisplayMode
+import com.kobo.mobile_map_core.mobile_map_core.utils.GpsUtils
 import com.kobo360.map.MarkerClusterRenderer
 import com.mapbox.geojson.Point
+import com.xdev.mvvm.utils.Status
+import kotlinx.android.synthetic.main.activity_maps.*
+import kotlinx.android.synthetic.main.fragment_user_options.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.asFlow
@@ -45,7 +51,7 @@ import org.json.JSONObject
 import java.util.*
 
 
-abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
+abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener {
 
 
     protected var mqttAndroidClient: MqttAndroidClient? = null
@@ -67,6 +73,7 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
     protected lateinit var truckInfo: Trucks
     protected lateinit var mMap: GoogleMap
     protected lateinit var mMapView: View
+    protected var overviewW: Overview? = null
     protected lateinit var currentLatLng: LatLng
     protected lateinit var fusedLocationClient: FusedLocationProviderClient
     protected lateinit var clusterManager: ClusterManager<TruckClusterItem>
@@ -78,6 +85,8 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
     protected lateinit var displayMode: MapDisplayMode
     protected lateinit var focusFrom: FocusFrom
     protected var selectedMarker: Marker? = null
+    protected var customersMode: Boolean = false
+    protected var transporterMode: Boolean = false
 
     protected fun initMapStuffs() {
         displayMode = MapDisplayMode.UserFocusMode
@@ -85,6 +94,7 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
         mapService = MapService(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
+
 
 
     fun clearMapAndData(command: ClearCommand) {
@@ -184,32 +194,32 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
-    protected open fun setUpLocationPermission() {
+    protected open fun setUpLocationPermission(goMyLocation: Boolean = true) {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), BattlefieldLandingActivity.LOCATION_PERMISSION_REQUEST_CODE)
             return
         } else {
-//            mMap.isMyLocationEnabled = true
             fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
                 // Got last known location. In some rare situations this can be null.
                 // 3
                 if (location != null) {
-//                lastLocation = location
-                    val currentLatLng = LatLng(location.latitude, location.longitude)
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
+                    mMap.isMyLocationEnabled = true
+                    mMap.setOnMyLocationButtonClickListener(this)
+                    currentLatLng = LatLng(location.latitude, location.longitude)
+                    fetchAndSubscribeForLocationOverview()
+                    if (goMyLocation)
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
 //                    bootStrapPickupStationsAndTrucks()
                 }
             }
 
-//            val locationButton = (mMapView.findViewById<View>(Integer.parseInt("1")).parent as View).findViewById<View>(Integer.parseInt("2"))
-
-//            locationButton.visibility = View.INVISIBLE
+            val locationButton = (mMapView.findViewById<View>(Integer.parseInt("1")).parent as View).findViewById<View>(Integer.parseInt("2"))
 //
-//            val rlp=locationButton.layoutParams as (RelativeLayout.LayoutParams)
-//            // position on right bottom
-//            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP,0)
-//            rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE)
-//            rlp.setMargins(0,0,60,30)
+            val rlp = locationButton.layoutParams as (RelativeLayout.LayoutParams)
+            // position on right bottom
+            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
+            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
+            rlp.setMargins(0, 30, 60, 30)
         }
     }
 
@@ -219,12 +229,8 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
         clusterManager = ClusterManager(this, googleMap)
         setUpClusterManagerClickListener()
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
-        //mMap.isTrafficEnabled = true
         mMap.isIndoorEnabled = false
         mMap.isBuildingsEnabled = true
-//        mMap.uiSettings.isCompassEnabled = true
-//        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style))
-
         mMap.uiSettings.setAllGesturesEnabled(true)
 
 //        mMap.moveCamera(
@@ -249,43 +255,35 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     abstract fun multipleTruckClusteringMode()
 
+    abstract fun fetchAndSubscribeForLocationOverview()
+
     fun userFocusMode() {
-        setUpLocationPermission()
-        fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
-            // Get last known location. In some rare situations this can be null.
-            // 3
-            if (location != null) {
-//                lastLocation = location
-                currentLatLng = LatLng(location.latitude, location.longitude)
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
+        GpsUtils(this).turnGPSOn {
+            if (it) {
+                setUpLocationPermission()
             }
         }
-
-//        var circleOptions = CircleOptions()
-//            .center(headOffice).radius(800.0)
-//            .fillColor(Color.parseColor("#d4e8f2"))
-//            .strokeColor(Color.parseColor("#d4e8f2"))
-//        mMap.addCircle(circleOptions)
-
     }
 
     fun tripTruckFocusMode() {
 
         clearMapAndData(ClearCommand.MAP)
+        GpsUtils(this).turnGPSOn {
+            if (it) {
+                setUpLocationPermission(goMyLocation = false)
+            }
+        }
         if (truckInfo.tripDetail?.travelledRoutePolyline?.isNotEmpty()!! && truckInfo.tripDetail?.currentBestRoute?.isNotEmpty()!!) {
             drawPolyLine(travelledPolyList = mapService.decodePoly(truckInfo.tripDetail?.travelledRoutePolyline!!),
                     currentBestPolyList = mapService.decodePoly(truckInfo.tripDetail?.currentBestRoute!!))
         }
 
         selectedMarker = mMap.addMarker(
-                truckInfo.lastKnownLocation?.coordinates?.let { it1 -> toLatLng(it1) }?.let { it2 ->
-                    truckInfo.bearing?.toFloat()?.let {
-                        MarkerOptions()
-                                .position(it2)
-                                //                                                .title(selectedTruck!!.d.reg_number)
-                                .rotation(it)
-                                .icon(truckFromStatus(truckInfo))
-                    }
+                truckInfo.lastKnownLocation?.coordinates?.let { cord -> toLatLng(cord) }?.let { latLng ->
+                    MarkerOptions()
+                            .position(latLng)
+                            .rotation((truckInfo.bearing ?: 0.0).toFloat())
+                            .icon(truckFromStatus(truckInfo))
                 }
         )
 
@@ -326,15 +324,18 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
 //
 //        }
 
+        GpsUtils(this).turnGPSOn {
+            if (it) {
+                setUpLocationPermission(goMyLocation = false)
+            }
+        }
 
         truckInfo.lastKnownLocation?.let { lkl ->
             val marker = mMap.addMarker(
-                    truckInfo.bearing?.toFloat()?.let {
-                        MarkerOptions()
-                                .position(toLatLngNotNull(lkl.coordinates))
-                                .rotation(it)
-                                .icon(truckFromStatus(truckInfo))
-                    }
+                    MarkerOptions()
+                            .position(toLatLngNotNull(lkl.coordinates))
+                            .rotation((truckInfo.bearing ?: 0.0).toFloat())
+                            .icon(truckFromStatus(truckInfo))
             )
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(toLatLngNotNull(lkl.coordinates), 17f))
 
@@ -369,6 +370,7 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
 //        val supportMapFragment = SupportMapFragment.newInstance()
         supportFragmentManager.beginTransaction().add(R.id.mainActiveTripsHome, supportMapFragment).addToBackStack("mapFragment").commit()
+        mMapView = findViewById(R.id.mainActiveTripsHome)
         supportMapFragment.getMapAsync(this)
     }
 
@@ -417,7 +419,7 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
             return if (!tp.onTrip!!) {
-                BitmapDescriptorFactory.fromResource(R.drawable.ic_available_truck)
+                BitmapDescriptorFactory.fromResource(R.drawable.ic_truck_available)
             } else {
                 when (tp.tripDetail?.overviewStatus.toString().toLowerCase(Locale.getDefault())) {
                     "toPickup".toLowerCase(Locale.getDefault()) -> BitmapDescriptorFactory.fromResource(R.drawable.ic_enroute_truck)
@@ -436,7 +438,7 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
             return if (!tp.onTrip) {
-                BitmapDescriptorFactory.fromResource(R.drawable.ic_available_truck)
+                BitmapDescriptorFactory.fromResource(R.drawable.ic_truck_available)
             } else {
 //                println(null.toString())
                 when (tp.tripDetail?.overviewStatus?.toLowerCase(Locale.getDefault())) {
@@ -731,6 +733,56 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback {
         snackBar.show()
 
     }
+
+    override fun onMyLocationButtonClick(): Boolean {
+        GpsUtils(this).turnGPSOn {
+            if (it) {
+                setUpLocationPermission()
+            }
+        }
+        return true
+    }
+
+    protected fun addKoboStationsAndCustomerLocationOnMap(overview: Overview?) {
+
+        overview?.customerLocations?.let {
+            it.forEach { cl ->
+                cl?.location?.let { loc ->
+                    mMap.addMarker(
+                            MarkerOptions()
+                                    .position(NewBaseMapActivity.toLatLngNotNull(loc.coordinates))
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_customerlocation)))
+                }
+            }
+
+
+        }
+
+        overview?.kobocareStations?.let {
+            it.forEach { cl ->
+                cl?.location?.let { loc ->
+                    mMap.addMarker(
+                            MarkerOptions()
+                                    .position(NewBaseMapActivity.toLatLngNotNull(loc.coordinates))
+                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_kobostation)))
+                }
+            }
+        }
+    }
+
+    protected open fun bootstrapLocationOverview(overview: Overview?) {
+        overviewW = overview
+
+        addKoboStationsAndCustomerLocationOnMap(overview)
+
+        val marker = mMap.addMarker(
+                MarkerOptions()
+                        .position(currentLatLng)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location)))
+
+
+    }
+
 
 
 }

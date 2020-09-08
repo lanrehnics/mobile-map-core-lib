@@ -4,10 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Editable
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.Spinner
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.libraries.maps.CameraUpdateFactory
@@ -112,6 +109,11 @@ class CustomerActionsImpl(private val overviewBottomSheet: BottomSheetBehavior<V
     override fun closeSearchBottomSheet() {
         overviewBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
         searchBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+    }
+
+    override fun setButtonTitles(search: TextView, track: TextView) {
+        search.text = "Search Available \nTrucks"
+        track.text = "Track Trucks"
     }
 
     override fun setUpSpinner(context: Context, list: List<AssetClasses>, onSelect: (result: AssetClasses) -> Unit) {

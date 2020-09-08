@@ -1,14 +1,13 @@
 package com.kobo.mobile_map_core.mobile_map_core.ui.map
 
 import android.annotation.SuppressLint
-import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import androidx.lifecycle.Observer
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -16,28 +15,34 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.libraries.maps.CameraUpdateFactory
 import com.google.android.libraries.maps.GoogleMap
+import com.google.android.libraries.maps.model.BitmapDescriptorFactory
+import com.google.android.libraries.maps.model.CircleOptions
 import com.google.android.libraries.maps.model.LatLngBounds
 import com.google.android.libraries.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
 import com.kobo.mobile_map_core.mobile_map_core.R
-import com.kobo.mobile_map_core.mobile_map_core.animation.TruckMover
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiHelper
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiServiceImpl
 import com.kobo.mobile_map_core.mobile_map_core.data.models.ClearCommand
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.DedicatedTruckData
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.Trucks
+import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.Overview
 import com.kobo.mobile_map_core.mobile_map_core.enums.FocusFrom
 import com.kobo.mobile_map_core.mobile_map_core.enums.MapDisplayMode
 import com.kobo.mobile_map_core.mobile_map_core.ui.adapter.DedicatedTruckListAdapter
 import com.kobo.mobile_map_core.mobile_map_core.ui.adapter.OnDedicatedTruckItemClickListener
 import com.kobo.mobile_map_core.mobile_map_core.ui.base.ViewModelFactory
 import com.kobo.mobile_map_core.mobile_map_core.ui.viewmodel.DedicatedTruckViewModel
+import com.kobo.mobile_map_core.mobile_map_core.utils.GpsUtils
 import com.todkars.shimmer.ShimmerRecyclerView
 import com.xdev.mvvm.utils.Status
 import kotlinx.android.synthetic.main.activity_dedicated_truck.*
+import kotlinx.android.synthetic.main.activity_dedicated_truck.pBar
+import kotlinx.android.synthetic.main.activity_dedicated_truck.switchToList
+import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.android.synthetic.main.dedicated_truck_bottom_sheet.*
-import java.lang.reflect.Array
+import kotlinx.android.synthetic.main.fragment_user_options.*
 import java.util.*
 
 class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickListener {
@@ -123,12 +128,10 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
                             truckInfo.lastKnownLocation?.let {
                                 selectedMarker = mMap.addMarker(
                                         toLatLng(it.coordinates)?.let { it1 ->
-                                            truckInfo.bearing?.toFloat()?.let { it2 ->
                                                 MarkerOptions()
                                                         .position(it1)
-                                                        .rotation(it2)
+                                                        .rotation((truckInfo.bearing?:0.0).toFloat())
                                                         .icon(truckFromStatus(truckInfo))
-                                            }
                                         }
 
                                 )
@@ -160,6 +163,12 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
         clearMapAndData(ClearCommand.ALL)
         truckMarkerManager = dedicatedTruckData.truckData.trucks?.map { it.regNumber to it }?.toMap()?.toMutableMap()
         dedicatedTruckData.truckData.trucks?.let { setupClusterManager(it) }
+        GpsUtils(this).turnGPSOn {
+            if (it) {
+                setUpLocationPermission(goMyLocation = (dedicatedTruckData.truckData.trucks
+                        ?: ArrayList()).isEmpty())
+            }
+        }
     }
 
 
@@ -262,6 +271,20 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
         )
         listShimmerDedicatedTrucks.adapter = adapter
         listShimmerDedicatedTrucks.showShimmer()
+
+        when (shaper.getString(MobileMapCorePlugin.KEY_APP_TYPE, "")) {
+            MobileMapCorePlugin.APP_TYPE_CUSTOMER -> {
+                customersMode = true
+            }
+
+            MobileMapCorePlugin.APP_TYPE_TRANSPORTER -> {
+                transporterMode = true
+            }
+
+            MobileMapCorePlugin.APP_TYPE_PARTNER -> {
+                transporterMode = true
+            }
+        }
     }
 
     private fun setupObserver() {
@@ -303,7 +326,9 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
         tvDriverName.text = truckInfo.driver?.firstName
 //        tvDriverRating.text = selectedTripInfo.driver.rating.toString()
 //        tvMemberSince.text = "Member since: N/A"
-
+        if (customersMode) {
+            btnBookTruck.visibility = View.VISIBLE
+        }
         this.let {
             Glide.with(it)
                     .load(truckInfo.driver?.image)
@@ -329,6 +354,31 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
         }
         switchToList.visibility = View.GONE
         switchToMap.visibility = View.VISIBLE
+    }
+
+
+    override fun fetchAndSubscribeForLocationOverview() {
+
+
+        val userTypeAndId = shaper.getString(MobileMapCorePlugin.KEY_USER_TYPE_AND_ID, "")
+
+        dedicatedTruckViewModel.getLocationOverview(userTypeAndId!!, currentLatLng).observe(this, androidx.lifecycle.Observer {
+            when (it.status) {
+                Status.SUCCESS -> {
+                    pBar.visibility = View.INVISIBLE
+                    switchToList.visibility = View.INVISIBLE
+                    it.data?.let { response -> bootstrapLocationOverview(response.data?.overview) }
+                }
+                Status.LOADING -> {
+                    pBar.visibility = View.VISIBLE
+                }
+                Status.ERROR -> {
+                    pBar.visibility = View.INVISIBLE
+                    //Handle Error
+                }
+            }
+        })
+
     }
 
 }

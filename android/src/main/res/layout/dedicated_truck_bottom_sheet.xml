@@ -95,27 +95,27 @@
                 <ImageView
                     android:layout_width="13dp"
                     android:layout_height="13dp"
-                    android:src="@drawable/ic_navigation"
+                    android:src="@drawable/ic_droppin"
                     android:visibility="invisible" />
 
-<!--                <TextView-->
-<!--                    android:id="@+id/tvRating"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginStart="10dp"-->
-<!--                    android:fontFamily="@font/avenir_book"-->
-<!--                    android:textColor="@color/colorPrimaryText"-->
-<!--                    android:textSize="12sp"-->
-<!--                    tools:text="4.0" />-->
+                <TextView
+                    android:id="@+id/tvRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:fontFamily="@font/avenir_book"
+                    android:textColor="@color/colorPrimaryText"
+                    android:textSize="12sp"
+                    tools:text="4.0" />
 
-<!--                <RatingBar-->
-<!--                    android:id="@+id/rbTruckRate"-->
-<!--                    style="@style/Base.Widget.AppCompat.RatingBar.Small"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginLeft="5dp"-->
-<!--                    android:progressTint="@color/colorAccent"-->
-<!--                    android:rating="4" />-->
+                <RatingBar
+                    android:id="@+id/rbTruckRate"
+                    style="@style/Base.Widget.AppCompat.RatingBar.Small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:progressTint="@color/colorAccent"
+                    android:rating="4" />
 
             </LinearLayout>
 
@@ -130,13 +130,12 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearRating">
 
-                <ImageView
-                    android:layout_width="13dp"
-                    android:layout_height="13dp"
-                    android:src="@drawable/ic_navigation" />
+
 
                 <TextView
+                    android:drawableLeft="@drawable/ic_droppin"
                     android:id="@+id/tvCurrentNavigation"
+                    android:drawablePadding="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
@@ -230,6 +229,7 @@
             android:id="@+id/btnBookTruck"
             android:layout_width="match_parent"
             android:layout_height="55dp"
+            android:visibility="gone"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="40dp"
             android:layout_marginHorizontal="10dp"

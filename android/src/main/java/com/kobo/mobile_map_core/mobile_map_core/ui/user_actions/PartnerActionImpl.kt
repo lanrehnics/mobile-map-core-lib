@@ -4,10 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Editable
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.Spinner
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.libraries.maps.CameraUpdateFactory
@@ -69,6 +66,7 @@ class PartnerActionImpl(private val overviewBottomSheet: BottomSheetBehavior<Vie
                 }
             }
         })
+
 
 
         searchBottomSheet.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
@@ -207,6 +205,12 @@ class PartnerActionImpl(private val overviewBottomSheet: BottomSheetBehavior<Vie
         itemDetailsBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
 
         setItemDetails.invoke("order")
+    }
+
+
+    override fun setButtonTitles(search: TextView, track: TextView) {
+        search.text = "Search Available \nOrder"
+        track.text = "My Trucks"
     }
 
     override fun onTripInfoCloseButtonClick(supportFragmentManager: FragmentManager) {

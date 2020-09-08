@@ -52,16 +52,15 @@
                 android:textSize="20sp" />
 
             <ProgressBar
-                android:layout_marginRight="10dp"
-                android:indeterminateDrawable="@drawable/progress"
-                android:layout_alignParentRight="true"
-                android:layout_centerInParent="true"
-                android:visibility="invisible"
                 android:id="@+id/pBar"
                 style="?android:attr/progressBarStyleLarge"
                 android:layout_width="50dp"
-                android:layout_height="50dp">
-            </ProgressBar>
+                android:layout_height="50dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerInParent="true"
+                android:layout_marginRight="10dp"
+                android:indeterminateDrawable="@drawable/progress"
+                android:visibility="invisible"></ProgressBar>
 
         </RelativeLayout>
 
@@ -106,15 +105,16 @@
                             android:src="@drawable/ic_magnifyingglass" />
 
                         <TextView
+                            android:id="@+id/tvSearchFeature"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="15dp"
                             android:fontFamily="@font/avenir_regular"
                             android:gravity="center"
-                            android:text="Search Available Trucks"
                             android:textColor="@color/colorPrimaryText"
                             android:textFontWeight="800"
-                            android:textSize="12sp" />
+                            android:textSize="12sp"
+                            tools:text="Search Available Trucks" />
 
 
                     </LinearLayout>
@@ -184,15 +184,16 @@
                             android:src="@drawable/ic_movertruck" />
 
                         <TextView
+                            android:id="@+id/tvTrackFeature"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="15dp"
                             android:fontFamily="@font/avenir_regular"
                             android:gravity="center"
-                            android:text="Track Trucks"
                             android:textColor="@color/colorPrimaryText"
                             android:textFontWeight="800"
-                            android:textSize="12sp" />
+                            android:textSize="12sp"
+                            tools:text="Track Trucks" />
 
 
                     </LinearLayout>
@@ -247,19 +248,19 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:fontFamily="@font/avenir_regular"
+                    android:text="Available trucks within\ncurrent location"
                     android:textColor="@color/colorPrimaryTextDark"
-                    android:textFontWeight="500"
-                    android:text="Available trucks within\ncurrent location" />
+                    android:textFontWeight="500" />
 
                 <TextView
+                    android:id="@+id/tvTruckOverviewAvailableTrucks"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:id="@+id/tvTruckOverviewAvailableTrucks"
                     android:fontFamily="@font/avenir_regular"
-                    tools:text="13"
                     android:textColor="@color/colorPrimaryTextDark"
-                    android:textFontWeight="500" />
+                    android:textFontWeight="500"
+                    tools:text="13" />
 
 
             </RelativeLayout>
@@ -301,9 +302,9 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:fontFamily="@font/avenir_regular"
-                    tools:text="5"
                     android:textColor="@color/colorGreen"
-                    android:textFontWeight="500" />
+                    android:textFontWeight="500"
+                    tools:text="5" />
 
 
             </RelativeLayout>

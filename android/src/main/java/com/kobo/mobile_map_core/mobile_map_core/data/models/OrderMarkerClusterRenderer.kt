@@ -33,7 +33,7 @@ class OrderMarkerClusterRenderer<T : ClusterItem> internal constructor(
             superWouldCluster = currentZoomLevel < maxZoomLevel
         }
 
-        return superWouldCluster && cluster.size > 20
+        return superWouldCluster && cluster.size > 10000
     }
 
 
