@@ -2,6 +2,7 @@ package com.kobo.mobile_map_core.mobile_map_core.ui.user_actions
 
 import android.content.Context
 import android.text.Editable
+import android.widget.TextView
 import androidx.fragment.app.FragmentManager
 import com.google.android.libraries.maps.GoogleMap
 import com.google.maps.android.clustering.ClusterManager
@@ -13,6 +14,7 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.asset_class_model.As
 interface UserTypeAction {
     fun openSearchAvailableTrucks()
     fun closeSearchBottomSheet()
+    fun setButtonTitles(search: TextView, track: TextView)
     fun setUpSpinner(context: Context, list: List<AssetClasses>, onSelect: (result: AssetClasses) -> Unit)
     fun setSearchForAvailableTrucks(isSearch: Boolean)
     fun setEtPickUp(pickupString: Editable?)

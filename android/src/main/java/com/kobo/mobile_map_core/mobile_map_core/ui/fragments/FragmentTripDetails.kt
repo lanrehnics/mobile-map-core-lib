@@ -79,7 +79,7 @@ class FragmentTripDetails : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(tripInfo: Trucks) =
+        fun newInstance(tripInfo: Trucks?) =
                 FragmentTripDetails().apply {
                     arguments = Bundle().apply {
                         putSerializable(ARG_PARAM, tripInfo)

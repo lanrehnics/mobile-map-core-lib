@@ -22,7 +22,6 @@ import com.google.android.libraries.maps.OnMapReadyCallback
 import com.google.android.libraries.maps.SupportMapFragment
 import com.google.android.libraries.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.snackbar.Snackbar
 import com.google.maps.android.clustering.ClusterManager
 import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
 import com.kobo.mobile_map_core.mobile_map_core.R
@@ -56,6 +55,7 @@ import com.kobo.mobile_map_core.mobile_map_core.utils.GpsUtils
 import com.xdev.mvvm.utils.Status
 import kotlinx.android.synthetic.main.activity_maps.*
 import kotlinx.android.synthetic.main.battlefield_landing_activity_main.*
+import kotlinx.android.synthetic.main.dedicated_truck_bottom_sheet.*
 import kotlinx.android.synthetic.main.fragment_user_options.*
 import kotlinx.android.synthetic.main.search_available_order.*
 import kotlinx.android.synthetic.main.search_available_truck.*
@@ -73,10 +73,11 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     private var searchRadius: Int? = 1
     private var searchForAvailableTrucks: Boolean = false
     private lateinit var data: Any
-    private var overviewW: Overview? = null
     private lateinit var userTypeAction: UserTypeAction
     private lateinit var searchCard: CardView
     private lateinit var clearSearch: ImageView
+    private lateinit var tvSearchFeature: TextView
+    private lateinit var tvTrackFeature: TextView
 
     override fun onAttachFragment(fragment: Fragment) {
         if (fragment is SearchForPlaces) {
@@ -105,6 +106,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         initializeViews()
         setupViewModel()
         setupFetchGroupedAssetObserver()
+        userTypeAction.setButtonTitles(tvSearchFeature, tvTrackFeature)
 
 
         // Initialize map, services, bottom sheet and drawer
@@ -212,7 +214,9 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         mMap = googleMap
         mMap.setOnMapLongClickListener {
             currentLatLng = it
+            subscribeForReverseGeocode()
             fetchAndSubscribeForLocationOverview()
+
         }
         clusterManager = ClusterManager(this, googleMap)
         ordersClusterManager = ClusterManager(this, googleMap)
@@ -251,7 +255,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     override fun multipleTruckClusteringMode() {
     }
 
-    override fun setUpLocationPermission() {
+    override fun setUpLocationPermission(goMyLocation: Boolean) {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
@@ -286,7 +290,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         }
     }
 
-    private fun fetchAndSubscribeForLocationOverview() {
+    override fun fetchAndSubscribeForLocationOverview() {
 
 
         tvHello.text = "Hello ${shaper.getString(MobileMapCorePlugin.KEY_USER_FIRST_NAME, "")}"
@@ -396,11 +400,8 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
                 btnCloseTruckInfo.visibility = View.INVISIBLE
                 searchCard.visibility = View.VISIBLE
                 userTypeAction.expandSearchBottomSheet()
-                if (
-                        truckDetailsBottomSheet.state == BottomSheetBehavior.STATE_EXPANDED ||
+                if (truckDetailsBottomSheet.state == BottomSheetBehavior.STATE_EXPANDED ||
                         availableOrderBottomSheet.state == BottomSheetBehavior.STATE_EXPANDED
-
-
                 ) {
                     truckDetailsBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
                     availableOrderBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
@@ -487,12 +488,18 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
             fetchAndSubscribeForLocationOverview()
             searchCard.visibility = View.VISIBLE
             clearSearch.visibility = View.GONE
+
+            truckDetailsBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
         }
         searchCard.visibility = View.GONE
         clearSearch.visibility = View.GONE
         btnSearchButton = findViewById(R.id.btnSearchButton)
         btnBookTruck = findViewById(R.id.btnBookTruck)
         btnSearchButtonOrder = findViewById(R.id.btnSearchButtonOrder)
+
+
+        tvSearchFeature = findViewById(R.id.tvSearchFeature)
+        tvTrackFeature = findViewById(R.id.tvTrackFeature)
 
 
         overviewBottomSheet = BottomSheetBehavior.from(findViewById(R.id.layout_bottom_sheet))
@@ -744,7 +751,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
     }
 
-    private fun bootstrapLocationOverview(overview: Overview?) {
+    override fun bootstrapLocationOverview(overview: Overview?) {
         overviewW = overview
         tvTruckOverviewAvailableTrucks.text = overview?.totalAvailableTrucks.toString()
         tvTruckOverviewActiveTrips.text = overview?.totalActiveTrucks.toString()
@@ -753,30 +760,8 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
             setupClusterManager(it as List<Trucks>)
         }
 
+        addKoboStationsAndCustomerLocationOnMap(overview)
 
-        overview?.customerLocations?.let {
-            it.forEach { cl ->
-                cl?.location?.let { loc ->
-                    mMap.addMarker(
-                            MarkerOptions()
-                                    .position(NewBaseMapActivity.toLatLngNotNull(loc.coordinates))
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_customerlocation)))
-                }
-            }
-
-
-        }
-
-        overview?.kobocareStations?.let {
-            it.forEach { cl ->
-                cl?.location?.let { loc ->
-                    mMap.addMarker(
-                            MarkerOptions()
-                                    .position(NewBaseMapActivity.toLatLngNotNull(loc.coordinates))
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_kobostation)))
-                }
-            }
-        }
         mMap.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(currentLatLng, 13.0F),
                 object : GoogleMap.CancelableCallback {
@@ -786,7 +771,9 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
                     override fun onCancel() {}
                 })
-        var circleOptions = CircleOptions()
+
+
+        val circleOptions = CircleOptions()
                 .center(currentLatLng).radius(3000.0)
                 .fillColor(Color.parseColor("#5029489b"))
                 .strokeColor(Color.parseColor("#29489b"))
@@ -830,9 +817,24 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         }
 
         if ((!truckData.polyline.isNullOrEmpty()) && truckData.type == TruckDataConst.TYPE_DESTINATION) {
-            drawPolyLine(mapService.decodePoly(truckData.polyline))
+            val listOfPolyline: List<LatLng> = mapService.decodePoly(truckData.polyline)
+            drawPolyLine(listOfPolyline)
+
+            listOfPolyline.firstOrNull()?.let {
+                mMap.addMarker(MarkerOptions()
+                        .position(it)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_droppinstarttrip)))
+            }
+
+            listOfPolyline.lastOrNull()?.let {
+                mMap.addMarker(MarkerOptions()
+                        .position(it)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_droppinendtrip)))
+            }
+
         }
 
+        overviewW?.let { addKoboStationsAndCustomerLocationOnMap(it) }
 
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(globalSelectedAdd.pickUp?.latLng, 14.5f))
         truckData.trucks?.forEach { model -> addTrucks(model) }
@@ -922,41 +924,40 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
                     object : GoogleMap.CancelableCallback {
                         override fun onFinish() {
 
-                            if (truck.bearing == null) {
-                                showErrorMessage(findViewById(R.id.mainMapHome), "No bearing for truck")
-                            } else {
-                                clearMapAndData(ClearCommand.MAP)
+//                                showErrorMessage(findViewById(R.id.mainMapHome), "No bearing for truck")
+                            clearMapAndData(ClearCommand.MAP)
 
-                                selectedMarker = mMap.addMarker(
-                                        MarkerOptions()
-                                                .position(it)
-                                                .rotation(truck.bearing.toFloat())
-                                                .icon(truckFromStatus(truck))
-                                )
+                            setTruckDetails(truck)
 
-                                searchCard.visibility = View.GONE
-                                clearSearch.visibility = View.VISIBLE
-                                truckDetailsBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
-                                availableOrderBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
-                                mqttTopic = "client/track/${truck.regNumber}".toLowerCase(Locale.getDefault())
-                                setUpMQTT()
-                                truck.events?.let { events ->
-                                    events.forEach { ev ->
+                            selectedMarker = mMap.addMarker(
+                                    MarkerOptions()
+                                            .position(it)
+                                            .rotation((truck.bearing ?: 0.0).toFloat())
+                                            .icon(truckFromStatus(truck))
+                            )
 
-                                        ev?.let { it ->
-                                            mMap.addMarker(
-                                                    toLatLng(it.location.coordinates)?.let { it1 ->
-                                                        MarkerOptions()
-                                                                .position(it1)
-                                                                .icon(eventMarkerIconFromEventName(it))
-                                                    }
-                                            )
-                                        }
+                            searchCard.visibility = View.GONE
+                            clearSearch.visibility = View.VISIBLE
+                            truckDetailsBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
+                            overviewBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+                            availableOrderBottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+                            mqttTopic = "client/track/${truck.regNumber}".toLowerCase(Locale.getDefault())
+                            setUpMQTT()
 
+                            truck.events?.let { events ->
+                                events.forEach { ev ->
+                                    ev?.let { it ->
+                                        mMap.addMarker(
+                                                toLatLng(it.location.coordinates)?.let { it1 ->
+                                                    MarkerOptions()
+                                                            .position(it1)
+                                                            .icon(eventMarkerIconFromEventName(it))
+                                                }
+                                        )
                                     }
+
                                 }
                             }
-
 
                             if (truck.tripDetail != null) {
                                 if (truck.tripDetail.travelledRoutePolyline.isNotEmpty() && truck.tripDetail.currentBestRoute.isNotEmpty()) {
@@ -972,5 +973,15 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
                         override fun onCancel() {}
                     })
         }
+    }
+
+    private fun setTruckDetails(truck: Trucks) {
+        tvTruckRegNo.text = truck.regNumber
+        tvAssetInfo.text = "${truck.assetClass?.type} ${truck.assetClass?.size} ${truck.assetClass?.unit}"
+        tvCurrentNavigation.text = truck.lastKnownLocation?.address ?: "N/A"
+        tvRating.text = "5.0"
+        tvDriverName.text = "${truck.driver?.firstName ?: "N/A"} ${truck.driver?.lastName ?: ""} "
+        tvDriverRating.text = truck.driver?.rating?.toString() ?: "5.0"
+
     }
 }
