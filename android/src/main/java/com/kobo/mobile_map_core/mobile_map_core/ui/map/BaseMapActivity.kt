@@ -178,9 +178,9 @@ abstract class BaseMapActivity : NewBaseMapActivity() {
                 tvDriverRating.text = selectedTruck?.driver?.rating.toString()
                 ratingBarDriverRating.rating = selectedTruck?.driver?.rating?.toFloat()!!
 
-                this.let {
+                context.let {
                     Glide.with(it)
-                            .load(selectedTruck?.driver?.image)
+                            .load(selectedTruck.driver.image)
                             .placeholder(ColorDrawable(Color.BLACK))
                             .into(profile_image)
                 }
