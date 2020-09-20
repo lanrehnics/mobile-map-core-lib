@@ -1,8 +1,11 @@
 package com.kobo.mobile_map_core.mobile_map_core.ui.map
 
+//import com.google.android.libraries.maps.CameraUpdateFactory
+//import com.google.android.libraries.maps.GoogleMap
+//import com.google.android.libraries.maps.model.LatLngBounds
+//import com.google.android.libraries.maps.model.MarkerOptions
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -16,24 +19,17 @@ import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
 import com.google.android.libraries.maps.CameraUpdateFactory
 import com.google.android.libraries.maps.GoogleMap
-import com.google.android.libraries.maps.model.BitmapDescriptorFactory
 import com.google.android.libraries.maps.model.LatLngBounds
 import com.google.android.libraries.maps.model.MarkerOptions
-//import com.google.android.libraries.maps.CameraUpdateFactory
-//import com.google.android.libraries.maps.GoogleMap
-//import com.google.android.libraries.maps.model.LatLngBounds
-//import com.google.android.libraries.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
 import com.kobo.mobile_map_core.mobile_map_core.R
-import com.kobo.mobile_map_core.mobile_map_core.animation.TruckMover
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiHelper
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiServiceImpl
 import com.kobo.mobile_map_core.mobile_map_core.data.models.ClearCommand
 import com.kobo.mobile_map_core.mobile_map_core.data.models.NavigationData
 import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.ActiveTripsData
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.Trucks
-import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.Overview
 import com.kobo.mobile_map_core.mobile_map_core.enums.FocusFrom
 import com.kobo.mobile_map_core.mobile_map_core.enums.MapDisplayMode
 import com.kobo.mobile_map_core.mobile_map_core.ui.adapter.ActiveTripsDetailsPagerAdapter
@@ -45,11 +41,7 @@ import com.kobo.mobile_map_core.mobile_map_core.ui.fragments.FragmentTripDetails
 import com.kobo.mobile_map_core.mobile_map_core.ui.viewmodel.ActiveTripsViewModel
 import com.kobo.mobile_map_core.mobile_map_core.utils.GpsUtils
 import com.xdev.mvvm.utils.Status
-import kotlinx.android.synthetic.main.activity_dedicated_truck.*
 import kotlinx.android.synthetic.main.activity_track_active_trips.*
-import kotlinx.android.synthetic.main.activity_track_active_trips.pBar
-import kotlinx.android.synthetic.main.activity_track_active_trips.switchToList
-import kotlinx.android.synthetic.main.fragment_user_options.*
 import java.util.*
 
 
@@ -155,7 +147,8 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
 
             MobileMapCorePlugin.APP_TYPE_PARTNER -> {
                 transporterMode = true
-            }}
+            }
+        }
 
 
     }
@@ -440,11 +433,11 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
 
 
                             selectedMarker = mMap.addMarker(
-                                    truckInfo.lastKnownLocation?.coordinates?.let { cord-> toLatLng(cord) }?.let { it2 ->
-                                            MarkerOptions()
-                                                    .position(it2)
-                                                    .rotation((truckInfo.bearing?: 0.0).toFloat())
-                                                    .icon(truckFromStatus(truckInfo))
+                                    truckInfo.lastKnownLocation?.coordinates?.let { cord -> toLatLng(cord) }?.let { it2 ->
+                                        MarkerOptions()
+                                                .position(it2)
+                                                .rotation((truckInfo.bearing ?: 0.0).toFloat())
+                                                .icon(truckFromStatus(truckInfo))
                                     }
                             )
 
@@ -475,17 +468,18 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
         }
     }
 
-    override fun onSwitchToMapClickListener() {
+    override fun onSwitchToMapClickListener(data: ActiveTripsData) {
+        activeTripsData = data
         bottomSheetView.visibility = View.GONE
         val count = supportFragmentManager.backStackEntryCount
         if (count > 0) {
             supportFragmentManager.popBackStack()
         }
-        if (pBar.visibility == View.GONE) {
-            displayMode = MapDisplayMode.MultipleTruckClusteringMode
-            switchToList.visibility = View.VISIBLE
-            openMapFragment()
-        }
+//        if (pBar.visibility == View.GONE) {
+        displayMode = MapDisplayMode.MultipleTruckClusteringMode
+        switchToList.visibility = View.VISIBLE
+        openMapFragment()
+//        }
     }
 
 

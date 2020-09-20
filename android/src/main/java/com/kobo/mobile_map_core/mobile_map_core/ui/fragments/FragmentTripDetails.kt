@@ -119,8 +119,8 @@ class FragmentTripDetails : Fragment() {
         tvDropOffAddressTwo.text = "____"
         tvDeliveryAddress.text = trips.tripDetail?.deliveryLocation?.address
         tvEta.text = trips.tripDetail?.expectedETAObject?.text
-        tvSalesNo.text = trips.tripDetail?.salesOrderNo
-        tvWaybillNo.text = trips.tripDetail?.waybillNo
+        tvSalesNo.text = trips.tripDetail?.salesOrderNo ?: "N/A"
+        tvWaybillNo.text = trips.tripDetail?.waybillNo ?: "N/A"
         tvTruckRegNo.text = trips.regNumber
         tvAssetInfo.text = "${trips.assetClass?.type} ${trips.assetClass?.size}${trips.assetClass?.unit}"
         tvRating.text = "N/A"
@@ -130,7 +130,7 @@ class FragmentTripDetails : Fragment() {
         tvCargoSize.text = "N/A"
         tvCurrentNavigation.text = trips.lastKnownLocation?.address
         tvDriverName.text = trips.driver?.firstName
-        tvDriverRating.text = trips.driver?.rating.toString()
+        trips.driver?.rating?.let {  tvDriverRating.text =  it.toString()}
         trips.driver?.rating?.toFloat()?.let {  ratingBarDriverRating.rating = it  }
         activity?.let {
             Glide.with(it)

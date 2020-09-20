@@ -35,8 +35,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
                 onPressed: () async {
                   MobileMapCore.loadMap({
                     "app_type": SessionManager.userType.toLowerCase(),
-                    "user_type_and_id":
-                        "${SessionManager.userType.toLowerCase()}Id=${SessionManager.userId}",
+                    "user_type_and_id": "${SessionManager.userType.toLowerCase()}Id=${SessionManager.userId}",
                     "token": SessionManager.token,
                     "id": SessionManager.userId,
                     "user_name": SessionManager.name,
@@ -65,8 +64,7 @@ class _LandingPageScreenState extends State<LandingPageScreen> {
               FlatButton(
                   onPressed: () {
                     SessionManager.logOut();
-                    Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (ct) => LoginScreen()));
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (ct) => LoginScreen()));
                   },
                   child: Text("Logout"))
             ],
