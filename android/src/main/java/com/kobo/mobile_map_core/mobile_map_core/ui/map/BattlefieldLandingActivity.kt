@@ -663,6 +663,9 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
                 userTypeAction.setSearchForAvailableTrucks(searchForAvailableTrucks)
                 btnCloseTruckInfo.visibility = View.INVISIBLE
                 userTypeAction.expandSearchBottomSheet()
+                truckMover?.stopTruckMovementTimer()
+                truckMover = null
+                keepListening = false
             }
         } else {
             super.onBackPressed()
@@ -917,6 +920,10 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         val count = supportFragmentManager.backStackEntryCount
         if (count > 0) {
             supportFragmentManager.popBackStack()
+        }
+
+        if(truck.lastKnownLocation == null){
+            showErrorMessage(findViewById(R.id.mainMapHome), "oops! Couldn't detect truck last location.")
         }
         toLatLng(truck.lastKnownLocation?.coordinates)?.let {
             mMap.animateCamera(

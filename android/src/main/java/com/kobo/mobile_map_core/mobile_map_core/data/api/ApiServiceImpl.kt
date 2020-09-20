@@ -2,13 +2,13 @@ package com.kobo.mobile_map_core.mobile_map_core.data.api
 
 import android.content.Context
 import android.util.ArrayMap
-import com.google.gson.Gson
 import androidx.preference.PreferenceManager
 import com.google.android.libraries.maps.model.LatLng
-import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.ActiveTripsDataResponse
+import com.google.gson.Gson
 import com.kobo.mobile_map_core.mobile_map_core.AppConfig
 import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
 import com.kobo.mobile_map_core.mobile_map_core.data.models.BookTruckResponse
+import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.ActiveTripsDataResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.asset_class_model.AssetClassResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.AutoCompleteResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.AvailableTruckResponse
@@ -173,6 +173,22 @@ class ApiServiceImpl(val context: Context) : ApiService {
                 .build()
                 .getObjectSingle(OverviewResponse::class.java)
     }
+
+//    override fun fetchLocationOverview(userTypeAndId: String, latLng: LatLng): Single<OverviewResponse> {
+//
+//        return rxSingle {
+//            try {
+//                val headers: ArrayMap<String, String> = ArrayMap()
+//                headers["Authorization"] = getToken()
+//
+//                val res = LiteHttp.instance?.get(AppConfig.locationOverview(context, userTypeAndId, latLng), headers, null)
+//                val result = Gson().fromJson(res.toString(), OverviewResponse::class.java)
+//                result
+//            } catch (e: Exception) {
+//                throw  e
+//            }
+//        }
+//    }
 
 
     override fun bookTruck(truckReg: String?): Single<BookTruckResponse> {

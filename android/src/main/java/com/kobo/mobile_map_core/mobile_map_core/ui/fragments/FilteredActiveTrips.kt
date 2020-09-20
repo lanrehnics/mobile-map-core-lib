@@ -15,7 +15,8 @@ import com.kobo.mobile_map_core.mobile_map_core.MobileMapCorePlugin
 import com.kobo.mobile_map_core.mobile_map_core.R
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiHelper
 import com.kobo.mobile_map_core.mobile_map_core.data.api.ApiServiceImpl
-import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.Trips
+import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.ActiveTripsData
+import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.ActiveTripsDataResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.Trucks
 import com.kobo.mobile_map_core.mobile_map_core.ui.adapter.ActiveTripsFilteredListAdapter
 import com.kobo.mobile_map_core.mobile_map_core.ui.adapter.OnActiveTripItemClickListener
@@ -55,6 +56,7 @@ class FilteredActiveTrips : Fragment(), OnActiveTripItemClickListener {
     private lateinit var switchToMap: ImageView
     private lateinit var adapter: ActiveTripsFilteredListAdapter
     private lateinit var getActiveTripsViewModel: ActiveTripsViewModel
+    private  lateinit var data: ActiveTripsData;
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,7 +94,7 @@ class FilteredActiveTrips : Fragment(), OnActiveTripItemClickListener {
 
         switchToMap = view.findViewById(R.id.switchToMap)
         switchToMap.setOnClickListener {
-            switchToMapClickListener.onSwitchToMapClickListener()
+            switchToMapClickListener.onSwitchToMapClickListener(data)
         }
 
 
@@ -141,7 +143,7 @@ class FilteredActiveTrips : Fragment(), OnActiveTripItemClickListener {
                 Status.SUCCESS -> {
 //                    progressBar.visibility = View.GONE
                     listShimmerFilteredActiveTrips.hideShimmer()
-                    it.data?.let { autoComplete -> autoComplete.data.tripsData.trucks?.let { it1 -> renderList(it1) } }
+                    it.data?.let { activeTrips -> bootstrapActiveTrips(activeTrips) }
 //                    recyclerView.visibility = View.VISIBLE
                 }
                 Status.LOADING -> {
@@ -155,6 +157,12 @@ class FilteredActiveTrips : Fragment(), OnActiveTripItemClickListener {
                 }
             }
         })
+    }
+
+    private fun bootstrapActiveTrips(activeTrips: ActiveTripsDataResponse) {
+        data = activeTrips.data
+        activeTrips.data.tripsData.trucks?.let { it1 -> renderList(it1) }
+
     }
 
 
@@ -177,6 +185,6 @@ class FilteredActiveTrips : Fragment(), OnActiveTripItemClickListener {
     }
 
     interface SwitchToMapClickListener {
-        fun onSwitchToMapClickListener()
+        fun onSwitchToMapClickListener(data: ActiveTripsData)
     }
 }

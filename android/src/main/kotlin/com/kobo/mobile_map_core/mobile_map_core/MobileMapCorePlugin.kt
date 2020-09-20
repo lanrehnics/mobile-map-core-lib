@@ -57,8 +57,8 @@ class MobileMapCorePlugin : MethodCallHandler {
 
 
         private val PROD_CLOUDMQTT_HOST = "tcp://cool-newsreader.cloudmqtt.com:1883"
-        private val PROD_CLOUDMQTT_USER = "geo-android"
-        private val PROD_CLOUDMQTT_PASS = "12Jayi$$3KbndG@e"
+        private val PROD_CLOUDMQTT_USER = "geo-web"
+        private val PROD_CLOUDMQTT_PASS = "12Jayi$$3KWbbG@"
 
 
         const val KEY_CLOUDMQTT_HOST = "key_cloudmqtt_host"

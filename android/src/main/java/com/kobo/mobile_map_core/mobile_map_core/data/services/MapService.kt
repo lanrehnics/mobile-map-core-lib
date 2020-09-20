@@ -17,31 +17,31 @@ class MapService constructor(private val mContext: Context) {
 
     private val geoBaseUrl =
             "https://maps.googleapis.com/maps/api/directions/json?"
-    private val googleMapApiKey: String = "AIzaSyCZsmroa6P94FfCXaWIlVd9PcVpVpQYdqs"
+//    private val googleMapApiKey: String = "AIzaSyCZsmroa6P94FfCXaWIlVd9PcVpVpQYdqs"
 
-    suspend fun getPolyline(origin: LatLng, destination: LatLng): List<LatLng> {
-        var polyLineList: List<LatLng> = ArrayList()
-        val res = LiteHttp.instance?.get(getMapRouteUrlByTrip(origin, destination))
-//        print(res.toString())
-        val result = Gson().fromJson(res.toString(), PolylineJsonDecoder::class.java)
-        if (result.routes.isNotEmpty()) {
-            polyLineList = decodePoly(result.routes[0].overview_polyline.points)
-        }
-        return polyLineList
-    }
+//    suspend fun getPolyline(origin: LatLng, destination: LatLng): List<LatLng> {
+//        var polyLineList: List<LatLng> = ArrayList()
+//        val res = LiteHttp.instance?.get(getMapRouteUrlByTrip(origin, destination))
+////        print(res.toString())
+//        val result = Gson().fromJson(res.toString(), PolylineJsonDecoder::class.java)
+//        if (result.routes.isNotEmpty()) {
+//            polyLineList = decodePoly(result.routes[0].overview_polyline.points)
+//        }
+//        return polyLineList
+//    }
 
-    private fun getMapRouteUrlByTrip(origin: LatLng, destination: LatLng): String {
-        return "${geoBaseUrl}origin=" +
-                origin.latitude.toString() +
-                "," +
-                origin.longitude.toString() +
-                "&destination=" +
-                destination.latitude.toString() +
-                "," +
-                destination.longitude.toString() +
-                "&mode=driving" +
-                "&key=${googleMapApiKey}"
-    }
+//    private fun getMapRouteUrlByTrip(origin: LatLng, destination: LatLng): String {
+//        return "${geoBaseUrl}origin=" +
+//                origin.latitude.toString() +
+//                "," +
+//                origin.longitude.toString() +
+//                "&destination=" +
+//                destination.latitude.toString() +
+//                "," +
+//                destination.longitude.toString() +
+//                "&mode=driving" +
+//                "&key=${googleMapApiKey}"
+//    }
 
     fun decodePoly(encoded: String): List<LatLng> {
         val poly = ArrayList<LatLng>()

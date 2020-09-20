@@ -12,7 +12,6 @@ import com.google.android.libraries.maps.model.PolylineOptions
 import com.kobo.mobile_map_core.mobile_map_core.data.models.activetrips.Location
 import com.kobo.mobile_map_core.mobile_map_core.ui.map.NewBaseMapActivity
 import java.util.*
-import kotlin.collections.ArrayList
 
 class TruckMover(private val googleMap: GoogleMap, private val context: Context, private var selectedMarker: Marker?) {
 
