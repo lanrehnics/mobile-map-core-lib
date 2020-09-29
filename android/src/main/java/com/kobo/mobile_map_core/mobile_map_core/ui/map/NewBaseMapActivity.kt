@@ -74,7 +74,7 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback, Goo
     protected lateinit var mMap: GoogleMap
     protected lateinit var mMapView: View
     protected var overviewW: Overview? = null
-    protected lateinit var currentLatLng: LatLng
+    protected var currentLatLng: LatLng? = null
     protected lateinit var fusedLocationClient: FusedLocationProviderClient
     protected lateinit var clusterManager: ClusterManager<TruckClusterItem>
     protected var truckMarkerManager: MutableMap<String?, Trucks>? = mutableMapOf()
@@ -94,7 +94,6 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback, Goo
         mapService = MapService(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
-
 
 
     fun clearMapAndData(command: ClearCommand) {
@@ -775,14 +774,15 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback, Goo
 
         addKoboStationsAndCustomerLocationOnMap(overview)
 
-        val marker = mMap.addMarker(
-                MarkerOptions()
-                        .position(currentLatLng)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location)))
+        currentLatLng?.let {
+            val marker = mMap.addMarker(
+                    MarkerOptions()
+                            .position(it)
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location)))
+        }
 
 
     }
-
 
 
 }

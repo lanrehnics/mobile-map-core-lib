@@ -179,23 +179,26 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
     }
 
     private fun subscribeForReverseGeocode() {
-        mapLandingViewModel.getReverseGeocode(currentLatLng).observe(this, androidx.lifecycle.Observer {
-            when (it.status) {
-                Status.SUCCESS -> {
+        currentLatLng?.let {
+            mapLandingViewModel.getReverseGeocode(it).observe(this, androidx.lifecycle.Observer {
+                when (it.status) {
+                    Status.SUCCESS -> {
 
-                    it.data?.let { response -> setMyCurrentLocations(response) }
-                }
-                Status.LOADING -> {
+                        it.data?.let { response -> setMyCurrentLocations(response) }
+                    }
+                    Status.LOADING -> {
 //                    progressBar.visibility = View.VISIBLE
 //                    recyclerView.visibility = View.GONE
-                }
-                Status.ERROR -> {
-                    //Handle Error
+                    }
+                    Status.ERROR -> {
+                        //Handle Error
 //                    progressBar.visibility = View.GONE
 //                    Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+                    }
                 }
-            }
-        })
+            })
+        }
+
     }
 
     private fun setMyCurrentLocations(res: ReverseGeocodeResponse) {
@@ -295,23 +298,25 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
 
         tvHello.text = "Hello ${shaper.getString(MobileMapCorePlugin.KEY_USER_FIRST_NAME, "")}"
         val userTypeAndId = shaper.getString(MobileMapCorePlugin.KEY_USER_TYPE_AND_ID, "")
+        currentLatLng?.let {
+            mapLandingViewModel.getLocationOverview(userTypeAndId!!, it).observe(this, androidx.lifecycle.Observer {
+                when (it.status) {
+                    Status.SUCCESS -> {
+                        pBar.visibility = View.INVISIBLE
+                        switchToList.visibility = View.INVISIBLE
+                        it.data?.let { response -> bootstrapLocationOverview(response.data?.overview) }
+                    }
+                    Status.LOADING -> {
+                        pBar.visibility = View.VISIBLE
+                    }
+                    Status.ERROR -> {
+                        pBar.visibility = View.INVISIBLE
+                        //Handle Error
+                    }
+                }
+            })
+        }
 
-        mapLandingViewModel.getLocationOverview(userTypeAndId!!, currentLatLng).observe(this, androidx.lifecycle.Observer {
-            when (it.status) {
-                Status.SUCCESS -> {
-                    pBar.visibility = View.INVISIBLE
-                    switchToList.visibility = View.INVISIBLE
-                    it.data?.let { response -> bootstrapLocationOverview(response.data?.overview) }
-                }
-                Status.LOADING -> {
-                    pBar.visibility = View.VISIBLE
-                }
-                Status.ERROR -> {
-                    pBar.visibility = View.INVISIBLE
-                    //Handle Error
-                }
-            }
-        })
 
     }
 
@@ -783,10 +788,12 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
                 .strokeWidth(1F)
         mMap.addCircle(circleOptions)
 
-        val marker = mMap.addMarker(
-                MarkerOptions()
-                        .position(currentLatLng)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location)))
+        currentLatLng?.let {
+            mMap.addMarker(
+                    MarkerOptions()
+                            .position(it)
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location)))
+        }
 
 
     }
@@ -922,7 +929,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
             supportFragmentManager.popBackStack()
         }
 
-        if(truck.lastKnownLocation == null){
+        if (truck.lastKnownLocation == null) {
             showErrorMessage(findViewById(R.id.mainMapHome), "oops! Couldn't detect truck last location.")
         }
         toLatLng(truck.lastKnownLocation?.coordinates)?.let {

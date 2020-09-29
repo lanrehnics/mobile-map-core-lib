@@ -56,7 +56,7 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
     private lateinit var getActiveTripsViewModel: ActiveTripsViewModel
     private lateinit var tripInfoBottomSheet: BottomSheetBehavior<View>
     private lateinit var bottomSheetView: View
-    private lateinit var activeTripsData: ActiveTripsData
+    private  var activeTripsData: ActiveTripsData? = null
 
 
     val TRIP_INFO = "trip_info"
@@ -387,13 +387,13 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
 
     override fun multipleTruckClusteringMode() {
         clearMapAndData(ClearCommand.ALL)
-        tripMarkerManager = activeTripsData.tripsData.trucks?.map { it?.regNumber!! to it }?.toMap()?.toMutableMap()
+        tripMarkerManager = activeTripsData?.tripsData?.trucks?.map { it?.regNumber!! to it }?.toMap()?.toMutableMap()
 //        val convertTripsToTruckList: List<Trucks?>? = activeTripsData.tripsData.trucks
 //        convertTripsToTruckList?.let { setupClusterManager(it) }
-        activeTripsData.tripsData.trucks?.let { setupClusterManager(it) }
+        activeTripsData?.tripsData?.trucks?.let { setupClusterManager(it) }
         GpsUtils(this).turnGPSOn {
             if (it) {
-                setUpLocationPermission(goMyLocation = (activeTripsData.tripsData.trucks
+                setUpLocationPermission(goMyLocation = (activeTripsData?.tripsData?.trucks
                         ?: ArrayList()).isEmpty())
             }
         }
@@ -482,27 +482,28 @@ class TrackActiveTrips : NewBaseMapActivity(), FilteredActiveTrips.OnTripInfoCli
 //        }
     }
 
-
     override fun fetchAndSubscribeForLocationOverview() {
 
         val userTypeAndId = shaper.getString(MobileMapCorePlugin.KEY_USER_TYPE_AND_ID, "")
+        currentLatLng?.let {
+            getActiveTripsViewModel.getLocationOverview(userTypeAndId!!, it).observe(this, androidx.lifecycle.Observer {
+                when (it.status) {
+                    Status.SUCCESS -> {
+                        pBar.visibility = View.INVISIBLE
+                        switchToList.visibility = View.INVISIBLE
+                        it.data?.let { response -> bootstrapLocationOverview(response.data?.overview) }
+                    }
+                    Status.LOADING -> {
+                        pBar.visibility = View.VISIBLE
+                    }
+                    Status.ERROR -> {
+                        pBar.visibility = View.INVISIBLE
+                        //Handle Error
+                    }
+                }
+            })
+        }
 
-        getActiveTripsViewModel.getLocationOverview(userTypeAndId!!, currentLatLng).observe(this, androidx.lifecycle.Observer {
-            when (it.status) {
-                Status.SUCCESS -> {
-                    pBar.visibility = View.INVISIBLE
-                    switchToList.visibility = View.INVISIBLE
-                    it.data?.let { response -> bootstrapLocationOverview(response.data?.overview) }
-                }
-                Status.LOADING -> {
-                    pBar.visibility = View.VISIBLE
-                }
-                Status.ERROR -> {
-                    pBar.visibility = View.INVISIBLE
-                    //Handle Error
-                }
-            }
-        })
 
     }
 

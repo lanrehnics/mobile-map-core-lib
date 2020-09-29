@@ -52,7 +52,7 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
     private lateinit var dedicatedTruckViewModel: DedicatedTruckViewModel
     private lateinit var dedicatedTruckBottomSheet: BottomSheetBehavior<View>
     private lateinit var bottomSheetView: View
-    private lateinit var dedicatedTruckData: DedicatedTruckData
+    private var dedicatedTruckData: DedicatedTruckData? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -128,10 +128,10 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
                             truckInfo.lastKnownLocation?.let {
                                 selectedMarker = mMap.addMarker(
                                         toLatLng(it.coordinates)?.let { it1 ->
-                                                MarkerOptions()
-                                                        .position(it1)
-                                                        .rotation((truckInfo.bearing?:0.0).toFloat())
-                                                        .icon(truckFromStatus(truckInfo))
+                                            MarkerOptions()
+                                                    .position(it1)
+                                                    .rotation((truckInfo.bearing ?: 0.0).toFloat())
+                                                    .icon(truckFromStatus(truckInfo))
                                         }
 
                                 )
@@ -161,11 +161,11 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
 
     override fun multipleTruckClusteringMode() {
         clearMapAndData(ClearCommand.ALL)
-        truckMarkerManager = dedicatedTruckData.truckData.trucks?.map { it.regNumber to it }?.toMap()?.toMutableMap()
-        dedicatedTruckData.truckData.trucks?.let { setupClusterManager(it) }
+        truckMarkerManager = dedicatedTruckData?.truckData?.trucks?.map { it.regNumber to it }?.toMap()?.toMutableMap()
+        dedicatedTruckData?.truckData?.trucks?.let { setupClusterManager(it) }
         GpsUtils(this).turnGPSOn {
             if (it) {
-                setUpLocationPermission(goMyLocation = (dedicatedTruckData.truckData.trucks
+                setUpLocationPermission(goMyLocation = (dedicatedTruckData?.truckData?.trucks
                         ?: ArrayList()).isEmpty())
             }
         }
@@ -361,23 +361,25 @@ class DedicatedTruckActivity : NewBaseMapActivity(), OnDedicatedTruckItemClickLi
 
 
         val userTypeAndId = shaper.getString(MobileMapCorePlugin.KEY_USER_TYPE_AND_ID, "")
+        currentLatLng?.let {
+            dedicatedTruckViewModel.getLocationOverview(userTypeAndId!!, it).observe(this, androidx.lifecycle.Observer {
+                when (it.status) {
+                    Status.SUCCESS -> {
+                        pBar.visibility = View.INVISIBLE
+                        switchToList.visibility = View.INVISIBLE
+                        it.data?.let { response -> bootstrapLocationOverview(response.data?.overview) }
+                    }
+                    Status.LOADING -> {
+                        pBar.visibility = View.VISIBLE
+                    }
+                    Status.ERROR -> {
+                        pBar.visibility = View.INVISIBLE
+                        //Handle Error
+                    }
+                }
+            })
+        }
 
-        dedicatedTruckViewModel.getLocationOverview(userTypeAndId!!, currentLatLng).observe(this, androidx.lifecycle.Observer {
-            when (it.status) {
-                Status.SUCCESS -> {
-                    pBar.visibility = View.INVISIBLE
-                    switchToList.visibility = View.INVISIBLE
-                    it.data?.let { response -> bootstrapLocationOverview(response.data?.overview) }
-                }
-                Status.LOADING -> {
-                    pBar.visibility = View.VISIBLE
-                }
-                Status.ERROR -> {
-                    pBar.visibility = View.INVISIBLE
-                    //Handle Error
-                }
-            }
-        })
 
     }
 
