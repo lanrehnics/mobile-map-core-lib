@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:paddingHorizontal="16dp">
+
+
+    <TextView
+        android:id="@+id/tvCustomerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/avenir_heavy"
+        android:textColor="@color/colorPrimaryTextLight"
+        android:textSize="16sp"
+        tools:text="Dangote Cement LTD" />
+
+    <TextView
+        android:id="@+id/tvTotalOrders"
+        android:layout_alignTop="@+id/tvCustomerName"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/avenir_heavy"
+        android:textColor="@color/colorPrimaryText"
+        android:textSize="16sp"
+        tools:text="10 orders" />
+
+    <TextView
+        android:id="@+id/tvPickUpLocationName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvCustomerName"
+        android:layout_marginTop="2dp"
+        android:fontFamily="@font/avenir_regular"
+        android:textColor="@color/green"
+        android:textSize="12sp"
+        tools:text="Jibowu Loading Station" />
+
+    <TextView
+        android:id="@+id/tvAssetInfo"
+        android:layout_alignTop="@+id/tvPickUpLocationName"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/avenir_regular"
+        android:textColor="@color/green"
+        android:textSize="12sp"
+        tools:text="Flatbed 40ft" />
+
+    <TextView
+        android:id="@+id/tvPickUpAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvPickUpLocationName"
+        android:layout_marginTop="2dp"
+        android:fontFamily="@font/avenir_regular"
+        android:textColor="@android:color/black"
+        android:textSize="12sp"
+        tools:text="No 22 Ikorodu road, Jibowu Bus stop, Lagos" />
+
+    <TextView
+        android:id="@+id/tvEta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvPickUpAddress"
+        android:layout_marginTop="2dp"
+        android:fontFamily="@font/avenir_regular"
+        android:textColor="@color/tcolorRed"
+        android:textSize="12sp"
+        tools:text="25 minutes away" />
+
+
+    <View
+        android:background="@color/colorDividerGrey"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/tvEta"
+        android:layout_marginTop="20dp" />
+
+
+</RelativeLayout>

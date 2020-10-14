@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/searchAvailableTruckId"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:behavior_hideable="true"
+    app:behavior_peekHeight="120dp"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:orientation="vertical"
+        tools:context=".ui.map.SearchAvailableTruck">
+
+        <RelativeLayout
+            android:id="@+id/bottomSheetHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bottom_sheet_bg"
+            android:paddingLeft="24dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="100dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/avenir_regular"
+                android:text="Search available trucks"
+                android:textColor="@color/colorPrimaryTextLight"
+                android:textFontWeight="800"
+                android:textSize="20sp" />
+
+            <ImageButton
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginEnd="22dp"
+                android:background="@android:color/transparent"
+                android:onClick="closeSearchBottomSheet"
+                android:src="@android:drawable/ic_menu_close_clear_cancel" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="70dp"
+            android:background="@drawable/bottom_sheet_bg_white"
+            android:orientation="vertical"
+            android:paddingLeft="17dp"
+            android:paddingRight="17dp"
+            android:paddingBottom="50dp">
+
+            <TextView
+                android:id="@+id/whatTypeOfTruck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="54dp"
+                android:fontFamily="@font/avenir_regular"
+                android:text="What type of truck do you need?"
+                android:textColor="@color/colorPrimaryText"
+                android:textSize="14sp" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Spinner
+                    android:id="@+id/spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="2.5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/holo_bg"
+                    android:popupBackground="@drawable/anchor_bg" />
+
+
+<!--                <Spinner-->
+<!--                    android:id="@+id/spinner2"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="50dp"-->
+<!--                    android:layout_marginLeft="2.5dp"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:background="@drawable/holo_bg"-->
+<!--                    android:popupBackground="@drawable/anchor_bg" />-->
+
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/txtView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="23dp"
+                android:fontFamily="@font/avenir_regular"
+                android:text="Set pickup location"
+                android:textColor="@color/colorPrimaryText"
+                android:textSize="14sp" />
+
+
+            <EditText
+                android:id="@+id/etPickUpLocation"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/holo_bg"
+                android:clickable="true"
+                android:focusable="false"
+                android:fontFamily="@font/avenir_regular"
+                android:hint="click here"
+                android:onClick="openFragmentSearchForPlacesForPickUpLocation"
+                android:paddingLeft="13dp"
+                android:textColor="@color/colorPrimaryText"
+                android:textColorHint="@color/colorPrimaryText"
+                android:textSize="16sp" />
+
+
+            <RadioGroup
+                android:id="@+id/toggle"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="26dp"
+                android:background="@drawable/holo_bg"
+                android:checkedButton="@+id/offer"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/setSearchRadius"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="1dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/toggle_widget_background"
+                    android:button="@null"
+                    android:checked="true"
+                    android:fontFamily="@font/avenir_regular"
+                    android:gravity="center"
+                    android:onClick="setSearchRadius"
+                    android:text="Set search radius"
+                    android:textColor="@color/colorPrimaryText"
+                    android:textFontWeight="800" />
+
+                <RadioButton
+                    android:id="@+id/setToLocation"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginRight="1dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/toggle_widget_background"
+                    android:button="@null"
+                    android:checked="false"
+                    android:fontFamily="@font/avenir_regular"
+                    android:gravity="center"
+                    android:onClick="setToLocation"
+                    android:text="To Location"
+                    android:textColor="@color/colorPrimaryText"
+                    android:textFontWeight="800" />
+            </RadioGroup>
+
+            <EditText
+                android:id="@+id/editTextToLocation"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/holo_bg"
+                android:clickable="true"
+                android:focusable="false"
+                android:fontFamily="@font/avenir_regular"
+                android:hint="click here"
+                android:onClick="openFragmentSearchForPlaces"
+                android:paddingLeft="13dp"
+                android:textColor="@color/colorPrimaryText"
+                android:textColorHint="@color/colorPrimaryText"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <SeekBar
+                android:id="@+id/seekBar"
+                style="@style/MySeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="39dp"
+                android:max="5" />
+
+            <RelativeLayout
+                android:id="@+id/calibration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/avenir_regular"
+                    android:text="1KM"
+                    android:textColor="@color/colorPrimaryText"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/seekBarIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:fontFamily="@font/avenir_regular"
+                    android:text="2.5 KM"
+                    android:textColor="@color/colorPrimaryText"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:fontFamily="@font/avenir_regular"
+                    android:text="5KM"
+                    android:textColor="@color/colorPrimaryText"
+                    android:textSize="14sp" />
+
+            </RelativeLayout>
+
+
+            <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
+                android:id="@+id/btnSearchButton"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="40dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/button_bg"
+                android:fontFamily="@font/avenir_medium"
+                android:gravity="center"
+                android:text="SEARCH"
+                android:textColor="@color/colorSwitchNotSelected"
+                android:textSize="16sp"
+                app:spinning_bar_color="@color/colorPrimaryTextLight" />
+
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+</androidx.core.widget.NestedScrollView>

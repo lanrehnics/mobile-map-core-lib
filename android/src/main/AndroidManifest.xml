@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.kobo.mobile_map_core.mobile_map_core">
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -7,21 +8,48 @@
          location permissions for the 'MyLocation' functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application>
+
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data  android:name="com.kobo.mobile_map_core.mobile_map_core.AndroidNetworkingInitializer"
+                android:value="androidx.startup" />
+        </provider>
+
         <activity
-            android:name=".search.SearchActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar"
-            />
+            android:name=".ui.map.NavigationActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity
+            android:name=".ui.map.DedicatedTruckActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity
+            android:name=".ui.map.TrackActiveTrips"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity
+            android:name=".ui.map.SearchAvailableTruck"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".map.MapsActivity"
+            android:name=".ui.map.BattlefieldLandingActivity"
             android:label="@string/title_activity_maps"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
+
+        <service android:name="org.eclipse.paho.android.service.MqttService"/>
+
     </application>
 
 </manifest>

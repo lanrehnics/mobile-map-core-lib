@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tripDetailsBottomSheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:background="@android:color/white"
+    android:fillViewport="true"
+    app:behavior_hideable="true"
+    app:behavior_peekHeight="200dp"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/bottomSheetHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="17dp"
+            android:paddingBottom="24dp">
+
+            <View
+                android:layout_width="50dp"
+                android:layout_height="4dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/anchor_bg_grey" />
+
+
+        </RelativeLayout>
+
+        <RadioGroup
+            android:id="@+id/toggleDetails"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_marginHorizontal="17dp"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/holo_bg"
+            android:checkedButton="@+id/setDisplayTripDetails"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/setDisplayTripDetails"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="1dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginBottom="1dp"
+                android:layout_weight="1"
+                android:background="@drawable/toggle_details_widget_background"
+                android:button="@null"
+                android:fontFamily="@font/avenir_regular"
+                android:gravity="center"
+                android:onClick="displayTripsDetails"
+                android:text="Trip detail"
+                android:textColor="@color/colorPrimaryText"
+                android:textFontWeight="800" />
+
+            <RadioButton
+                android:id="@+id/setDisplayTripEvents"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="1dp"
+                android:layout_marginRight="1dp"
+                android:layout_marginBottom="1dp"
+                android:layout_weight="1"
+                android:background="@drawable/toggle_details_widget_background"
+                android:button="@null"
+                android:checked="false"
+                android:fontFamily="@font/avenir_regular"
+                android:gravity="center"
+                android:onClick="displayTripsEvents"
+                android:text="Trip event"
+                android:textColor="@color/colorPrimaryText"
+                android:textFontWeight="800" />
+        </RadioGroup>
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/vpPagerActiveTripDetails"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:layout_marginHorizontal="17dp"
+            android:layout_marginTop="16dp"></androidx.viewpager.widget.ViewPager>
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

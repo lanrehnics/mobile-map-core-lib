@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.map.TrackActiveTrips">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/mainActiveTripsHome"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white">
+
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fitsSystemWindows="true"
+                android:theme="@style/AppTheme.AppBarOverlay"
+                app:elevation="0dp">
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="@android:color/white"
+                    app:layout_scrollFlags="scroll|enterAlways"
+                    app:popupTheme="@style/AppTheme.PopupOverlay"
+                    app:title="Dedicated trucks"
+                    app:titleTextAppearance="@style/TitleTextAppearance"
+                    app:titleTextColor="@color/colorPrimaryText" />
+            </com.google.android.material.appbar.AppBarLayout>
+
+<!--            <EditText-->
+<!--                android:id="@+id/etPickUpLocation"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="42dp"-->
+<!--                android:layout_below="@+id/appBar"-->
+<!--                android:layout_marginHorizontal="16dp"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:background="@drawable/search_bg"-->
+<!--                android:fontFamily="@font/avenir_regular"-->
+<!--                android:hint="Search trip"-->
+<!--                android:paddingLeft="13dp"-->
+<!--                android:textColor="@color/colorPrimaryText"-->
+<!--                android:textColorHint="@color/transparentColorPrimaryText"-->
+<!--                android:textSize="16sp" />-->
+
+
+            <com.todkars.shimmer.ShimmerRecyclerView
+                android:id="@+id/listShimmerDedicatedTrucks"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/appBar"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:shimmer_recycler_item_count="10"
+                app:shimmer_recycler_layout="@layout/item_filtered_avtive_trip_shimmer" />
+
+
+            <RelativeLayout
+                android:id="@+id/switchToMap"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="16dp">
+
+                <ImageView
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_centerInParent="true"
+                    android:onClick="openMapFragmentWithAllTrucks"
+                    android:src="@drawable/ic_fab_map" />
+
+
+                <ProgressBar
+                    android:id="@+id/pBar"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_centerInParent="true"
+                    android:indeterminateDrawable="@drawable/progress"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/switchToList"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginVertical="16dp"
+            android:onClick="switchToListFromMap"
+            android:src="@drawable/ic_floatingactionbtn"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+    <include layout="@layout/dedicated_truck_bottom_sheet" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

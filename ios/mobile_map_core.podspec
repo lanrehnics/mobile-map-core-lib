@@ -15,12 +15,8 @@ A new flutter plugin project.
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
-  s.dependency 'Pulley', '~> 2.5.0'
-  s.dependency 'Firebase/Core'
-  s.dependency 'Firebase/Firestore'
-  s.dependency 'GeoFire'
-  s.dependency 'GoogleMaps'
+  s.dependency 'BattleFieldIOS'
   s.static_framework = true
-  s.ios.deployment_target = '10.0'
+  s.ios.deployment_target = '11.0'
 end
 

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
+import 'package:mobile_map_core_example/LandingPage.dart';
+import 'package:mobile_map_core_example/LoginScreen.dart';
+import 'package:mobile_map_core_example/SessionManager.dart';
 
-import 'package:flutter/services.dart';
-import 'package:mobile_map_core/mobile_map_core.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-void main() => runApp(MyApp());
+  await SessionManager.init();
+
+  runApp(MyApp());
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -12,64 +17,15 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-  String stuff = "nvlkxjvl";
-
   @override
   void initState() {
     super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      platformVersion = await MobileMapCore.prepareMap;
-    } on PlatformException {
-      platformVersion = 'Failed to prepare map.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text('Running on: $_platformVersion\n'),
-
-              SizedBox(height: 50,),
-
-              RaisedButton(
-                onPressed: () async{
-                  MobileMapCore.loadMap({
-                    "token": "",
-                    "id": 0,
-                    "user_type": "squad",
-                  });
-                },
-                child: Text("Open map"),
-              )
-            ],
-          ),
-        )
-      ),
+      home: SessionManager.isLoggedIn ? LandingPageScreen() : LoginScreen(),
     );
   }
 }
