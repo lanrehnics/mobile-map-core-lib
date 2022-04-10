@@ -9,6 +9,7 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.Ava
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.DedicatedTruckResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.gsearch.GeneralSearchResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.OverviewResponse
+import com.kobo.mobile_map_core.mobile_map_core.data.models.notifications.NotificationsResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.orders.AvailableOrdersResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.place_id.PlacesResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.reverse_geocode.ReverseGeocodeResponse
@@ -26,4 +27,5 @@ interface ApiService {
     fun fetchDedicatedTruck(): Single<DedicatedTruckResponse>
     fun fetchLocationOverview(userTypeAndId: String, latLng: LatLng): Single<OverviewResponse>
     fun bookTruck(truckReg: String?): Single<BookTruckResponse>
+    fun fetchNotifications(): Single<NotificationsResponse>
 }

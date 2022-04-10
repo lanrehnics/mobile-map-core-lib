@@ -50,6 +50,10 @@ abstract class AppConfig {
             return "${getBaseUrl(context)}bookTruck/$truckRegistrationNumber"
         }
 
+        fun notifications(context: Context): String {
+            return "${getKoboBaseUrl(context)}notification/byQueries"
+        }
+
         fun groupedAssetClass(context: Context): String {
             return "${getKoboBaseUrl(context)}asset/grouped"
         }

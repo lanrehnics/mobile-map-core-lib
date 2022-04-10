@@ -10,6 +10,7 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.Ava
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.DedicatedTruckResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.gsearch.GeneralSearchResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.OverviewResponse
+import com.kobo.mobile_map_core.mobile_map_core.data.models.notifications.NotificationsResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.orders.AvailableOrdersResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.place_id.PlacesResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.reverse_geocode.ReverseGeocodeResponse
@@ -61,6 +62,10 @@ class MainRepository(private val apiHelper: ApiHelper) {
 
     fun bookTruck(truckReg: String?): Single<BookTruckResponse> {
         return apiHelper.bookTruck(truckReg)
+    }
+
+    fun fetchNotifications(): Single<NotificationsResponse> {
+        return apiHelper.fetchNotifications()
     }
 
 }

@@ -15,6 +15,7 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.available_trucks.Ava
 import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.DedicatedTruckResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.gsearch.GeneralSearchResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.OverviewResponse
+import com.kobo.mobile_map_core.mobile_map_core.data.models.notifications.NotificationsResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.orders.AvailableOrdersResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.place_id.PlacesResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.models.reverse_geocode.ReverseGeocodeResponse
@@ -204,6 +205,29 @@ class ApiServiceImpl(val context: Context) : ApiService {
                 val res = LiteHttp.instance?.put(AppConfig.bookTruck(context, truckReg
                         ?: ""), headers, null)
                 val result = Gson().fromJson(res.toString(), BookTruckResponse::class.java)
+                result
+            } catch (e: Exception) {
+                throw  e
+            }
+        }
+    }
+
+
+    override fun fetchNotifications(): Single<NotificationsResponse> {
+
+        return rxSingle {
+            try {
+                val headers: ArrayMap<String, String> = ArrayMap()
+                headers["Authorization"] = getToken()
+
+                val query: ArrayMap<String, Any>? = ArrayMap()
+                
+                query?.set("userType", "admin")
+                query?.set("tag", "TRIP_STATUS")
+                query?.set("key", "ACTION")
+
+                val res = LiteHttp.instance?.get(AppConfig.notifications(context), headers, query)
+                val result = Gson().fromJson(res.toString(), NotificationsResponse::class.java)
                 result
             } catch (e: Exception) {
                 throw  e

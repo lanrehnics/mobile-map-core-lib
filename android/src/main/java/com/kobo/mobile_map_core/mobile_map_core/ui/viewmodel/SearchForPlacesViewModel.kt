@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.kobo.mobile_map_core.mobile_map_core.data.models.autocomplete.AutoCompleteResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.repository.MainRepository
 import com.kobo.mobile_map_core.mobile_map_core.utils.Resource
+import com.kobo.mobile_map_core.mobile_map_core.utils.tweakEvent.SingleLiveEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -14,14 +15,12 @@ import timber.log.Timber
 
 class SearchForPlacesViewModel(private val mainRepository: MainRepository) : ViewModel() {
 
-    //    private val autoSuggestedPlaces = MutableLiveData<Resource<List<ActiveTrip>>>()
-    private val autoSuggestedPlaces = MutableLiveData<Resource<AutoCompleteResponse>>()
+    //    private val autoSuggestedPlaces = SingleLiveEvent<Resource<List<ActiveTrip>>>()
+    private val autoSuggestedPlaces = SingleLiveEvent<Resource<AutoCompleteResponse>>()
     private val compositeDisposable = CompositeDisposable()
 
 
     private fun fetchAutoCompletePlaces(searchTerms: String) {
-        Log.d(">>>>>>>>>>>>" ,"Getting Places which means getting places")
-        Log.d(">>>>>>>>>>>>" ,"$autoSuggestedPlaces")
         autoSuggestedPlaces.postValue(Resource.loading(null))
         compositeDisposable.add(
                 mainRepository.fetchPlacesByAutoComplete(searchTerms)

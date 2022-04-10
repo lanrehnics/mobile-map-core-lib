@@ -218,7 +218,7 @@ abstract class NewBaseMapActivity : AppCompatActivity(), OnMapReadyCallback, Goo
             // position on right bottom
             rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
             rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-            rlp.setMargins(0, 30, 60, 30)
+            rlp.setMargins(0, 190, 60, 30)
         }
     }
 

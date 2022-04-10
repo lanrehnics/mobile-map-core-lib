@@ -6,14 +6,15 @@ import androidx.lifecycle.ViewModel
 import com.kobo.mobile_map_core.mobile_map_core.data.models.gsearch.GeneralSearchResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.repository.MainRepository
 import com.kobo.mobile_map_core.mobile_map_core.utils.Resource
+import com.kobo.mobile_map_core.mobile_map_core.utils.tweakEvent.SingleLiveEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
 class GeneralSearchViewModel(private val mainRepository: MainRepository) : ViewModel() {
 
-    //    private val autoSuggestedPlaces = MutableLiveData<Resource<List<ActiveTrip>>>()
-    private val genSearch = MutableLiveData<Resource<GeneralSearchResponse>>()
+    //    private val autoSuggestedPlaces = SingleLiveEvent<Resource<List<ActiveTrip>>>()
+    private val genSearch = SingleLiveEvent<Resource<GeneralSearchResponse>>()
     private val compositeDisposable = CompositeDisposable()
 
 

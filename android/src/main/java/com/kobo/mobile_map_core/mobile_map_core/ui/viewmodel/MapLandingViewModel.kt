@@ -13,19 +13,20 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.place_id.PlacesRespo
 import com.kobo.mobile_map_core.mobile_map_core.data.models.reverse_geocode.ReverseGeocodeResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.repository.MainRepository
 import com.kobo.mobile_map_core.mobile_map_core.utils.Resource
+import com.kobo.mobile_map_core.mobile_map_core.utils.tweakEvent.SingleLiveEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
 class MapLandingViewModel(private val mainRepository: MainRepository) : ViewModel() {
 
-    private val groupedAssetClass = MutableLiveData<Resource<AssetClassResponse>>()
-    private val reverseGeoCode = MutableLiveData<Resource<ReverseGeocodeResponse>>()
-    private val availableTrucks = MutableLiveData<Resource<AvailableTruckResponse>>()
-    private val availableOrders = MutableLiveData<Resource<AvailableOrdersResponse>>()
-    private val latLngFromPlacesId = MutableLiveData<Resource<PlacesResponse>>()
-    private val locationOverview = MutableLiveData<Resource<OverviewResponse>>()
-    private val bookTruckResponse = MutableLiveData<Resource<BookTruckResponse>>()
+    private val groupedAssetClass = SingleLiveEvent<Resource<AssetClassResponse>>()
+    private val reverseGeoCode = SingleLiveEvent<Resource<ReverseGeocodeResponse>>()
+    private val availableTrucks = SingleLiveEvent<Resource<AvailableTruckResponse>>()
+    private val availableOrders = SingleLiveEvent<Resource<AvailableOrdersResponse>>()
+    private val latLngFromPlacesId = SingleLiveEvent<Resource<PlacesResponse>>()
+    private val locationOverview = SingleLiveEvent<Resource<OverviewResponse>>()
+    private val bookTruckResponse = SingleLiveEvent<Resource<BookTruckResponse>>()
     private val compositeDisposable = CompositeDisposable()
 
     init {

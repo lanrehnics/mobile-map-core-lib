@@ -30,6 +30,9 @@
             android:name=".ui.map.NavigationActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
+            android:name=".ui.map.NotificationsActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity
             android:name=".ui.map.DedicatedTruckActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
@@ -47,7 +50,6 @@
             android:name=".ui.map.BattlefieldLandingActivity"
             android:label="@string/title_activity_maps"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
-
         <service android:name="org.eclipse.paho.android.service.MqttService"/>
 
     </application>

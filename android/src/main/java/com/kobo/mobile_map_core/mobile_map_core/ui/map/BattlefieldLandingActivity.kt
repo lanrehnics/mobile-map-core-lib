@@ -289,7 +289,7 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
             // position on right bottom
             rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0)
             rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-            rlp.setMargins(0, 30, 60, 30)
+            rlp.setMargins(0, 190, 60, 30)
         }
     }
 
@@ -566,6 +566,10 @@ class BattlefieldLandingActivity : BaseMapActivity(), OnMapReadyCallback,
         generalSearch.setOnResultItemClickListener(this)
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.add(R.id.mainMapHome, generalSearch, "GeneralSearchFragment").addToBackStack("GeneralSearchFragment").commit()
+    }
+    
+    fun gotoNotifications(view: View) {
+        startActivity(Intent(this, NotificationsActivity::class.java))
     }
 
     fun closeSearchBottomSheet(view: View) {

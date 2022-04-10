@@ -15,5 +15,6 @@ class ApiHelper(private val apiService: ApiService) {
     fun placeId(placeId: String) = apiService.fetchLatLngFromPlacesId(placeId)
     fun fetchLocationOverview(userTypeAndId: String, latLng: LatLng) = apiService.fetchLocationOverview(userTypeAndId, latLng)
     fun bookTruck(truckReg: String?) = apiService.bookTruck(truckReg)
+    fun fetchNotifications() = apiService.fetchNotifications()
 
 }

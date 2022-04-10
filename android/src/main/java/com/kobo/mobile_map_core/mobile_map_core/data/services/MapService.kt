@@ -17,7 +17,7 @@ class MapService constructor(private val mContext: Context) {
 
     private val geoBaseUrl =
             "https://maps.googleapis.com/maps/api/directions/json?"
-//    private val googleMapApiKey: String = "AIzaSyCZsmroa6P94FfCXaWIlVd9PcVpVpQYdqs"
+//    private val googleMapApiKey: String = ""
 
 //    suspend fun getPolyline(origin: LatLng, destination: LatLng): List<LatLng> {
 //        var polyLineList: List<LatLng> = ArrayList()

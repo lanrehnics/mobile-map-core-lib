@@ -8,15 +8,16 @@ import com.kobo.mobile_map_core.mobile_map_core.data.models.dedicatedtrucks.Dedi
 import com.kobo.mobile_map_core.mobile_map_core.data.models.location_overview.OverviewResponse
 import com.kobo.mobile_map_core.mobile_map_core.data.repository.MainRepository
 import com.kobo.mobile_map_core.mobile_map_core.utils.Resource
+import com.kobo.mobile_map_core.mobile_map_core.utils.tweakEvent.SingleLiveEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
 class DedicatedTruckViewModel(private val mainRepository: MainRepository) : ViewModel() {
 
-    private val dedicatedTruckResponse = MutableLiveData<Resource<DedicatedTruckResponse>>()
+    private val dedicatedTruckResponse = SingleLiveEvent<Resource<DedicatedTruckResponse>>()
     private val compositeDisposable = CompositeDisposable()
-    private val locationOverview = MutableLiveData<Resource<OverviewResponse>>()
+    private val locationOverview = SingleLiveEvent<Resource<OverviewResponse>>()
 
 
 
